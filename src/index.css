@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap');
+
+:root {
+  --primary: #26A69A; /* Mint */
+  --primary-light: #B2DFDB;
+  --primary-dark: #00796B;
+  --secondary: #4E342E; /* Deep Brown */
+  --accent: #80CBC4;
+  --bg-primary: #FFFDF7;
+  --bg-secondary: #FFFFFF;
+  --body-text: #3E2723;
+  --muted-text: #6D4C41;
+  --white: #FFFFFF;
+  --shadow: 0 10px 30px rgba(62, 39, 35, 0.08);
+  --shadow-hover: 0 15px 40px rgba(62, 39, 35, 0.12);
+  --border-radius: 16px;
+  --transition: all 0.3s ease;
+
+  /* Rainbow points for 8-do representation */
+  --p1: #FF5252; --p2: #FFAD42; --p3: #F4FF81; --p4: #64FFDA;
+  --p5: #40C4FF; --p6: #7C4DFF; --p7: #E040FB; --p8: #FF4081;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--body-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  color: var(--body-text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Common Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+/* Badge Styles */
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.badge-safe { background: #E8F5E9; color: #2E7D32; }
+.badge-popular { background: #FFF3E0; color: #E65100; }
+.badge-special { background: #F3E5F5; color: #7B1FA2; }
+
+/* Modern Card Layout */
+.modern-card:hover .card-image-container {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.modern-card:hover h3 {
+  color: var(--primary);
+}
+
+.card-image-container {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+
+.card-image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05), transparent 30%);
+  pointer-events: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Popular Breeds Section */
+.breed-item {
+  transition: transform 0.3s ease;
+}
+
+.breed-item:hover {
+  transform: translateY(-5px);
+}
+
+.breed-item:hover .breed-icon-circle {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.breed-item:hover span {
+  color: var(--primary-dark);
+}
+
+.breed-icon-circle {
+  transition: var(--transition);
+}
+
+@media (max-width: 992px) {
+  .breed-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .breed-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .breed-icon-circle {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
+  }
+}

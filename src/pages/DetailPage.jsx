@@ -608,7 +608,7 @@ const DetailPage = () => {
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.85rem', color: '#888', gap: '5px' }}>
                 <span>관심 {engagement.likes}명</span>
-                <span>{"/"}</span>
+                <span>{" / "}</span>
                 <span>조회 {engagement.views}회</span>
               </div>
 
@@ -617,7 +617,7 @@ const DetailPage = () => {
               </div>
               <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
                 <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 10px', borderRadius: '15px', fontWeight: 'bold' }}>
-                  현재 분양중 {activeDogCount} {"/"} 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
+                  현재 분양중 {activeDogCount} {" / "} 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
                 </span>
               </div>
               <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '20px' }}>
@@ -709,6 +709,7 @@ const DetailPage = () => {
                   </div>
                 </div>
               </div>
+            </div>
 
           <div className="mobile-bottom-bar">
                <button 
@@ -832,7 +833,6 @@ const DetailPage = () => {
         </div>
       </div>
     </div>
-  </div>
   );
 };
 

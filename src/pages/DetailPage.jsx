@@ -2,6 +2,82 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
+// 영상 URL 렌더링 헬퍼 (IIFE 대신 독립 함수로 분리 - Rolldown 파서 버그 우회)
+function renderVideoEmbed(videoUrl) {
+  if (!videoUrl) return null;
+  const url = videoUrl;
+  const ytWatch = 'youtube.com' + '/watch';
+  const ytShort = 'youtu.be' + '/';
+  if (url.includes(ytWatch) || url.includes(ytShort)) {
+    let videoId = '';
+    if (url.includes(ytShort)) {
+      videoId = url.split(ytShort)[1].split('?')[0];
+    } else {
+      videoId = new URLSearchParams(url.split('?')[1]).get('v');
+    }
+    const embedSrc = 'https:' + '//' + 'www.youtube.com' + '/embed/' + videoId;
+    return (
+      <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px' }}>
+        <iframe
+          src={embedSrc}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="YouTube video"
+        />
+      </div>
+    );
+  }
+  const externalHref = url.startsWith('http') ? url : ('https:' + '//' + url);
+  return (
+    <a
+      href={externalHref}
+      target="_blank"
+      rel="noreferrer"
+      style={{ display: 'inline-block', padding: '12px 25px', backgroundColor: '#e1306c', color: 'white', fontWeight: 'bold', borderRadius: '8px', textDecoration: 'none' }}
+    >
+      인스타그램 {"&"} 영상 보러가기 👉
+    </a>
+  );
+}
+
+// 가격 표시 헬퍼
+function renderPrice(dog) {
+  const mainPrice = dog.price;
+  const origPrice = dog.original_price;
+  const formatP = (p) => {
+    if (p === 0 || p === '0' || p === '무료분양' || p === '0만원') return '무료분양';
+    if (typeof p === 'number') return p + '만원';
+    if (typeof p === 'string' && !p.includes('만원') && p !== '무료분양') return p + '만원';
+    return p;
+  };
+  const formattedMain = formatP(mainPrice);
+  if (origPrice && mainPrice && origPrice > mainPrice && mainPrice !== 0 && mainPrice !== '무료분양') {
+    const discountRate = Math.round(((origPrice - mainPrice) / origPrice) * 100);
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
+          <span style={{ fontSize: '1.1rem', color: '#FF4757', fontWeight: '800' }}>{discountRate}% 할인</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '2rem' }}>{formattedMain}</span>
+          {dog.is_negotiable && <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', fontWeight: 'bold' }}>협의가능</span>}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      {formattedMain}
+      {dog.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
+        <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', marginLeft: '10px', fontWeight: 'bold' }}>협의가능</span>
+      )}
+    </div>
+  );
+}
+
 const DetailPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -417,7 +493,7 @@ const DetailPage = () => {
               <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '500px', aspectRatio: '4/3', objectFit: 'cover' }} />
             </div>
 
-            {/* 안내 문구 추가 */}
+            
             <div style={{ 
               marginBottom: '20px', 
               padding: '15px', 
@@ -431,7 +507,7 @@ const DetailPage = () => {
               문의하실 때는 <b style={{ color: 'var(--primary)' }}>'팔도댕댕에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
             </div>
             
-            {/* 썸네일 갤러리 */}
+            
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', overflowX: 'auto', paddingBottom: '10px' }}>
                 {allImages.map((img, idx) => (
@@ -457,48 +533,16 @@ const DetailPage = () => {
                 {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
               
-              {/* 동영상/인스타 링크 표출 영역 */}
+              
               {dog.video_url && (
                 <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'var(--primary-dark)' }}>🎥 생생한 영상 확인</h3>
-                  {(() => {
-                    const url = dog.video_url;
-                    // 유튜브 링크일 경우 임베드 플레이어 표시
-                    if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
-                      let videoId = '';
-                      if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
-                      else videoId = new URLSearchParams(url.split('?')[1]).get('v');
-                      
-                      return (
-                        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px' }}>
-                          <iframe 
-                            src={`https://www.youtube.com/embed/${videoId}`} 
-                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                            frameBorder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowFullScreen
-                            title="YouTube video"
-                          />
-                        </div>
-                      );
-                    }
-                    // 유튜브가 아닐 경우 외부 링크 버튼으로 표시 (인스타 등)
-                    return (
-                      <a 
-                        href={url.startsWith('http') ? url : `https://${url}`} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        style={{ display: 'inline-block', padding: '12px 25px', backgroundColor: '#e1306c', color: 'white', fontWeight: 'bold', borderRadius: '8px', textDecoration: 'none' }}
-                      >
-                        인스타그램 / 영상 보러가기 👉
-                      </a>
-                    );
-                  })()}
+                  {renderVideoEmbed(dog.video_url)}
                 </div>
               )}
             </div>
 
-            {/* 판매자 신뢰 평가 */}
+            
             <div className="glass-card" style={{ padding: '30px' }}>
               <h2 style={{ marginBottom: '25px' }}>판매자 신뢰 평가</h2>
               <div className="info-grid-2">
@@ -518,7 +562,7 @@ const DetailPage = () => {
                 <div className="info-grid-child-border">
                   <h4 style={{ marginBottom: '15px' }}>최근 리뷰</h4>
                   <div style={{ fontSize: '0.9rem', color: '#666' }}>최근 등록된 리뷰가 {totalReviews}건 있습니다.</div>
-                  {/* 최근 3개 후기 노출 */}
+                  
                   <div style={{ marginTop: '15px' }}>
                     {storeReviews.slice(-3).reverse().map((r, idx) => (
                       <div key={idx} style={{ marginBottom: '15px', fontSize: '0.85rem' }}>
@@ -561,7 +605,7 @@ const DetailPage = () => {
                 </button>
               </div>
               
-              {/* 관심 및 조회수 표시 영역 추가 */}
+              
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.85rem', color: '#888', gap: '5px' }}>
                 <span>관심 {engagement.likes}명</span>
                 <span>/</span>
@@ -577,46 +621,7 @@ const DetailPage = () => {
                 </span>
               </div>
               <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '20px' }}>
-                {(() => {
-                  const mainPrice = dog.price;
-                  const origPrice = dog.original_price;
-                  
-                  // 가격 텍스트 생성 유틸
-                  const formatP = (p) => {
-                    if (p === 0 || p === '0' || p === '무료분양' || p === '0만원') return '무료분양';
-                    if (typeof p === 'number') return `${p}만원`;
-                    if (typeof p === 'string' && !p.includes('만원') && p !== '무료분양') return `${p}만원`;
-                    return p;
-                  };
-
-                  const formattedMain = formatP(mainPrice);
-
-                  // 할인가격과 최초가격이 모두 있는 경우
-                  if (origPrice && mainPrice && origPrice > mainPrice && mainPrice !== 0 && mainPrice !== '무료분양') {
-                    const discountRate = Math.round(((origPrice - mainPrice) / origPrice) * 100);
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '1rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
-                            <span style={{ fontSize: '1.1rem', color: '#FF4757', fontWeight: '800' }}>{discountRate}% 할인</span>
-                         </div>
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '2rem' }}>{formattedMain}</span>
-                            {dog.is_negotiable && <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', fontWeight: 'bold' }}>협의가능</span>}
-                         </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {formattedMain}
-                      {dog.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
-                        <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', marginLeft: '10px', verticalAlign: 'middle', fontWeight: 'bold' }}>협의가능</span>
-                      )}
-                    </div>
-                  );
-                })()}
+                {renderPrice(dog)}
               </div>
               
               <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', display: 'grid', gap: '12px', fontSize: '0.95rem' }}>
@@ -630,11 +635,11 @@ const DetailPage = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>생일 / 개월</span>
-                  <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} / {dog.age}</span>
+                  <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} {" / "} {dog.age}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>성별 / 접종</span>
-                  <span>{dog.gender} / {dog.vaccination || '미등록'}</span>
+                  <span>{dog.gender} {" / "} {dog.vaccination || '미등록'}</span>
                 </div>
                 {sellerInfo && (
                   <>
@@ -703,10 +708,9 @@ const DetailPage = () => {
                   )}
                 </div>
               </div>
-            </div> {/* detail-sidebar & glass-card 닫기 */}
-          </div> {/* detail-main-grid 닫기 */}
+            </div>
+          </div>
 
-          {/* 모바일 하단 고정 바 */}
           <div className="mobile-bottom-bar">
                <button 
                  onClick={() => {
@@ -723,7 +727,7 @@ const DetailPage = () => {
                </button>
             </div>
 
-            {/* 신고 모달창 */}
+            
             {showReportModal && currentUser?.id !== dog?.seller_id && (
               <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
@@ -766,7 +770,7 @@ const DetailPage = () => {
               <div className="fade-in" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#fdfdfd', border: '1px solid #eee', borderRadius: '12px' }}>
                 <h4 style={{ marginBottom: '15px', color: 'var(--primary-dark)', fontSize: '1.1rem' }}>리뷰 작성하기</h4>
                 
-                {/* 별점 */}
+                
                 <div style={{ marginBottom: '15px' }}>
                   <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '8px' }}>평점 선택</div>
                   <div style={{ display: 'flex', gap: '5px' }}>
@@ -782,7 +786,7 @@ const DetailPage = () => {
                   </div>
                 </div>
 
-                {/* 추천 태그 */}
+                
                 <div style={{ marginBottom: '15px' }}>
                   <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '8px' }}>이 매장의 좋았던 점 (다중선택 가능)</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -803,10 +807,10 @@ const DetailPage = () => {
                   </div>
                 </div>
 
-                {/* 텍스트 리뷰 */}
+                
                 <div style={{ marginBottom: '15px' }}>
                   <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '8px' }}>
-                     상세 후기 <span style={{ fontSize: '0.8rem', float: 'right' }}>{reviewData.content.length} / 200자</span>
+                     상세 후기 <span style={{ fontSize: '0.8rem', float: 'right' }}>{reviewData.content.length} {" / "} 200자</span>
                   </div>
                   <textarea 
                     placeholder="매장 방문이나 상담 후기를 자유롭게 적어주세요!" 
@@ -826,8 +830,9 @@ const DetailPage = () => {
                 </button>
               </div>
             )}
-          </div> {/* container 닫기 */}
-        </div> {/* fade-in 닫기 */}
+        </div>
+      </div>
+    </div>
   );
 };
 

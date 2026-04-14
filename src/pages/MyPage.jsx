@@ -533,13 +533,62 @@ const MyPage = () => {
     display: 'flex', alignItems: 'center', gap: '10px'
   });
 
+  // 모바일 탭 네비게이션용 메뉴 목록
+  const navItems = [
+    { id: 'dashboard', label: '🏠 대시보드' },
+    ...(isSeller ? [
+      { id: 'upload', label: '➕ 분양등록', action: () => navigate('/upload') },
+      { id: 'posts', label: '🐶 게시물' },
+      { id: 'store', label: '🏪 스토어' },
+      { id: 'ads', label: '📢 광고' },
+      { id: 'stats', label: '📊 통계' },
+    ] : []),
+    { id: 'chats', label: '💬 팔톡' },
+    { id: 'bookmarks', label: '💝 관심아이' },
+    { id: 'notifications', label: '🔔 알림' },
+  ];
+
   return (
     <div className="container" style={{ padding: '60px 0' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 3fr', gap: '30px' }}>
+
+        {/* ── 모바일 프로필 + 탭 네비게이션 ── */}
+        <div className="mypage-profile-card glass-card" style={{ marginBottom: '15px', padding: '20px', textAlign: 'center' }}>
+          {profile?.profile_image
+            ? <img src={profile.profile_image} alt="프사" style={{ width: '55px', height: '55px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+            : <div style={{ width: '55px', height: '55px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', flexShrink: 0 }}>🐶</div>
+          }
+          <div>
+            <div style={{ fontWeight: '800', fontSize: '1rem' }}>{profile?.nickname}</div>
+            <div style={{ color: '#999', fontSize: '0.75rem' }}>{session?.user?.email}</div>
+            {isSeller && <span style={{ display: 'inline-block', marginTop: '4px', padding: '2px 8px', backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold' }}>⭐ 인증 사업자</span>}
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+            <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>⚙️</button>
+            <button onClick={() => supabase.auth.signOut().then(() => navigate('/'))} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
+          </div>
+        </div>
+
+        {/* 모바일 가로 스크롤 탭 */}
+        <div className="mypage-mobile-nav">
+          {navItems.map(item => (
+            <button
+              key={item.id}
+              className={`mypage-nav-chip${activeTab === item.id ? ' active' : ''}`}
+              onClick={() => {
+                if (item.action) item.action();
+                else setActiveTab(item.id);
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mypage-layout">
           
-          {/* 사이드바 */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* ── 데스크탑 사이드바 ── */}
+          <aside className="mypage-desktop-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="glass-card" style={{ padding: '30px' }}>
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 {profile?.profile_image ? (
@@ -585,9 +634,9 @@ const MyPage = () => {
             </div>
           </aside>
 
-          {/* 메인 콘텐츠 영역 */}
+          {/* ── 메인 콘텐츠 영역 ── */}
           <main>
-            <div className="glass-card" style={{ padding: '40px', minHeight: '700px' }}>
+            <div className="glass-card mypage-main-card" style={{ padding: '40px', minHeight: '700px' }}>
               
               {/* === 프로필 편집 화면 === */}
               {isEditingProfile && (
@@ -614,7 +663,7 @@ const MyPage = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-grid-2">
                     <div>
                       <label style={labelStyle}>닉네임</label>
                       <input value={nickname} onChange={e => setNickname(e.target.value)} style={inputStyle}/>
@@ -702,8 +751,9 @@ const MyPage = () => {
                     <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>게시물 관리</h2>
                     <button onClick={() => navigate('/upload')} style={miniBtnStyle}>+ 새 분양등록</button>
                   </div>
-                  
-                  <div style={{ overflowX: 'auto' }}>
+
+                  {/* 데스크탑 테이블 */}
+                  <div className="post-table-wrap" style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #eee' }}>
@@ -746,6 +796,26 @@ const MyPage = () => {
                     </table>
                     {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
                   </div>
+
+                  {/* 모바일 카드 리스트 */}
+                  <div className="post-card-list">
+                    {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
+                    {myDogs.map(dog => (
+                      <div key={dog.id} className="post-mobile-card">
+                        <img src={dog.image_url} alt="dog" style={{ width: '72px', height: '72px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>{dog.nickname} ({dog.gender}) · {dog.region} · <b style={{ color: 'var(--primary-dark)' }}>{dog.price === 0 ? '무료' : dog.price + '만원'}</b></div>
+                          <div style={{ fontSize: '0.8rem', color: '#888' }}>👀 {dogStats[dog.id]?.views || 0}  💝 {dogStats[dog.id]?.likes || 0}</div>
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
+                            <button onClick={() => handleCompleteAdoption(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>💖 분양완료</button>
+                            <button onClick={() => handleEditPost(dog)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#eee', color: '#333', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>✏️ 수정</button>
+                            <button onClick={() => handleDeletePost(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#ff6b6b', color: 'white', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>🗑️ 삭제</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -770,7 +840,7 @@ const MyPage = () => {
                       }} style={inputStyle} />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                    <div className="form-grid-2" style={{ marginBottom: '20px' }}>
                       <div>
                         <label style={labelStyle}>상호명 (자동 연동)</label>
                         <input value={businessApp?.business_name || '등록된 상호명 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
@@ -851,8 +921,9 @@ const MyPage = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>광고 관리</h2>
                   </div>
-                  
-                  <div style={{ overflowX: 'auto', marginBottom: '40px' }}>
+
+                  {/* 데스크탑 테이블 */}
+                  <div className="post-table-wrap" style={{ overflowX: 'auto', marginBottom: '40px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #eee' }}>
@@ -881,6 +952,21 @@ const MyPage = () => {
                       </tbody>
                     </table>
                     {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
+                  </div>
+
+                  {/* 모바일 카드 리스트 (광고) */}
+                  <div className="post-card-list" style={{ marginBottom: '30px' }}>
+                    {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
+                    {myDogs.map(dog => (
+                      <div key={dog.id} className="post-mobile-card">
+                        <img src={dog.image_url} alt="dog" style={{ width: '72px', height: '72px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '10px' }}>{dog.nickname} · {dog.region}</div>
+                          <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>보유 쿠폰 목록</h3>
@@ -916,7 +1002,7 @@ const MyPage = () => {
               {activeTab === 'stats' && isSeller && (
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px' }}>통계 확인</h2>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) minmax(300px, 1fr)', gap: '30px' }}>
+                  <div className="stats-grid">
                     <div className="glass-card" style={{ padding: '20px' }}>
                       <h3 style={{ fontSize: '1.1rem', marginBottom: '20px' }}>최근 7일 조회수 트렌드</h3>
                       <div style={{ height: '250px' }}>
@@ -953,9 +1039,9 @@ const MyPage = () => {
               )}
 
               {activeTab === 'chats' && (
-                <div className="fade-in" style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: '20px', height: '700px', backgroundColor: 'white', borderRadius: '20px', border: '1px solid #eee', overflow: 'hidden' }}>
+                <div className={`fade-in chat-layout${selectedRoom ? ' room-open' : ''}`}>
                   {/* 좌측: 대화 목록 */}
-                  <div style={{ borderRight: '1px solid #eee', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div className="chat-room-panel">
                     <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
                       <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>팔톡 대화목록</h3>
                     </div>
@@ -1037,7 +1123,7 @@ const MyPage = () => {
                   </div>
 
                   {/* 우측: 대화 세부 창 */}
-                  <div style={{ height: '100%', backgroundColor: '#fcfcfc', position: 'relative' }}>
+                  <div className="chat-detail-panel">
                     {selectedRoom ? (
                       <ChatWindow 
                         room={selectedRoom} 
@@ -1105,7 +1191,7 @@ const MyPage = () => {
 
             </div>
           </main>
-        </div>
+        </div> {/* mypage-layout */}
       </div>
 
       {isApplyModalOpen && <BusinessApplyModal userId={session.user.id} onClose={() => setIsApplyModalOpen(false)} onSuccess={setBusinessApp} />}

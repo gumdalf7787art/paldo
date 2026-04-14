@@ -111,15 +111,18 @@ const Card = ({ type, data, badgeText }) => {
         }}>
           <div style={{ 
             display: 'flex', 
+            flexWrap: 'wrap',
             alignItems: 'center', 
-            gap: '8px', 
-            fontSize: '0.85rem', 
+            gap: '4px 8px', 
+            fontSize: 'min(0.85rem, 3.5vw)', 
             color: 'var(--muted-text)',
-            fontWeight: '500'
+            fontWeight: '500',
+            flex: 1,
+            overflow: 'hidden'
           }}>
-            <span>{data.breed}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{data.breed}</span>
             <span style={{ width: '1px', height: '10px', backgroundColor: '#eee' }}></span>
-            <span>{data.region}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{data.region}</span>
           </div>
           
           <button 
@@ -127,22 +130,22 @@ const Card = ({ type, data, badgeText }) => {
             style={{ 
               background: 'none', 
               border: 'none', 
-              fontSize: '0.8rem', 
+              fontSize: 'min(0.8rem, 3vw)', 
               padding: '0', 
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
+              gap: '2px',
               cursor: 'pointer',
               transition: 'all 0.2s',
               color: isLiked ? '#ff4757' : '#999',
               fontWeight: '600',
-              whiteSpace: 'nowrap'
+              flexShrink: 0
             }}
             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             <span>{isLiked ? '❤️' : '🤍'}</span>
-            <span>{isLiked ? '관심중' : '관심등록'}</span>
+            <span style={{ display: 'inline-block' }}>{isLiked ? '관심중' : '관심등록'}</span>
           </button>
         </div>
 

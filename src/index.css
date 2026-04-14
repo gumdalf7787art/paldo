@@ -64,6 +64,13 @@ ul {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
 }
 
 .glass-card {
@@ -72,6 +79,28 @@ ul {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+}
+
+/* Response Grid Classes */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid-2 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 992px) {
+  .responsive-grid-2 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .responsive-grid-2 { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px;
+  }
 }
 
 /* Animations */
@@ -92,6 +121,7 @@ ul {
   font-weight: 700;
   text-transform: uppercase;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .badge-safe { background: #E8F5E9; color: #2E7D32; }
@@ -179,3 +209,94 @@ ul {
     font-size: 1.5rem !important;
   }
 }
+
+/* Utility for text truncation */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Logo Responsive */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo-circle {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.logo-text {
+  font-size: 2.2rem;
+  margin: 0;
+  color: #4E342E;
+  letter-spacing: -2px;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .logo-container {
+    gap: 8px;
+  }
+  .logo-circle {
+    width: 45px;
+    height: 45px;
+  }
+  .logo-text {
+    font-size: 1.5rem;
+    letter-spacing: -1px;
+  }
+}
+
+/* Header Responsive */
+.header-responsive {
+  transition: var(--transition);
+}
+
+@media (max-width: 600px) {
+  .header-content {
+    height: 70px !important;
+  }
+  .nav-group {
+    gap: 8px !important;
+  }
+  .nav-link {
+    font-size: 0.8rem !important;
+  }
+  .nav-btn {
+    padding: 8px 15px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-btn {
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Mobile Helpers */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .mobile-only {
+    display: block;
+  }
+}
+

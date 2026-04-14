@@ -127,17 +127,17 @@ const Header = () => {
 
   return (
     <>
-      <header className="fade-in" style={{
-        width: '100%', padding: '20px 0', borderBottom: '1px solid rgba(0,0,0,0.05)',
+      <header className="fade-in header-responsive" style={{
+        width: '100%', borderBottom: '1px solid rgba(0,0,0,0.05)',
         backgroundColor: 'var(--bg-secondary)', position: 'sticky', top: 0, zIndex: 1000
       }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="container header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '80px' }}>
           <Link to="/"><Logo /></Link>
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             {!session ? (
               <>
-                <Link to="/login" style={navLinkStyle}>로그인</Link>
-                <Link to="/signup" style={navBtnStyle}>회원가입</Link>
+                <Link to="/login" style={navLinkStyle} className="nav-link">로그인</Link>
+                <Link to="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
               </>
             ) : (
               <>

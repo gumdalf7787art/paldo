@@ -49,7 +49,7 @@ const AnalyticsTracker = () => {
 
 const BrandIntro = () => (
   <section className="fade-in" style={{ 
-    padding: '40px 0 30px', 
+    padding: 'min(40px, 8vw) 0 min(30px, 6vw)', 
     textAlign: 'center', 
     background: 'linear-gradient(to bottom, #fff, var(--bg-primary))',
     borderBottom: '1px solid #f0f0f0'
@@ -61,7 +61,7 @@ const BrandIntro = () => (
         backgroundColor: 'var(--primary-light)', 
         color: 'var(--primary-dark)', 
         borderRadius: '30px', 
-        fontSize: '0.75rem', 
+        fontSize: 'min(0.75rem, 3.5vw)', 
         fontWeight: '800',
         marginBottom: '12px',
         boxShadow: '0 2px 5px rgba(38, 166, 154, 0.1)'
@@ -69,22 +69,23 @@ const BrandIntro = () => (
         ✨ CLEAN ADOPTION
       </div>
       <h1 style={{ 
-        fontSize: '2rem', 
+        fontSize: 'min(2rem, 8vw)', 
         fontWeight: '800', 
         marginBottom: '8px', 
         lineHeight: '1.2',
-        color: 'var(--body-text)'
+        color: 'var(--body-text)',
+        wordBreak: 'keep-all'
       }}>
         허위 매물 없는 <span style={{ color: 'var(--primary)' }}>클린 분양</span>
       </h1>
       <p style={{ 
-        fontSize: '1rem', 
+        fontSize: 'min(1rem, 4vw)', 
         color: 'var(--muted-text)', 
         fontWeight: '500', 
         maxWidth: '600px', 
         margin: '0 auto' 
       }}>
-        안심하고 새로운 가족을 만나보세요. <b>팔도댕댕은 검증된 사업자만 함께합니다.</b>
+        안심하고 새로운 가족을 만나보세요. <br className="mobile-only" /><b>팔도댕댕은 검증된 사업자만 함께합니다.</b>
       </p>
     </div>
   </section>

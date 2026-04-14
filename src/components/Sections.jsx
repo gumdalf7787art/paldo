@@ -95,7 +95,7 @@ const HeroCarousel = () => {
   return (
     <section style={{ padding: '20px 0', position: 'relative' }}>
       <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+        <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
           {visibleAds.map((ad, i) => (
             <Card key={`${currentIndex}-${i}`} type="large" data={ad} />
           ))}
@@ -146,21 +146,21 @@ const AdSections = () => {
       <div className="container">
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="안심 분양" sub="검증된 매장의 강아지들" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px' }}>
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
             {safeDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="안심" data={dog} />)}
           </div>
         </div>
 
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="인기 분양" sub="지금 가장 사랑받고 있어요" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px' }}>
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
             {popularDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="인기" data={dog} />)}
           </div>
         </div>
 
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="스페셜 분양" sub="팔도댕댕이 추천하는 특별한 아이들" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px' }}>
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
             {specialDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="스페셜" data={dog} />)}
           </div>
         </div>
@@ -191,7 +191,7 @@ const AdoptionList = () => {
     <section style={{ padding: '60px 0', backgroundColor: '#f9f9f9' }}>
       <div className="container">
         <SectionTitle title="분양 리스트" sub="전국의 모든 분양 정보를 확인하세요" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '15px' }}>
+        <div className="responsive-grid-2">
           {loading ? (
              <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>리스트를 불러오는 중입니다...</p>
           ) : dogs.length === 0 ? (

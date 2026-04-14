@@ -89,19 +89,57 @@ ul {
 }
 
 @media (max-width: 1200px) {
-  .responsive-grid-2 { grid-template-columns: repeat(4, 1fr); }
+  .responsive-grid-2 { grid-template-columns: repeat(4, 1fr) !important; }
 }
 
 @media (max-width: 992px) {
-  .responsive-grid-2 { grid-template-columns: repeat(3, 1fr); }
+  .responsive-grid-2 { grid-template-columns: repeat(3, 1fr) !important; }
 }
 
 @media (max-width: 600px) {
   .responsive-grid-2 { 
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, 1fr) !important; 
     gap: 12px;
   }
 }
+
+/* Section Title Styles */
+.section-title-wrap {
+  margin-bottom: 25px;
+  display: flex;
+  align-items: baseline;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.section-title-wrap h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.section-title-wrap span {
+  color: var(--muted-text);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .section-title-wrap {
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  .section-title-wrap h2 {
+    font-size: 1.4rem;
+  }
+  .section-title-wrap span {
+    font-size: 0.85rem;
+    width: 100%;
+    margin-top: -2px;
+  }
+}
+
 
 /* Animations */
 @keyframes fadeIn {

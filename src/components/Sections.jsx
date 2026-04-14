@@ -117,9 +117,9 @@ const HeroCarousel = () => {
 };
 
 const SectionTitle = ({ title, sub }) => (
-  <div style={{ marginBottom: '25px', display: 'flex', alignItems: 'baseline', gap: '15px' }}>
-    <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>{title}</h2>
-    <span style={{ color: 'var(--muted-text)', fontSize: '1rem' }}>{sub}</span>
+  <div className="section-title-wrap">
+    <h2>{title}</h2>
+    <span>{sub}</span>
   </div>
 );
 
@@ -127,12 +127,17 @@ const AdSections = () => {
   const [safeDogs, setSafeDogs] = useState([]);
   const [popularDogs, setPopularDogs] = useState([]);
   const [specialDogs, setSpecialDogs] = useState([]);
+  
+  const [safeIdx, setSafeIdx] = useState(0);
+  const [popularIdx, setPopularIdx] = useState(0);
+  const [specialIdx, setSpecialIdx] = useState(0);
 
   useEffect(() => {
     const loadAdSections = async () => {
-      const safe = await fetchAdsAndFill('safe', 5, '안심');
-      const popular = await fetchAdsAndFill('popular', 5, '인기');
-      const special = await fetchAdsAndFill('special', 5, '스페셜');
+      // 로테이션을 위해 넉넉히 12개씩 로드 (4의 배수)
+      const safe = await fetchAdsAndFill('safe', 12, '안심');
+      const popular = await fetchAdsAndFill('popular', 12, '인기');
+      const special = await fetchAdsAndFill('special', 12, '스페셜');
       
       setSafeDogs(safe);
       setPopularDogs(popular);
@@ -141,27 +146,54 @@ const AdSections = () => {
     loadAdSections();
   }, []);
 
+  // 자동 로테이션 타이머 (5초마다 4개씩 이동)
+  useEffect(() => {
+    if (safeDogs.length === 0) return;
+    const timer = setInterval(() => {
+      setSafeIdx(prev => (prev + 4) % safeDogs.length);
+      setPopularIdx(prev => (prev + 4) % popularDogs.length);
+      setSpecialIdx(prev => (prev + 4) % specialDogs.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [safeDogs.length, popularDogs.length, specialDogs.length]);
+
+  const getVisibleItems = (items, idx) => {
+    if (items.length === 0) return [];
+    return [
+      items[idx % items.length],
+      items[(idx + 1) % items.length],
+      items[(idx + 2) % items.length],
+      items[(idx + 3) % items.length]
+    ].filter(Boolean);
+  };
+
   return (
     <section style={{ padding: '60px 0' }}>
       <div className="container">
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="안심 분양" sub="검증된 매장의 강아지들" />
-          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-            {safeDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="안심" data={dog} />)}
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            {getVisibleItems(safeDogs, safeIdx).map((dog, i) => (
+              <Card key={`safe-${safeIdx}-${i}`} type="middle" badgeText="안심" data={dog} />
+            ))}
           </div>
         </div>
 
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="인기 분양" sub="지금 가장 사랑받고 있어요" />
-          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-            {popularDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="인기" data={dog} />)}
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            {getVisibleItems(popularDogs, popularIdx).map((dog, i) => (
+              <Card key={`pop-${popularIdx}-${i}`} type="middle" badgeText="인기" data={dog} />
+            ))}
           </div>
         </div>
 
         <div style={{ marginBottom: '60px' }}>
           <SectionTitle title="스페셜 분양" sub="팔도댕댕이 추천하는 특별한 아이들" />
-          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-            {specialDogs.map((dog) => <Card key={dog.id} type="middle" badgeText="스페셜" data={dog} />)}
+          <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            {getVisibleItems(specialDogs, specialIdx).map((dog, i) => (
+              <Card key={`spec-${specialIdx}-${i}`} type="middle" badgeText="스페셜" data={dog} />
+            ))}
           </div>
         </div>
       </div>

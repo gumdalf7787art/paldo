@@ -608,7 +608,7 @@ const DetailPage = () => {
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.85rem', color: '#888', gap: '5px' }}>
                 <span>관심 {engagement.likes}명</span>
-                <span>/</span>
+                <span>{"/"}</span>
                 <span>조회 {engagement.views}회</span>
               </div>
 
@@ -634,11 +634,11 @@ const DetailPage = () => {
                   <span>{dog.region}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>생일 / 개월</span>
+                  <span style={{ color: 'var(--muted-text)' }}>생일 {" / "} 개월</span>
                   <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} {" / "} {dog.age}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>성별 / 접종</span>
+                  <span style={{ color: 'var(--muted-text)' }}>성별 {" / "} 접종</span>
                   <span>{dog.gender} {" / "} {dog.vaccination || '미등록'}</span>
                 </div>
                 {sellerInfo && (
@@ -706,10 +706,9 @@ const DetailPage = () => {
                       </div>
                     </>
                   )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
           <div className="mobile-bottom-bar">
                <button 
@@ -732,7 +731,7 @@ const DetailPage = () => {
               <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
                   <h3 style={{ marginBottom: '20px', color: '#e63946' }}>🚨 허위매물/문제 게시물 신고</h3>
-                  <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>신고 사유를 선택하시고 제출해주세요. <br/>허위 신고 시 이용에 제한이 있을 수 있습니다.</p>
+                  <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>신고 사유를 선택하시고 제출해주세요. <br />허위 신고 시 이용에 제한이 있을 수 있습니다.</p>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
                     {reportReasons.map(r => (
@@ -832,6 +831,8 @@ const DetailPage = () => {
             )}
         </div>
       </div>
+    </div>
+  </div>
   );
 };
 

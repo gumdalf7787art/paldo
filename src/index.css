@@ -104,6 +104,23 @@ ul {
   }
 }
 
+.responsive-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid-4 { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+@media (max-width: 768px) {
+  .responsive-grid-4 { 
+    grid-template-columns: repeat(2, 1fr) !important; 
+    gap: 15px;
+  }
+}
+
 /* Section Title Styles */
 .section-title-wrap {
   margin-bottom: 25px;

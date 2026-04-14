@@ -131,9 +131,13 @@ function App() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h2 style={{ color: 'white', marginBottom: '10px' }}>팔도댕댕</h2>
-                <p>© 2024 Paldo Dang-Dang. All rights reserved.</p>
+                <div style={{ fontSize: '13px', lineHeight: '1.6', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
+                  블루프라임 &nbsp;&nbsp; 대표 : 김덕규 &nbsp;&nbsp; 사업자등록번호 : 153-87-03544<br />
+                  이메일 : goodduck2@naver.com
+                </div>
+                <p style={{ fontSize: '12px' }}>© 2024 Paldo Dang-Dang. All rights reserved.</p>
               </div>
-              <div style={{ display: 'flex', gap: '30px' }}>
+              <div style={{ display: 'flex', gap: '30px', fontSize: '14px' }}>
                 <span>개인정보처리방침</span>
                 <span>이용약관</span>
                 <span>사업자정보확인</span>

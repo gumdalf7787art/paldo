@@ -106,11 +106,7 @@ const BreedPage = () => {
               <h2 style={{ fontSize: '1.4rem', fontWeight: '800' }}>추천 {breedName}</h2>
               <span style={{ fontSize: '0.75rem', padding: '2px 8px', backgroundColor: '#fff3e0', color: '#e65100', borderRadius: '4px', fontWeight: 'bold' }}>AD</span>
             </div>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(4, 1fr)', 
-              gap: '24px' 
-            }}>
+            <div className="responsive-grid-4">
               {adDogs.map(dog => (
                 <Card key={dog.id} type="large" data={dog} badgeText="추천" />
               ))}
@@ -126,11 +122,7 @@ const BreedPage = () => {
               <p style={{ color: '#999' }}>현재 등록된 {breedName} 분양 게시물이 없습니다.</p>
             </div>
           ) : (
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(6, 1fr)', 
-              gap: '15px' 
-            }}>
+            <div className="responsive-grid-2">
               {regularDogs.map(dog => (
                 <Card key={dog.id} type="small" data={dog} />
               ))}

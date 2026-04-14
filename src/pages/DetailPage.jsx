@@ -617,7 +617,7 @@ const DetailPage = () => {
               </div>
               <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
                 <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 10px', borderRadius: '15px', fontWeight: 'bold' }}>
-                  현재 분양중 {activeDogCount} / 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
+                  현재 분양중 {activeDogCount} {"/"} 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
                 </span>
               </div>
               <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '20px' }}>
@@ -832,7 +832,6 @@ const DetailPage = () => {
             )}
         </div>
       </div>
-    </div>
   );
 };
 

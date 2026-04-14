@@ -411,10 +411,10 @@ const DetailPage = () => {
            홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '40px' }}>
+        <div className="detail-main-grid">
           <div>
             <div style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', marginBottom: '15px', boxShadow: 'var(--shadow)' }}>
-              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: '500px', objectFit: 'cover' }} />
+              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '500px', aspectRatio: '4/3', objectFit: 'cover' }} />
             </div>
 
             {/* 안내 문구 추가 */}
@@ -501,7 +501,7 @@ const DetailPage = () => {
             {/* 판매자 신뢰 평가 */}
             <div className="glass-card" style={{ padding: '30px' }}>
               <h2 style={{ marginBottom: '25px' }}>판매자 신뢰 평가</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+              <div className="info-grid-2">
                 <div>
                   {reviewStats.map((stat, i) => (
                     <div key={i} style={{ marginBottom: '15px' }}>
@@ -536,7 +536,7 @@ const DetailPage = () => {
             </div>
           </div>
 
-          <div style={{ position: 'sticky', top: '100px', alignSelf: 'start' }}>
+          <div className="detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start' }}>
             <div className="glass-card" style={{ padding: '30px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h1 style={{ fontSize: '1.8rem', marginBottom: '5px', flex: 1 }}>{dog.nickname} ({dog.breed})</h1>
@@ -666,43 +666,61 @@ const DetailPage = () => {
                 </div>
               </div>
 
-              <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <button onClick={handleStartChat} style={chatBtnStyle}>
-                   💬 팔톡으로 상담하기
-                </button>
-                {sellerInfo?.kakao_channel && (
-                  <button onClick={() => window.open(sellerInfo.kakao_channel, '_blank')} style={kakaoBtnStyle}>
-                    💬 카카오톡으로 상담하기
+                <div className="desktop-only" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <button onClick={handleStartChat} style={chatBtnStyle}>
+                     💬 팔톡으로 상담하기
                   </button>
-                )}
-                {sellerInfo && (
-                  <button onClick={() => navigate(`/store/${dog.seller_id}`)} style={{ ...chatBtnStyle, backgroundColor: '#f0f0f0', color: '#555' }}>
-                    🏪 이 스토어의 모든 게시물 보기
-                  </button>
-                )}
-                {currentUser?.id !== dog?.seller_id && (
-                  <>
-                    <button onClick={() => {
-                      if (hasReviewedThisDog) {
-                        alert('이미 이 게시물에 평가를 남기셨습니다.');
-                      } else {
-                        setShowReviewForm(!showReviewForm);
-                      }
-                    }} style={{ ...chatBtnStyle, backgroundColor: showReviewForm ? '#ccc' : '#fef2f2', color: showReviewForm ? 'white' : '#e63946', opacity: hasReviewedThisDog ? 0.6 : 1, cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer' }}>
-                      {hasReviewedThisDog ? '⭐ 평가 완료' : (showReviewForm ? '접기' : '⭐ 리뷰 및 평점 남기기')}
+                  {sellerInfo?.kakao_channel && (
+                    <button onClick={() => window.open(sellerInfo.kakao_channel, '_blank')} style={kakaoBtnStyle}>
+                      💬 카카오톡으로 상담하기
                     </button>
-                    <div style={{ textAlign: 'right', marginTop: '10px' }}>
-                      <span 
-                        onClick={() => setShowReportModal(true)} 
-                        style={{ fontSize: '0.85rem', color: '#888', textDecoration: 'underline', cursor: 'pointer' }}
-                      >
-                        🚨 이 게시물 신고하기
-                      </span>
-                    </div>
-                  </>
-                )}
+                  )}
+                  {sellerInfo && (
+                    <button onClick={() => navigate(`/store/${dog.seller_id}`)} style={{ ...chatBtnStyle, backgroundColor: '#f0f0f0', color: '#555' }}>
+                      🏪 이 스토어의 모든 게시물 보기
+                    </button>
+                  )}
+                  {currentUser?.id !== dog?.seller_id && (
+                    <>
+                      <button onClick={() => {
+                        if (hasReviewedThisDog) {
+                          alert('이미 이 게시물에 평가를 남기셨습니다.');
+                        } else {
+                          setShowReviewForm(!showReviewForm);
+                        }
+                      }} style={{ ...chatBtnStyle, backgroundColor: showReviewForm ? '#ccc' : '#fef2f2', color: showReviewForm ? 'white' : '#e63946', opacity: hasReviewedThisDog ? 0.6 : 1, cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer' }}>
+                        {hasReviewedThisDog ? '⭐ 평가 완료' : (showReviewForm ? '접기' : '⭐ 리뷰 및 평점 남기기')}
+                      </button>
+                      <div style={{ textAlign: 'right', marginTop: '10px' }}>
+                        <span 
+                          onClick={() => setShowReportModal(true)} 
+                          style={{ fontSize: '0.85rem', color: '#888', textDecoration: 'underline', cursor: 'pointer' }}
+                        >
+                          🚨 이 게시물 신고하기
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div> {/* glass-card 닫기 */}
+
+            {/* 모바일 하단 고정 바 추가 */}
+            <div className="mobile-bottom-bar">
+               <button 
+                 onClick={() => {
+                    const phone = sellerInfo?.store_contact || sellerInfo?.phone;
+                    if(phone) window.location.href = `tel:${phone}`;
+                    else alert('등록된 연락처가 없습니다.');
+                 }} 
+                 style={{ ...chatBtnStyle, backgroundColor: 'var(--white)', color: 'var(--primary-dark)', border: '1px solid var(--primary)' }}
+               >
+                 📞 전화 문의
+               </button>
+               <button onClick={handleStartChat} style={chatBtnStyle}>
+                 💬 팔톡 상담
+               </button>
+            </div>
 
             {/* 신고 모달창 */}
             {showReportModal && currentUser?.id !== dog?.seller_id && (

@@ -306,26 +306,35 @@ ul {
 
 @media (max-width: 600px) {
   .header-content {
-    height: 70px !important;
+    height: 60px !important;
   }
   .nav-group {
-    gap: 8px !important;
+    gap: 10px !important;
   }
   .nav-link {
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
   }
   .nav-btn {
-    padding: 8px 15px !important;
-    font-size: 0.85rem !important;
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
   }
 }
 
 @media (max-width: 400px) {
+  .nav-group {
+    gap: 5px !important;
+  }
   .nav-btn {
-    padding: 6px 10px !important;
-    font-size: 0.75rem !important;
+    padding: 5px 8px !important;
+    font-size: 0.7rem !important;
   }
 }
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 
 /* Mobile Helpers */
 .mobile-only {
@@ -354,12 +363,13 @@ ul {
 
 @media (max-width: 992px) {
   .detail-main-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
   }
   .detail-sidebar {
     position: static !important;
-    margin-top: 20px;
+    margin-top: 20px !important;
+    width: 100% !important;
   }
 }
 
@@ -370,16 +380,19 @@ ul {
   width: 100%;
   background: white;
   padding: 12px 16px;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 -5px 25px rgba(0,0,0,0.15);
   display: none;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  z-index: 2000;
+  z-index: 9999; /* 최상단 보장 */
 }
 
 @media (max-width: 768px) {
   .mobile-bottom-bar {
-    display: grid;
+    display: grid !important;
+  }
+  .fade-in {
+    padding-bottom: 80px !important; /* 하단 바 공간 확보 */
   }
 }
 
@@ -389,10 +402,21 @@ ul {
   gap: 40px;
 }
 
-@media (max-width: 600px) {
+.info-grid-child-border {
+  border-left: 1px solid #eee;
+  padding-left: 40px;
+}
+
+@media (max-width: 768px) {
   .info-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .info-grid-child-border {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
   }
 }
 

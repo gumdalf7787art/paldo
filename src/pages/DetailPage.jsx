@@ -411,8 +411,8 @@ const DetailPage = () => {
            홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
         </div>
 
-        <div className="detail-main-grid">
-          <div>
+        <div className="detail-main-grid" style={{ width: '100%' }}>
+          <div style={{ minWidth: 0 }}>
             <div style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', marginBottom: '15px', boxShadow: 'var(--shadow)' }}>
               <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '500px', aspectRatio: '4/3', objectFit: 'cover' }} />
             </div>
@@ -515,7 +515,7 @@ const DetailPage = () => {
                     </div>
                   ))}
                 </div>
-                <div style={{ borderLeft: '1px solid #eee', paddingLeft: '40px' }}>
+                <div className="info-grid-child-border">
                   <h4 style={{ marginBottom: '15px' }}>최근 리뷰</h4>
                   <div style={{ fontSize: '0.9rem', color: '#666' }}>최근 등록된 리뷰가 {totalReviews}건 있습니다.</div>
                   {/* 최근 3개 후기 노출 */}
@@ -703,10 +703,11 @@ const DetailPage = () => {
                   )}
                 </div>
               </div>
-            </div> {/* glass-card 닫기 */}
+            </div> {/* detail-sidebar & glass-card 닫기 */}
+          </div> {/* detail-main-grid 닫기 */}
 
-            {/* 모바일 하단 고정 바 추가 */}
-            <div className="mobile-bottom-bar">
+          {/* 모바일 하단 고정 바 */}
+          <div className="mobile-bottom-bar">
                <button 
                  onClick={() => {
                     const phone = sellerInfo?.store_contact || sellerInfo?.phone;
@@ -825,10 +826,8 @@ const DetailPage = () => {
                 </button>
               </div>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </div> {/* container 닫기 */}
+        </div> {/* fade-in 닫기 */}
   );
 };
 

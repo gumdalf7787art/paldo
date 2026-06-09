@@ -54,7 +54,7 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchNotifications = async (userId) => {
+  async function fetchNotifications(userId) {
     const { data } = await supabase
       .from('notifications')
       .select('*')
@@ -63,9 +63,9 @@ const Header = () => {
       .limit(20);
     
     if (data) setNotifications(data);
-  };
+  }
 
-  const fetchUnreadCount = async (userId) => {
+  async function fetchUnreadCount(userId) {
     const { count } = await supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
@@ -73,7 +73,7 @@ const Header = () => {
       .eq('is_read', false);
     
     setTotalUnreadCount(count || 0);
-  };
+  }
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -131,8 +131,49 @@ const Header = () => {
         width: '100%', borderBottom: '1px solid rgba(0,0,0,0.05)',
         backgroundColor: 'var(--bg-secondary)', position: 'sticky', top: 0, zIndex: 1000
       }}>
-        <div className="container header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '80px' }}>
+        <div className="container header-content" style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          height: '80px',
+          position: 'relative'
+        }}>
           <Link to="/"><Logo /></Link>
+          
+          {/* 헤더 중앙 클린분양 슬로건 */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+            gap: '3px'
+          }}>
+            <span style={{ 
+              fontSize: '0.95rem', 
+              fontWeight: '700', 
+              color: 'var(--primary)', 
+              letterSpacing: '-0.3px',
+              lineHeight: '1.2'
+            }}>
+              허위매물 없는 클린분양
+            </span>
+            <span style={{ 
+              fontSize: '0.82rem', 
+              fontWeight: '500', 
+              color: '#64748b', 
+              letterSpacing: '-0.3px',
+              lineHeight: '1.2'
+            }}>
+              팔도댕댕이 만들어갑니다.
+            </span>
+          </div>
+
           <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             {!session ? (
               <>

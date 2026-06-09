@@ -830,7 +830,6 @@ const DetailPage = () => {
                 </button>
               </div>
             )}
-        </div>
       </div>
     </div>
   );

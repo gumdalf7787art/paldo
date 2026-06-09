@@ -183,6 +183,8 @@ ul {
 .badge-safe { background: #E8F5E9; color: #2E7D32; }
 .badge-popular { background: #FFF3E0; color: #E65100; }
 .badge-special { background: #F3E5F5; color: #7B1FA2; }
+.badge-recommend { background: #E0F2FE; color: #0369A1; }
+.badge-new { background: #FFE4E6; color: #E11D48; }
 
 /* Modern Card Layout */
 .modern-card:hover .card-image-container {
@@ -627,4 +629,271 @@ html, body {
     grid-template-columns: 1fr !important;
     gap: 15px !important;
   }
+}
+
+/* =============================
+   Naver Style Portal Layout
+   ============================= */
+.main-portal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  margin-top: 30px;
+  margin-bottom: 60px;
+}
+
+@media (max-width: 1024px) {
+  .main-portal-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Naver Style Search Bar */
+.naver-search-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+  background-color: var(--bg-primary);
+}
+
+.naver-search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  height: 56px;
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  background-color: white;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(38, 166, 154, 0.08);
+}
+
+.naver-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--body-text);
+  padding: 0 10px;
+}
+
+.naver-search-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Breed Chips (Naver Style Quick Shortcuts) */
+.breed-chips-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  scrollbar-width: none; /* Firefox */
+}
+.breed-chips-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.breed-chip {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breed-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  background-color: var(--primary-light);
+}
+
+/* Cast Tabs (안심 / 인기 / 스페셜) */
+.cast-tabs-container {
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 30px;
+}
+
+.cast-tabs-header {
+  display: flex;
+  background-color: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cast-tab-btn {
+  flex: 1;
+  padding: 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #718096;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.cast-tab-btn.active {
+  color: var(--primary-dark);
+  background-color: white;
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: -1px;
+}
+
+.cast-tab-content {
+  padding: 24px;
+}
+
+/* Login Widget (Sidebar) */
+.naver-login-widget {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.naver-login-widget-text {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 12px;
+}
+
+.naver-login-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background-color: var(--primary);
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(38, 166, 154, 0.2);
+  margin-bottom: 12px;
+  transition: var(--transition);
+}
+
+.naver-login-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.naver-login-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #a0aec0;
+  padding: 0;
+}
+
+.naver-login-links a {
+  color: #a0aec0 !important;
+}
+
+.naver-login-links a:hover {
+  text-decoration: underline;
+  color: var(--body-text) !important;
+}
+
+/* Profile Widget (Sidebar - Logged In) */
+.naver-profile-widget {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.profile-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.profile-widget-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  overflow: hidden;
+}
+
+.profile-widget-info h4 {
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.profile-widget-info span {
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.profile-widget-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border-top: 1px solid #edf2f7;
+  padding-top: 16px;
+}
+
+.profile-widget-menu-btn {
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 6px;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  transition: var(--transition);
+}
+
+.profile-widget-menu-btn:hover {
+  background-color: #edf2f7;
+  color: var(--primary-dark);
+}
+
+.profile-widget-logout-btn {
+  grid-column: 1 / -1;
+  background-color: white;
+  border: 1px solid #fed7d7;
+  color: #e53e3e;
+}
+
+.profile-widget-logout-btn:hover {
+  background-color: #fff5f5;
+  color: #c53030;
 }

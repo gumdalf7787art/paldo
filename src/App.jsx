@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 import Header from './components/Header'
-import { HeroCarousel, AdSections, AdoptionList, PopularBreeds } from './components/Sections'
+import { HeroCarousel, AdSections, AdoptionList, PopularBreeds, LoginWidget, PersonalRecommendWidget } from './components/Sections'
 import SearchBar from './components/SearchBar'
 import DetailPage from './pages/DetailPage'
 import MyPage from './pages/MyPage'
@@ -35,7 +35,7 @@ const AnalyticsTracker = () => {
         await supabase.from('analytics_logs').insert([{
           user_id: user?.id || null,
           event_type: 'page_view',
-          page_path: fullPath
+          page_path: location.pathname + location.search
         }]);
       } catch (err) {
         console.error('Analytics tracking failed:', err);
@@ -47,58 +47,52 @@ const AnalyticsTracker = () => {
   return null;
 };
 
-const BrandIntro = () => (
-  <section className="fade-in" style={{ 
-    padding: 'min(40px, 8vw) 0 min(30px, 6vw)', 
-    textAlign: 'center', 
-    background: 'linear-gradient(to bottom, #fff, var(--bg-primary))',
-    borderBottom: '1px solid #f0f0f0'
-  }}>
-    <div className="container">
-      <div style={{ 
-        display: 'inline-block', 
-        padding: '4px 12px', 
-        backgroundColor: 'var(--primary-light)', 
-        color: 'var(--primary-dark)', 
-        borderRadius: '30px', 
-        fontSize: 'min(0.75rem, 3.5vw)', 
-        fontWeight: '800',
-        marginBottom: '12px',
-        boxShadow: '0 2px 5px rgba(38, 166, 154, 0.1)'
-      }}>
-        ✨ CLEAN ADOPTION
-      </div>
-      <h1 style={{ 
-        fontSize: 'min(2rem, 8vw)', 
-        fontWeight: '800', 
-        marginBottom: '8px', 
-        lineHeight: '1.2',
-        color: 'var(--body-text)',
-        wordBreak: 'keep-all'
-      }}>
-        허위 매물 없는 <span style={{ color: 'var(--primary)' }}>클린 분양</span>
-      </h1>
-      <p style={{ 
-        fontSize: 'min(1rem, 4vw)', 
-        color: 'var(--muted-text)', 
-        fontWeight: '500', 
-        maxWidth: '600px', 
-        margin: '0 auto' 
-      }}>
-        안심하고 새로운 가족을 만나보세요. <br className="mobile-only" /><b>팔도댕댕은 검증된 사업자만 함께합니다.</b>
-      </p>
-    </div>
-  </section>
-)
-
 const Home = () => (
-  <main>
-    <BrandIntro />
+  <main className="container" style={{ padding: '0 20px' }}>
+    {/* 1. 최상단 가로형 대표 강아지 홍보 배너 배치 */}
     <HeroCarousel />
-    <PopularBreeds />
+    
+    {/* 2. 검색창 배치 */}
     <SearchBar />
-    <AdSections />
-    <AdoptionList />
+    
+    {/* 3. 인기 견종 칩 가로바 배치 */}
+    <PopularBreeds />
+    
+    {/* 4. 2컬럼 레이아웃 (Main 콘텐츠 / Sidebar 위젯) */}
+    <div className="main-portal-layout">
+      {/* 좌측 메인 영역 */}
+      <div className="portal-main-col">
+        <AdSections />
+        <AdoptionList />
+      </div>
+      
+      {/* 우측 사이드바 영역 */}
+      <div className="portal-side-col">
+        <LoginWidget />
+        
+        {/* 입양 안내 위젯 */}
+        <div style={{
+          backgroundColor: '#FFF8F6',
+          border: '1px solid #FFECE5',
+          borderRadius: '12px',
+          padding: '20px',
+          boxShadow: 'var(--shadow)',
+          marginBottom: '20px'
+        }}>
+          <h4 style={{ color: '#E65100', fontSize: '0.9rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            💡 안심 입양 가이드
+          </h4>
+          <ul style={{ fontSize: '0.8rem', color: '#6D4C41', display: 'flex', flexDirection: 'column', gap: '6px', padding: 0, listStyle: 'none' }}>
+            <li>• 분양 시 반드시 <b>동물판매업 등록번호</b>를 확인하세요.</li>
+            <li>• 직접 매장을 방문하여 아이의 건강 상태를 살피는 것이 좋습니다.</li>
+            <li>• 계약서 작성 시 15일 이내 폐사/질병에 대한 보상 조건을 확인하세요.</li>
+          </ul>
+        </div>
+
+        {/* 맞춤형 개별 추천 위젯 */}
+        <PersonalRecommendWidget />
+      </div>
+    </div>
   </main>
 )
 

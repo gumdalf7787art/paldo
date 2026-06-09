@@ -52,6 +52,8 @@ const Card = ({ type, data, badgeText }) => {
     if (badgeText === '안심') return 'badge-safe';
     if (badgeText === '인기') return 'badge-popular';
     if (badgeText === '스페셜') return 'badge-special';
+    if (badgeText === '추천') return 'badge-recommend';
+    if (badgeText === '신규') return 'badge-new';
     return '';
   };
 
@@ -69,11 +71,13 @@ const Card = ({ type, data, badgeText }) => {
       onClick={() => navigate('/detail', { state: { dog: data } })}
       style={{
         width: '100%',
+        height: '100%',
         cursor: 'pointer',
         transition: 'var(--transition)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px'
+        gap: '8px',
+        justifyContent: 'flex-start'
       }} className="modern-card">
       
       {/* 1. 이미지 영역 (고정 비율 4:3) */}
@@ -87,7 +91,8 @@ const Card = ({ type, data, badgeText }) => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-        transition: 'var(--transition)'
+        transition: 'var(--transition)',
+        flexShrink: 0
       }} className="card-image-container">
         
         {/* 뱃지 */}
@@ -101,36 +106,65 @@ const Card = ({ type, data, badgeText }) => {
       </div>
 
       {/* 2. 콘텐츠 영역 */}
-      <div style={{ padding: '0 4px' }}>
-        {/* 상단 메타 정보 + 찜 버튼 (이름 위) */}
+      <div style={{ 
+        padding: '0 8px 4px 8px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flexGrow: 1, 
+        justifyContent: 'flex-start',
+        gap: '4px'
+      }}>
+        {/* 첫째줄: 품종(좌) / 지역(우) */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          marginBottom: '8px'
+          fontSize: '0.8rem', 
+          color: 'var(--muted-text)',
+          fontWeight: '500',
+          lineHeight: '1.2'
         }}>
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap',
-            alignItems: 'center', 
-            gap: '4px 8px', 
-            fontSize: 'min(0.85rem, 3.5vw)', 
-            color: 'var(--muted-text)',
-            fontWeight: '500',
-            flex: 1,
-            overflow: 'hidden'
+          <span style={{ 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap', 
+            maxWidth: '60%' 
+          }}>{data.breed}</span>
+          <span style={{ 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap', 
+            maxWidth: '38%', 
+            textAlign: 'right' 
+          }}>{data.region}</span>
+        </div>
+
+        {/* 둘째줄: 이름(좌) / 관심등록(우) */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          lineHeight: '1.2'
+        }}>
+          <h3 style={{ 
+            fontSize: '0.95rem', 
+            fontWeight: '700', 
+            color: 'var(--body-text)',
+            margin: 0,
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap',
+            maxWidth: '60%'
           }}>
-            <span style={{ whiteSpace: 'nowrap' }}>{data.breed}</span>
-            <span style={{ width: '1px', height: '10px', backgroundColor: '#eee' }}></span>
-            <span style={{ whiteSpace: 'nowrap' }}>{data.region}</span>
-          </div>
+            {data.nickname}
+          </h3>
           
           <button 
             onClick={toggleLike}
             style={{ 
               background: 'none', 
               border: 'none', 
-              fontSize: 'min(0.8rem, 3vw)', 
+              fontSize: '0.75rem', 
               padding: '0', 
               display: 'flex',
               alignItems: 'center',
@@ -145,33 +179,21 @@ const Card = ({ type, data, badgeText }) => {
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             <span>{isLiked ? '❤️' : '🤍'}</span>
-            <span style={{ display: 'inline-block' }}>{isLiked ? '관심중' : '관심등록'}</span>
+            <span>{isLiked ? '관심중' : '관심등록'}</span>
           </button>
         </div>
 
-        {/* 별명 (제목) */}
-        <h3 style={{ 
-          fontSize: '1.05rem', 
-          fontWeight: '700', 
-          lineHeight: '1.4',
-          marginBottom: '6px',
-          color: 'var(--body-text)',
-          display: '-webkit-box',
-          WebkitLineClamp: 1,
-          WebkitBoxDirection: 'vertical',
-          overflow: 'hidden'
-        }}>
-          {data.nickname}
-        </h3>
-
-        {/* 가격 (하단 강조) */}
+        {/* 셋째줄: 가격 */}
         <div style={{ 
           color: 'var(--primary)', 
           fontWeight: '800', 
-          fontSize: '1.15rem', 
+          fontSize: '1.05rem', 
           display: 'flex',
-          flexDirection: 'column',
-          gap: '2px'
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '4px',
+          lineHeight: '1.2',
+          marginTop: '2px'
         }}>
           {(() => {
             const mainPrice = data.price;
@@ -189,24 +211,20 @@ const Card = ({ type, data, badgeText }) => {
             if (origPrice && mainPrice && origPrice > mainPrice && mainPrice !== 0 && mainPrice !== '무료분양') {
               const discountRate = Math.round(((origPrice - mainPrice) / origPrice) * 100);
               return (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
-                    <span style={{ fontSize: '0.8rem', color: '#FF4757', fontWeight: '700' }}>{discountRate}% 할인</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {formattedMain}
-                    {data.is_negotiable && <span style={{ fontSize: '0.65rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '1px 5px', borderRadius: '4px' }}>협의</span>}
-                  </div>
-                </>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', fontSize: '0.95rem' }}>
+                  <span style={{ fontSize: '1.05rem', fontWeight: '800' }}>{formattedMain}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#FF4757', fontWeight: '700' }}>{discountRate}%</span>
+                  {data.is_negotiable && <span style={{ fontSize: '0.6rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '0px 4px', borderRadius: '3px' }}>협의</span>}
+                </div>
               );
             }
 
             return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {formattedMain}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>{formattedMain}</span>
                 {data.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
-                  <span style={{ fontSize: '0.65rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '1px 5px', borderRadius: '4px' }}>협의</span>
+                  <span style={{ fontSize: '0.6rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '0px 4px', borderRadius: '3px' }}>협의</span>
                 )}
               </div>
             );

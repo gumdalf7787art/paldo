@@ -457,7 +457,7 @@ const LoginWidget = () => {
         overflow: 'hidden', 
         cursor: 'pointer',
         display: 'block',
-        height: '320px',
+        height: '240px',
         position: 'relative'
       }}
       onClick={() => window.open('https://github.com/gumdalf7787art/paldo', '_blank')}

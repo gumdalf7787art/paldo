@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap');
 /* Last Updated: 2026-04-14 14:49 (Mobile Force Update) */
 
+html {
+  font-size: 90%; /* Scale down overall font-size by 10% */
+}
+
 :root {
   --primary: #26A69A; /* Mint */
   --primary-light: #B2DFDB;
@@ -32,7 +36,7 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: var(--bg-primary);
   color: var(--body-text);
-  line-height: 1.6;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -86,7 +90,7 @@ ul {
 .responsive-grid-2 {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 20px;
+  gap: 15px; /* Reduced from 20px */
 }
 
 @media (max-width: 1200px) {
@@ -100,14 +104,14 @@ ul {
 @media (max-width: 600px) {
   .responsive-grid-2 { 
     grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 12px;
+    gap: 10px; /* Reduced from 12px */
   }
 }
 
 .responsive-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 18px; /* Reduced from 24px */
 }
 
 @media (max-width: 1200px) {
@@ -117,7 +121,7 @@ ul {
 @media (max-width: 768px) {
   .responsive-grid-4 { 
     grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 15px;
+    gap: 12px; /* Reduced from 15px */
   }
 }
 
@@ -636,16 +640,16 @@ html, body {
    ============================= */
 .main-portal-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 24px;
-  margin-top: 30px;
-  margin-bottom: 60px;
+  grid-template-columns: minmax(0, 1fr) 320px; /* Width reduced from 340px to 320px */
+  gap: 20px; /* Reduced from 24px */
+  margin-top: 20px; /* Reduced from 30px */
+  margin-bottom: 45px; /* Reduced from 60px */
 }
 
 @media (max-width: 1024px) {
   .main-portal-layout {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 15px;
   }
 }
 
@@ -653,7 +657,7 @@ html, body {
 .naver-search-container {
   display: flex;
   justify-content: center;
-  padding: 30px 0;
+  padding: 20px 0; /* Reduced from 30px 0 */
   background-color: var(--bg-primary);
 }
 
@@ -661,12 +665,12 @@ html, body {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 600px;
-  height: 56px;
+  max-width: 550px; /* Reduced from 600px */
+  height: 48px; /* Reduced from 56px */
   border: 2px solid var(--primary);
   border-radius: 4px;
   background-color: white;
-  padding: 0 16px;
+  padding: 0 14px;
   box-shadow: 0 2px 8px rgba(38, 166, 154, 0.08);
 }
 

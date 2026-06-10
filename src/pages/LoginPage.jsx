@@ -20,6 +20,7 @@ const LoginPage = () => {
 
       if (error) throw new Error(error);
 
+      window.dispatchEvent(new Event('auth-change'));
       alert('로그인되었습니다!');
       navigate('/');
     } catch (error) {

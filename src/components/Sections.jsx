@@ -564,15 +564,21 @@ const LoginWidget = () => {
       if (session?.user) {
         const { data: profileData } = await api.auth.getUser();
         if (profileData) setProfile(profileData);
+      } else {
+        setProfile(null);
       }
     };
     initWidget();
+
+    window.addEventListener('auth-change', initWidget);
+    return () => window.removeEventListener('auth-change', initWidget);
   }, []);
 
   const handleLogout = async () => {
     await api.auth.logout();
     setSession(null);
     setProfile(null);
+    window.dispatchEvent(new Event('auth-change'));
     alert('로그아웃되었습니다.');
     navigate('/');
   };

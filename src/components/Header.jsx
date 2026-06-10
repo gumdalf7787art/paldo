@@ -22,10 +22,17 @@ const Header = () => {
         const { data: profileData } = await api.auth.getUser();
         if (profileData) setRole(profileData.role || 'user');
         fetchNotifications();
+      } else {
+        setRole('user');
+        setNotifications([]);
+        setTotalUnreadCount(0);
       }
     };
 
     initSession();
+
+    window.addEventListener('auth-change', initSession);
+    return () => window.removeEventListener('auth-change', initSession);
   }, []);
 
   useEffect(() => {
@@ -63,6 +70,7 @@ const Header = () => {
     setRole('user');
     setNotifications([]);
     setTotalUnreadCount(0);
+    window.dispatchEvent(new Event('auth-change'));
     alert('로그아웃되었습니다.');
     navigate('/');
   };

@@ -445,112 +445,7 @@ const AdoptionList = () => {
   );
 };
 
-const PopularBreeds = () => {
-  const navigate = useNavigate();
-  const breeds = [
-    { name: '말티즈', icon: '🐶' },
-    { name: '포메라니안', icon: '🐩' },
-    { name: '토이푸들', icon: '🐕' },
-    { name: '비숑프리제', icon: '🐾' },
-    { name: '푸들', icon: '🐕‍🦺' },
-    { name: '시바견', icon: '🦊' },
-    { name: '프랜치불독', icon: '🐷' },
-    { name: '웰쉬코기', icon: '🍞' },
-    { name: '리트리버', icon: '🐕' },
-    { name: '보더콜리', icon: '🦓' }
-  ];
 
-  return (
-    <section style={{ padding: '0 0 10px 0', backgroundColor: 'transparent' }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* 인기견종 레이블 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '3px',
-          whiteSpace: 'nowrap',
-          fontSize: '0.78rem',
-          fontWeight: '800',
-          color: '#475569',
-          backgroundColor: '#f1f5f9',
-          padding: '3px 8px',
-          borderRadius: '6px',
-          flexShrink: 0
-        }}>
-          🔥 인기견종
-        </div>
-
-        {/* 칩 목록 - PC 화면에서 좌우 꽉 차게 맞추기 위해 flex: 1 적용 및 균등 배분 */}
-        <div className="breed-chips-container" style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          gap: '6px', 
-          overflowX: 'auto', 
-          padding: '4px 0', 
-          margin: 0,
-          border: 'none',
-          flexGrow: 1,
-          scrollbarWidth: 'none'
-        }}>
-          {breeds.map((breed, i) => (
-            <div 
-              key={i} 
-              className="breed-chip"
-              onClick={() => navigate(`/breed/${breed.name}`)}
-              style={{
-                padding: '3px 0',
-                flex: '1',
-                minWidth: '70px',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
-                gap: '4px',
-                border: '1px solid #e2e8f0',
-                backgroundColor: 'white',
-                height: '26px',
-                boxSizing: 'border-box',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center'
-              }}
-            >
-              <span style={{ fontSize: '0.8rem' }}>{breed.icon}</span>
-              <span>{breed.name}</span>
-            </div>
-          ))}
-
-          {/* 전체보기 칩 추가 */}
-          <div 
-            className="breed-chip"
-            onClick={() => navigate('/breed/전체')}
-            style={{
-              padding: '3px 0',
-              flex: '1',
-              minWidth: '70px',
-              borderRadius: '8px',
-              fontSize: '0.75rem',
-              gap: '4px',
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#f8fafc',
-              color: 'var(--primary)',
-              fontWeight: '700',
-              height: '26px',
-              boxSizing: 'border-box',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center'
-            }}
-          >
-            <span style={{ fontSize: '0.8rem' }}>👀</span>
-            <span>전체보기</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const LoginWidget = () => {
   const [session, setSession] = useState(null);
@@ -790,4 +685,4 @@ const itemCardStyle = {
   border: '1px solid transparent'
 };
 
-export { HeroCarousel, AdSections, AdoptionList, PopularBreeds, LoginWidget, PersonalRecommendWidget };
+export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget };

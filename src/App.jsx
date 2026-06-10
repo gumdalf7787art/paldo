@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { api } from './lib/api'
 import Header from './components/Header'
-import { HeroCarousel, AdSections, AdoptionList, PopularBreeds, LoginWidget, PersonalRecommendWidget } from './components/Sections'
+import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from './components/Sections'
 import SearchBar from './components/SearchBar'
 import DetailPage from './pages/DetailPage'
 import MyPage from './pages/MyPage'
@@ -49,13 +49,10 @@ const Home = () => (
     {/* 1. 최상단 가로형 대표 강아지 홍보 배너 배치 */}
     <HeroCarousel />
     
-    {/* 2. 검색창 배치 */}
+    {/* 2. 검색창 배치 및 인기견종 통합 */}
     <SearchBar />
     
-    {/* 3. 인기 견종 칩 가로바 배치 */}
-    <PopularBreeds />
-    
-    {/* 4. 2컬럼 레이아웃 (Main 콘텐츠 / Sidebar 위젯) */}
+    {/* 3. 2컬럼 레이아웃 (Main 콘텐츠 / Sidebar 위젯) */}
     <div className="main-portal-layout">
       {/* 좌측 메인 영역 */}
       <div className="portal-main-col">

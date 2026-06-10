@@ -427,7 +427,7 @@ const DetailPage = () => {
 
   return (
     <div className="fade-in" style={{ paddingBottom: '100px' }}>
-      <div className="container">
+      <div className="container" style={{ maxWidth: '960px' }}>
         <div style={{ padding: '20px 0', fontSize: '0.9rem', color: 'var(--muted-text)' }}>
            홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
         </div>
@@ -435,16 +435,16 @@ const DetailPage = () => {
         <div className="detail-main-grid" style={{ width: '100%' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', marginBottom: '15px', boxShadow: 'var(--shadow)' }}>
-              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '500px', aspectRatio: '4/3', objectFit: 'cover' }} />
+              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '400px', aspectRatio: '4/3', objectFit: 'cover' }} />
             </div>
 
             
             <div style={{ 
-              marginBottom: '20px', 
-              padding: '15px', 
+              marginBottom: '15px', 
+              padding: '12px', 
               backgroundColor: '#f1f3f5', 
-              borderRadius: '12px', 
-              fontSize: '0.95rem', 
+              borderRadius: '10px', 
+              fontSize: '0.85rem', 
               color: '#495057', 
               textAlign: 'center',
               lineHeight: '1.5'
@@ -454,7 +454,7 @@ const DetailPage = () => {
             
             
             {allImages.length > 1 && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', overflowX: 'auto', paddingBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '8px' }}>
                 {allImages.map((img, idx) => (
                   <img 
                     key={idx} 
@@ -462,7 +462,7 @@ const DetailPage = () => {
                     alt={`썸네일 ${idx + 1}`} 
                     onClick={() => setSelectedImage(img)}
                     style={{ 
-                      width: '80px', height: '80px', objectFit: 'cover', borderRadius: '10px', cursor: 'pointer', flexShrink: 0,
+                      width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
                       border: selectedImage === img ? '3px solid var(--primary)' : '1px solid #ddd',
                       opacity: selectedImage === img ? 1 : 0.6,
                       transition: 'all 0.2s'
@@ -472,7 +472,7 @@ const DetailPage = () => {
               </div>
             )}
             
-            <div className="glass-card" style={{ padding: '30px', marginBottom: '40px' }}>
+            <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
               <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
               <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
                 {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
@@ -488,7 +488,7 @@ const DetailPage = () => {
             </div>
 
             
-            <div className="glass-card" style={{ padding: '30px' }}>
+            <div className="glass-card" style={{ padding: '20px' }}>
               <h2 style={{ marginBottom: '25px' }}>판매자 신뢰 평가</h2>
               <div className="info-grid-2">
                 <div>
@@ -526,17 +526,17 @@ const DetailPage = () => {
           </div>
 
           <div className="detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start' }}>
-            <div className="glass-card" style={{ padding: '30px' }}>
+            <div className="glass-card" style={{ padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h1 style={{ fontSize: '1.8rem', marginBottom: '5px', flex: 1 }}>{dog.nickname} ({dog.breed})</h1>
+                <h1 style={{ fontSize: '1.45rem', marginBottom: '5px', flex: 1 }}>{dog.nickname} ({dog.breed})</h1>
                 <button 
                   onClick={toggleLike}
                   style={{ 
                     background: isLiked ? '#fff1f2' : '#f8f9fa', 
                     border: isLiked ? '1px solid #ff4757' : '1px solid #ddd', 
-                    fontSize: '0.95rem', 
+                    fontSize: '0.85rem', 
                     cursor: 'pointer',
-                    padding: '8px 15px', 
+                    padding: '6px 12px', 
                     borderRadius: '25px',
                     display: 'flex', 
                     alignItems: 'center', 
@@ -557,7 +557,7 @@ const DetailPage = () => {
                 <span>조회 {engagement.views}회</span>
               </div>
 
-              <div style={{ fontSize: '1rem', color: '#666', marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.95rem', color: '#666', marginBottom: '10px' }}>
                 판매자: <b>{sellerInfo?.business_name || sellerInfo?.nickname || '불러오는 중...'}</b>
               </div>
               <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
@@ -565,11 +565,11 @@ const DetailPage = () => {
                   현재 분양중 {activeDogCount} {" / "} 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
                 </span>
               </div>
-              <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '20px' }}>
+              <div style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
                 {renderPrice(dog)}
               </div>
               
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', display: 'grid', gap: '12px', fontSize: '0.95rem' }}>
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>최초 등록일</span>
                   <span style={{ fontWeight: '500' }}>{new Date(dog.created_at).toLocaleDateString()}</span>

@@ -400,8 +400,8 @@ html, body {
 /* Detail Page Responsive */
 .detail-main-grid {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 40px;
+  grid-template-columns: 1fr 310px;
+  gap: 30px;
 }
 
 @media (max-width: 992px) {

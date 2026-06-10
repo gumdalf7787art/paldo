@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
-import { supabase } from './lib/supabaseClient'
+import { api } from './lib/api'
 import Header from './components/Header'
 import { HeroCarousel, AdSections, AdoptionList, PopularBreeds, LoginWidget, PersonalRecommendWidget } from './components/Sections'
 import SearchBar from './components/SearchBar'
@@ -22,21 +22,17 @@ const AnalyticsTracker = () => {
   useEffect(() => {
     const trackView = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        const user = data?.user;
+        const { data: user } = await api.auth.getUser();
         
         // 상세 페이지 ID 추출 (State 또는 Query Parameter)
         const searchParams = new URLSearchParams(location.search);
         const dogId = location.state?.dog?.id || searchParams.get('id');
         
-        // 상세 페이지(/detail)는 DetailPage 컴포넌트 내부에서 더 정밀하게(순차적 실행) 기록하므로 여기서는 제외
-        if (location.pathname === '/detail') return;
-
-        await supabase.from('analytics_logs').insert([{
-          user_id: user?.id || null,
-          event_type: 'page_view',
-          page_path: location.pathname + location.search
-        }]);
+        // 상세 페이지(/detail)는 DetailPage 컴포넌트 내부에서 더 정밀하게 기록
+        if (location.pathname === '/detail' && dogId) {
+          const breed = location.state?.dog?.breed || '';
+          await api.analytics.logActivity(dogId, breed, 'view');
+        }
       } catch (err) {
         console.error('Analytics tracking failed:', err);
       }
@@ -46,6 +42,7 @@ const AnalyticsTracker = () => {
 
   return null;
 };
+
 
 const Home = () => (
   <main className="container" style={{ padding: '0 20px' }}>

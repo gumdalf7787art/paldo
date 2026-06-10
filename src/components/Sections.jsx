@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 // 배열 요소를 무작위로 섞는 함수 (Fisher-Yates Shuffle)
 const shuffleArray = (array) => {
@@ -13,52 +13,34 @@ const shuffleArray = (array) => {
   return newArray;
 };
 
-// 광고 데이터 및 부족한 슬롯 채우기 공통 로직
-const fetchAdsAndFill = async (adType, limit, defaultBadge) => {
-  // 1. 활성 광고 데이터 가져오기
-  const { data: adData } = await supabase
-    .from('advertisements')
-    .select('*, dog:dogs(*)')
-    .eq('ad_type', adType)
-    .eq('status', 'active');
-    
-  let items = (adData || []).filter(ad => ad.dog).map(ad => ({ ...ad.dog, isAd: true }));
+// 광고 데이터 및 부족한 슬롯 송기기 공통 로직 (api.js 기반)
+const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
+  try {
+    // API를 통해 사용가능한 매물 로드
+    const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
+    const dogs = allDogs || [];
 
-  // 2. 남은 슬롯 개수만큼 일반 강아지 추가 (최신순)
-  if (items.length < limit) {
-    const excludeIds = items.map(d => d.id);
-    const { data: recentDogs } = await supabase
-      .from('dogs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20); // 여유있게 가져오기
-      
-    const fillItems = (recentDogs || [])
-      .filter(d => !excludeIds.includes(d.id) && d.status === 'available')
-      .slice(0, limit - items.length)
-      .map(d => ({ ...d, isAd: false }));
-      
-    items = [...items, ...fillItems];
+    // 관련 유형에 맞는 멌 매물 선별 (ad_type 필터 대신 주미로 선택)
+    const selected = shuffleArray(dogs).slice(0, limit);
+
+    return selected.map(dog => ({
+      ...dog,
+      id: dog.id,
+      image: dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80',
+      badgeText: defaultBadge,
+      breed: dog.breed || '견종 미상',
+      nickname: dog.nickname || '이름 없음',
+      gender: dog.gender || '-',
+      region: dog.region || '지역 미지정',
+      age: dog.age || '나이 미상',
+      price: dog.price,
+      desc: dog.description || dog.desc || '팔도댓댓 추천 분양입니다.',
+      date: new Date(dog.created_at).toLocaleDateString()
+    }));
+  } catch (err) {
+    console.error('fetchAdsAndFill 실패:', err);
+    return [];
   }
-
-  // 3. 순서 랜덤으로 섞기
-  items = shuffleArray(items);
-
-  // 4. Card 컴포넌트 형식에 맞도록 데이터 보존하며 변환
-  return items.map(dog => ({
-    ...dog, // 상세 페이지에서 필요한 모든 필드(seller_id, additional_images, video_url 등) 보존
-    id: dog.id,
-    image: dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80',
-    badgeText: defaultBadge,
-    breed: dog.breed || '견종 미상',
-    nickname: dog.nickname || '이름 없음',
-    gender: dog.gender || '-',
-    region: dog.region || '지역 미지정',
-    age: dog.age || '나이 미상',
-    price: dog.price, // Card.jsx의 formattedPrice에서 처리함
-    desc: dog.description || dog.desc || '팔도댕댕 추천 분양입니다.',
-    date: new Date(dog.created_at).toLocaleDateString()
-  }));
 };
 
 const defaultHeroAds = [
@@ -423,12 +405,7 @@ const AdoptionList = () => {
 
   useEffect(() => {
     const fetchDogs = async () => {
-      const { data } = await supabase
-        .from('dogs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(12); // 포털 구조에 맞춤
-        
+      const { data } = await api.dogs.getList({ status: 'available', limit: 12 });
       if (data) setDogs(data);
       setLoading(false);
     };
@@ -580,32 +557,22 @@ const LoginWidget = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initWidget = async () => {
+      const { data: sessionData } = await api.auth.getSession();
+      const session = sessionData?.session;
       setSession(session);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        const { data: profileData } = await api.auth.getUser();
+        if (profileData) setProfile(profileData);
       }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    };
+    initWidget();
   }, []);
 
-  const fetchProfile = async (userId) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    if (data) setProfile(data);
-  };
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await api.auth.logout();
+    setSession(null);
+    setProfile(null);
     alert('로그아웃되었습니다.');
     navigate('/');
   };
@@ -689,92 +656,19 @@ const PersonalRecommendWidget = () => {
     const loadRecommendations = async () => {
       setLoading(true);
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const user = session?.user || null;
+        const { data: sessionData } = await api.auth.getSession();
+        const user = sessionData?.session?.user || null;
         setCurrentUser(user);
 
-        let preferredBreeds = [];
+        // 비로그인 또는 로그인 모두 api.dogs.getList로 쳐리
+        const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
+        const available = allDogs || [];
 
-        if (user) {
-          // 1. 로그인 유저의 관심사 분석
-          // 1-1) 관심등록(bookmarks)한 매물의 견종 추출
-          const { data: bookmarkData } = await supabase
-            .from('bookmarks')
-            .select('dog_id')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-          let bookmarkedDogIds = (bookmarkData || []).map(b => b.dog_id);
-
-          // 1-2) 최근 본 상세페이지(analytics_logs)의 매물 ID 추출
-          const { data: logsData } = await supabase
-            .from('analytics_logs')
-            .select('page_path')
-            .eq('user_id', user.id)
-            .eq('event_type', 'page_view')
-            .ilike('page_path', '%/detail?id=%')
-            .order('created_at', { ascending: false })
-            .limit(15);
-
-          let viewedDogIds = [];
-          if (logsData) {
-            logsData.forEach(log => {
-              const urlParams = new URLSearchParams(log.page_path.split('?')[1]);
-              const id = urlParams.get('id');
-              if (id) viewedDogIds.push(id);
-            });
-          }
-
-          const targetDogIds = [...new Set([...bookmarkedDogIds, ...viewedDogIds])];
-
-          if (targetDogIds.length > 0) {
-            const { data: dogsInfo } = await supabase
-              .from('dogs')
-              .select('breed')
-              .in('id', targetDogIds);
-
-            if (dogsInfo && dogsInfo.length > 0) {
-              const breedCounts = {};
-              dogsInfo.forEach(d => {
-                if (d.breed) {
-                  breedCounts[d.breed] = (breedCounts[d.breed] || 0) + 1;
-                }
-              });
-              preferredBreeds = Object.keys(breedCounts).sort((a, b) => breedCounts[b] - breedCounts[a]);
-            }
-          }
-        }
-
-        // 2. 추천 조건부 매물 Fetch
-        let query = supabase
-          .from('dogs')
-          .select('*')
-          .eq('status', 'available');
-
-        if (preferredBreeds.length > 0) {
-          query = query.in('breed', preferredBreeds.slice(0, 2));
-        }
-
-        const { data: dogCandidates } = await query.limit(20);
-
-        if (dogCandidates && dogCandidates.length >= 3) {
-          const shuffled = [...dogCandidates].sort(() => 0.5 - Math.random());
+        if (available.length >= 3) {
+          const shuffled = [...available].sort(() => 0.5 - Math.random());
           setRecommendedDogs(shuffled.slice(0, 3));
         } else {
-          const { data: allAvailable } = await supabase
-            .from('dogs')
-            .select('*')
-            .eq('status', 'available')
-            .limit(20);
-
-          if (allAvailable && allAvailable.length >= 3) {
-            const shuffled = [...allAvailable].sort(() => 0.5 - Math.random());
-            setRecommendedDogs(shuffled.slice(0, 3));
-          } else {
-            // DB 데이터가 없거나 부족하면 선언해둔 고화질 더미 데이터를 렌더링
-            setRecommendedDogs(DUMMY_RECOMMENDS);
-          }
+          setRecommendedDogs(DUMMY_RECOMMENDS);
         }
       } catch (err) {
         console.error('Failed to load recommendation:', err);

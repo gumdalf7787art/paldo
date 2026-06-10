@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 const Card = ({ type, data, badgeText }) => {
   const navigate = useNavigate();
@@ -9,17 +9,11 @@ const Card = ({ type, data, badgeText }) => {
 
   useEffect(() => {
     const checkLikeStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        const { data: bookmark } = await supabase
-          .from('bookmarks')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('dog_id', data.id)
-          .single();
-        
-        if (bookmark) setIsLiked(true);
+      const { data: userData } = await api.auth.getUser();
+      if (userData) {
+        setUserId(userData.id);
+        const { data: bookmarkData } = await api.bookmarks.check(data.id);
+        if (bookmarkData?.bookmarked) setIsLiked(true);
       }
     };
     checkLikeStatus();
@@ -33,18 +27,13 @@ const Card = ({ type, data, badgeText }) => {
       return;
     }
 
-    if (isLiked) {
-      const { error } = await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', userId)
-        .eq('dog_id', data.id);
-      if (!error) setIsLiked(false);
-    } else {
-      const { error } = await supabase
-        .from('bookmarks')
-        .insert([{ user_id: userId, dog_id: data.id }]);
-      if (!error) setIsLiked(true);
+    // 낙관적 UI 업데이트
+    setIsLiked(prev => !prev);
+    const { error } = await api.bookmarks.toggle(data.id);
+    if (error) {
+      // 실패 시 롤백
+      setIsLiked(prev => !prev);
+      alert('관심 등록에 실패했습니다.');
     }
   };
   

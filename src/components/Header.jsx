@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 const Header = () => {
   const [session, setSession] = useState(null);
@@ -14,34 +14,18 @@ const Header = () => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const fetchProfile = async (userId) => {
-      const { data } = await supabase.from('profiles').select('role').eq('id', userId).single();
-      if (data) setRole(data.role);
+    const initSession = async () => {
+      const { data: sessionData } = await api.auth.getSession();
+      const session = sessionData?.session;
+      setSession(session);
+      if (session?.user) {
+        const { data: profileData } = await api.auth.getUser();
+        if (profileData) setRole(profileData.role || 'user');
+        fetchNotifications();
+      }
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchNotifications(session.user.id);
-        fetchUnreadCount(session.user.id);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchNotifications(session.user.id);
-        fetchUnreadCount(session.user.id);
-      } else {
-        setRole('user');
-        setNotifications([]);
-        setTotalUnreadCount(0);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    initSession();
   }, []);
 
   useEffect(() => {
@@ -54,70 +38,39 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  async function fetchNotifications(userId) {
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    
-    if (data) setNotifications(data);
+  async function fetchNotifications() {
+    const { data } = await api.notifications.getList();
+    if (data) {
+      setNotifications(data.slice(0, 20));
+      const unreadCount = data.filter(n => !n.is_read).length;
+      setTotalUnreadCount(unreadCount);
+    }
   }
 
-  async function fetchUnreadCount(userId) {
-    const { count } = await supabase
-      .from('notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('is_read', false);
-    
-    setTotalUnreadCount(count || 0);
-  }
-
+  // 15초 폴링으로 알림 자동 갱신
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const channel = supabase
-      .channel(`public:notifications:${session.user.id}`)
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'notifications', 
-        filter: `user_id=eq.${session.user.id}` 
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setNotifications((prev) => [payload.new, ...prev]);
-          setToastMsg(payload.new);
-          setTimeout(() => setToastMsg(null), 5000); 
-          fetchUnreadCount(session.user.id);
-        } else {
-          // UPDATE, DELETE 시에도 리프레시
-          fetchNotifications(session.user.id);
-          fetchUnreadCount(session.user.id);
-        }
-      })
-      .on('broadcast', { event: 'REFRESH_NOTIFICATIONS' }, () => {
-        fetchNotifications(session.user.id);
-        fetchUnreadCount(session.user.id);
-      })
-      .subscribe();
+    fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 15000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => clearInterval(intervalId);
   }, [session?.user?.id]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await api.auth.logout();
+    setSession(null);
+    setRole('user');
+    setNotifications([]);
+    setTotalUnreadCount(0);
     alert('로그아웃되었습니다.');
     navigate('/');
   };
 
   const markAsRead = async (id, link_url) => {
-    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
-    fetchUnreadCount(session.user.id);
+    // 로컬 즉시 반영
     setNotifications((prev) => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    setTotalUnreadCount(prev => Math.max(0, prev - 1));
     setShowDropdown(false);
     if (link_url) {
       if(link_url === '/mypage') navigate('/mypage', { state: { tab: 'notifications' }});

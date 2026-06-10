@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '../components/Card';
 import { 
@@ -124,32 +124,24 @@ const MyPage = () => {
     }
   }, [newPassword, confirmPassword]);
 
-  // 대화방 실시간 업데이트 감지 (안읽음 빨간 점 등 자동 갱신)
+  // 대화방 실시간 업데이트 감지 (폴링 방식으로 교체)
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const roomSubscription = supabase
-      .channel('chat_rooms_list_updates')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'chat_rooms'
-      }, () => {
-        fetchChatRooms(session.user.id);
-      })
-      .subscribe();
+    fetchChatRooms(session.user.id);
+    const intervalId = setInterval(() => {
+      fetchChatRooms(session.user.id);
+    }, 5000);
 
     return () => {
-      supabase.removeChannel(roomSubscription);
+      clearInterval(intervalId);
     };
   }, [session?.user?.id]);
 
   const fetchInitialData = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    // 관리자의 광고 만료 자동 처리 함수 호출
-    await supabase.rpc('check_and_expire_ads');
+    const { data: sessionData } = await api.auth.getSession();
+    const session = sessionData?.session;
 
     if (!session) {
       navigate('/login');
@@ -158,24 +150,7 @@ const MyPage = () => {
     setSession(session);
 
     // 1. 프로필
-    let { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .maybeSingle();
-
-    if (!profileData) {
-      const { data: newProfile } = await supabase
-        .from('profiles')
-        .upsert([{ 
-          id: session.user.id, 
-          nickname: session.user.user_metadata?.nickname || '새로운가족',
-          role: 'user',
-          grade: 'Bronze'
-        }])
-        .select().single();
-      profileData = newProfile;
-    }
+    const { data: profileData } = await api.auth.getUser();
 
     if (profileData) {
       setProfile(profileData);
@@ -198,13 +173,10 @@ const MyPage = () => {
     }
 
     // 2. 찜 목록
-    const { data: bookmarkData } = await supabase
-      .from('bookmarks')
-      .select('dogs(*)')
-      .eq('user_id', session.user.id);
+    const { data: bookmarkData } = await api.bookmarks.getList();
 
     if (bookmarkData) {
-      const activeDogs = bookmarkData.map(b => b.dogs).filter(d => d && d.status === 'available');
+      const activeDogs = bookmarkData.map(b => b.dogs || b).filter(d => d && d.status === 'available');
       setBookmarks(activeDogs);
     }
 
@@ -215,32 +187,20 @@ const MyPage = () => {
     }
 
     // 4. 사업자 신청
-    const { data: bData } = await supabase
-      .from('business_applications')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('created_at', { ascending: false })
-      .limit(1).maybeSingle();
+    const { data: bData } = await api.business.getLastApplication();
     setBusinessApp(bData);
 
     // 5. 사업자 기능: 게시물, 통계, 쿠폰 등
     if (profileData && (profileData.role === 'seller' || profileData.role === 'admin')) {
       await fetchSellerData(session.user.id);
       
-      const { data: couponsData } = await supabase
-        .from('user_coupons')
-        .select(`
-          *,
-          coupons:coupon_id(*)
-        `)
-        .eq('user_id', session.user.id);
+      const { data: couponsData } = await api.admin.getCoupons();
       if (couponsData) {
-        // 데이터 구조 평탄화 (렌더링 편의를 위해)
-        const formatted = couponsData.map(uc => ({
+        const myCoupons = couponsData.filter(uc => uc.user_id === session.user.id);
+        const formatted = myCoupons.map(uc => ({
           ...uc,
-          // Join 결과가 null일 경우(RLS 등)를 대비한 대체값 적용
-          coupon_name: uc.coupons?.display_name || '광고 쿠폰',
-          benefit_type: uc.coupons?.benefit_type || 'ad_exemption'
+          coupon_name: uc.coupon_name || uc.coupons?.display_name || '광고 쿠폰',
+          benefit_type: uc.benefit_type || uc.coupons?.benefit_type || 'ad_exemption'
         }));
         setUserCoupons(formatted);
       }
@@ -251,74 +211,41 @@ const MyPage = () => {
 
   const fetchSellerData = async (userId) => {
     // 1. 내 게시물 가져오기
-    const { data: dogsData } = await supabase
-      .from('dogs')
-      .select('*')
-      .eq('seller_id', userId)
-      .order('created_at', { ascending: false });
-
+    const { data: dogsData } = await api.dogs.getList({ seller_id: userId });
     setMyDogs(dogsData || []);
 
-    // 2. 게시물별 통계 가져오기 (새로운 RPC 호출)
-    const { data: statsData } = await supabase
-      .rpc('get_seller_dog_stats', { target_seller_id: userId });
-
+    // 2. 게시물별 통계 가져오기
     const statsMap = {};
-    if (statsData) {
-      statsData.forEach(item => {
-        statsMap[item.dog_id] = { views: Number(item.view_count) || 0, likes: Number(item.like_count) || 0 };
+    if (dogsData) {
+      dogsData.forEach(item => {
+        statsMap[item.id] = { views: Number(item.views_count) || 0, likes: Number(item.bookmarks_count) || 0 };
       });
     }
     setDogStats(statsMap);
 
-    // 3. 차트용 일간 전역 통계 가져오기 (새로운 RPC 호출)
-    const { data: dailyData } = await supabase
-      .rpc('get_seller_daily_views', { target_seller_id: userId });
-
+    // 3. 차트용 일간 전역 통계 가져오기
+    const { data: statsData } = await api.admin.getStats();
     let chartArr = [];
-    if (dailyData && dailyData.length > 0) {
-      chartArr = dailyData.map(d => ({
-        date: new Date(d.view_date).toLocaleDateString(), 
-        views: Number(d.daily_views) || 0
+    if (statsData && statsData.dailyViews && statsData.dailyViews.length > 0) {
+      chartArr = statsData.dailyViews.map(d => ({
+        date: d.date, 
+        views: Number(d.views) || 0
       }));
     } else {
-      // 데이터가 없으면 오늘 기준으로 0점 더미 추가
       chartArr.push({ date: new Date().toLocaleDateString(), views: 0 });
     }
     setChartData(chartArr);
   };
 
   const fetchChatRooms = async (userId) => {
-    // 1. 채팅방 기본 정보와 닉네임 가져오기
-    const { data: rooms } = await supabase
-      .from('chat_rooms')
-      .select(`
-        *, 
-        dogs(nickname, breed, image_url), 
-        buyer:profiles!chat_rooms_buyer_id_fkey(nickname, profile_image), 
-        seller:profiles!chat_rooms_seller_id_fkey(nickname, profile_image)
-      `)
-      .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
-      .order('updated_at', { ascending: false });
-    
+    const { data: rooms } = await api.chat.getRooms();
     if (rooms && rooms.length > 0) {
-      // 2. 판매자들의 업체명(business_name) 추가로 가져오기
-      const sellerIds = [...new Set(rooms.map(r => r.seller_id))];
-      const { data: bizData } = await supabase
-        .from('business_applications')
-        .select('user_id, business_name')
-        .in('user_id', sellerIds)
-        .eq('status', 'approved');
-      
-      // 3. 업체명 매핑
       const enrichedRooms = rooms.map(room => {
-        const biz = bizData?.find(b => b.user_id === room.seller_id);
         return {
           ...room,
-          seller_business_name: biz?.business_name || room.seller?.nickname || '판매자'
+          seller_business_name: room.seller_business_name || room.seller?.nickname || '판매자'
         };
       });
-      
       setChatRooms(enrichedRooms);
     } else {
       setChatRooms([]);
@@ -326,26 +253,18 @@ const MyPage = () => {
   };
 
   const fetchMyNotifications = async (userId) => {
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    const { data } = await api.notifications.getList();
     if (data) setMyNotifications(data);
   };
 
   const handleReadAllNotifications = async () => {
-    await supabase.from('notifications').update({ is_read: true }).eq('user_id', session.user.id);
-    setMyNotifications(prev => prev.map(n => ({...n, is_read: true})));
-    
-    // 헤더 및 다른 탭에 즉시 동기화 신호 전송
-    await supabase.channel(`public:notifications:${session.user.id}`).send({
-      type: 'broadcast',
-      event: 'REFRESH_NOTIFICATIONS',
-      payload: { userId: session.user.id }
-    });
-
-    alert('모두 읽음 처리되었습니다.');
+    const { error } = await api.notifications.markAllAsRead();
+    if (!error) {
+      setMyNotifications(prev => prev.map(n => ({...n, is_read: true})));
+      alert('모두 읽음 처리되었습니다.');
+    } else {
+      alert('알림 읽음 처리 실패: ' + error);
+    }
   };
 
   const handlePhoneChange = (e) => {
@@ -364,23 +283,22 @@ const MyPage = () => {
 
     try {
       if (profileImagePreview && typeof profileImage !== 'string') {
-        const fileExt = profileImage.name.split('.').pop();
-        const fileName = `profile_${session.user.id}_${Math.random()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage.from('business-docs').upload(fileName, profileImage);
-        if (!uploadError) {
-          const { data } = supabase.storage.from('business-docs').getPublicUrl(fileName);
-          avatarUrl = data.publicUrl;
-        }
+        avatarUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (e) => reject(e);
+          reader.readAsDataURL(profileImage);
+        });
       }
 
-      const { error } = await supabase.from('profiles').update({ nickname, phone, address, profile_image: avatarUrl }).eq('id', session.user.id);
+      const { error } = await api.auth.updateProfile({ nickname, phone, address, profile_image: avatarUrl });
       if (!error) {
         alert('저장되었습니다.');
         setIsEditingProfile(false);
         setProfile({ ...profile, nickname, phone, address, profile_image: avatarUrl });
         setProfileImage(avatarUrl);
       } else {
-        alert('저장 실패: ' + error.message);
+        alert('저장 실패: ' + error);
       }
     } catch (err) {
       alert('저장 실패: ' + err.message);
@@ -394,35 +312,32 @@ const MyPage = () => {
 
     try {
       if (storeHeaderPreview && storeHeader) {
-        // 이미지가 객체(File)인 경우 새롭게 업로드
         if (typeof storeHeader !== 'string') {
-          const fileExt = storeHeader.name.split('.').pop();
-          const fileName = `store_${session.user.id}_${Math.random()}.${fileExt}`;
-          const { error: uploadError } = await supabase.storage.from('business-docs').upload(fileName, storeHeader);
-          if (uploadError) throw uploadError;
-          const { data } = supabase.storage.from('business-docs').getPublicUrl(fileName);
-          bannerUrl = data.publicUrl;
+          bannerUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsDataURL(storeHeader);
+          });
         }
       }
 
-      // 스토어 추가 사진첩 업로드 처리
       const finalStoreImages = [];
       for (const img of storeImages) {
         if (typeof img === 'string') {
-          finalStoreImages.push(img); // 기존 URL 유지
+          finalStoreImages.push(img);
         } else {
-          // 신규 파일 업로드
-          const fileExt = img.name.split('.').pop();
-          const fileName = `store_gallery_${session.user.id}_${Math.random()}.${fileExt}`;
-          const { error: uploadError } = await supabase.storage.from('business-docs').upload(fileName, img);
-          if (!uploadError) {
-            const { data } = supabase.storage.from('business-docs').getPublicUrl(fileName);
-            finalStoreImages.push(data.publicUrl);
-          }
+          const b64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsDataURL(img);
+          });
+          finalStoreImages.push(b64);
         }
       }
 
-      const { error } = await supabase.from('profiles').update({
+      const { error } = await api.auth.updateProfile({
         store_header_image: bannerUrl,
         store_contact: storeContact,
         kakao_channel: kakaoChannel,
@@ -431,13 +346,17 @@ const MyPage = () => {
         biz_no: bizNo,
         animal_sale_no: animalSaleNo,
         store_additional_images: finalStoreImages
-      }).eq('id', session.user.id);
+      });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
       alert('스토어 정보가 저장되었습니다.');
-      setStoreHeader(bannerUrl);
-      setStoreImages(finalStoreImages);
-      setStoreImagePreviews(finalStoreImages);
+      const { data: updatedProfile } = await api.auth.getUser();
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+        setStoreHeader(updatedProfile.store_header_image);
+        setStoreImages(updatedProfile.store_additional_images || []);
+        setStoreImagePreviews(updatedProfile.store_additional_images || []);
+      }
     } catch (err) {
       alert('저장 실패: ' + err.message);
     } finally {
@@ -456,7 +375,6 @@ const MyPage = () => {
     const newPreviews = [...storeImagePreviews];
 
     for (const file of files) {
-      // 리사이징 처리
       const resizedBlob = await resizeImage(file);
       const resizedFile = new File([resizedBlob], file.name, { type: 'image/jpeg' });
       
@@ -475,21 +393,23 @@ const MyPage = () => {
 
   const handleUpdatePassword = async () => {
     if (!passwordMatch || newPassword.length < 6) return alert('비밀번호를 확인해주세요.');
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    const { error } = await api.auth.updatePassword(newPassword);
     if (!error) {
       alert('비밀번호가 변경되었습니다.');
       setNewPassword(''); setConfirmPassword(''); setIsChangingPassword(false);
     } else {
-      alert(error.message);
+      alert(error);
     }
   };
 
   const handleDeletePost = async (dogId) => {
     if (!window.confirm('삭제하시겠습니까?')) return;
-    const { error } = await supabase.from('dogs').delete().eq('id', dogId);
+    const { error } = await api.dogs.delete(dogId);
     if (!error) {
       alert('삭제되었습니다.');
       setMyDogs(prev => prev.filter(d => d.id !== dogId));
+    } else {
+      alert('삭제 실패: ' + error);
     }
   };
 
@@ -499,20 +419,18 @@ const MyPage = () => {
     const currentCount = profile.completed_adoption_count || 0;
     const newCount = currentCount + 1;
 
-    // 1. 프로필 테이블에 분양 건수 증가 업데이트
-    const { error: updateError } = await supabase.from('profiles').update({ completed_adoption_count: newCount }).eq('id', session.user.id);
-    
+    const { error: updateError } = await api.auth.updateProfile({ completed_adoption_count: newCount });
     if (updateError) {
-      return alert('완료 처리 실패: ' + updateError.message);
+      return alert('완료 처리 실패: ' + updateError);
     }
 
-    // 2. 해당 개시물 원본에서 영구 삭제
-    const { error: deleteError } = await supabase.from('dogs').delete().eq('id', dogId);
-    
+    const { error: deleteError } = await api.dogs.delete(dogId);
     if (!deleteError) {
       alert(`분양 완료 처리되었습니다! (누적 완료 달성: ${newCount}건)`);
       setProfile({ ...profile, completed_adoption_count: newCount });
       setMyDogs(prev => prev.filter(d => d.id !== dogId));
+    } else {
+      alert('완료 후 게시물 제거 실패: ' + deleteError);
     }
   };
 
@@ -565,7 +483,7 @@ const MyPage = () => {
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
             <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>⚙️</button>
-            <button onClick={() => supabase.auth.signOut().then(() => navigate('/'))} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
+            <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
           </div>
         </div>
 
@@ -621,7 +539,7 @@ const MyPage = () => {
               {/* 설정, 로그아웃 */}
               <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
                 <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ ...actionBtnStyle, fontSize: '0.85rem', marginBottom: '10px' }}>⚙️ 프로필 설정</button>
-                <button onClick={() => supabase.auth.signOut().then(() => navigate('/'))} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
+                <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
 
                 {profile?.role === 'user' && (
                   !businessApp ? (
@@ -1052,15 +970,8 @@ const MyPage = () => {
                         chatRooms.map(room => (
                           <div 
                             key={room.id} 
-                            onClick={async () => {
+                            onClick={() => {
                               setSelectedRoom(room);
-                              // 읽음 처리 로직 (DB 업데이트)
-                              const isBuyer = session.user.id === room.buyer_id;
-                              const updateData = isBuyer ? { buyer_has_unread: false } : { seller_has_unread: false };
-                              await supabase.from('chat_rooms').update(updateData).eq('id', room.id);
-                              
-                              // 로컬 상태 즉시 갱신 (빨간 점 제거)
-                              setChatRooms(prev => prev.map(r => r.id === room.id ? { ...r, ...updateData } : r));
                             }} 
                             style={{ 
                               ...chatRoomItemStyle, 
@@ -1234,26 +1145,38 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return alert('사업자등록증 파일을 첨부해 주세요.');
     setUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}_${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('business-docs').upload(fileName, file);
-      if (uploadError) throw uploadError;
+      // 파일을 base64로 변환 (서버로 전송)
+      let fileBase64 = null;
+      let fileName = null;
+      if (file) {
+        fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(file);
+        });
+        fileName = file.name;
+      }
 
-      const { data: { publicUrl } } = supabase.storage.from('business-docs').getPublicUrl(fileName);
+      const { error } = await api.business.apply({
+        business_name: form.bizName,
+        representative_name: form.repName,
+        phone: form.phone,
+        address: form.address,
+        biz_no: form.bizNo,
+        animal_sale_no: form.animalNo,
+        file_base64: fileBase64,
+        file_name: fileName,
+      });
 
-      const { error: dbError } = await supabase.from('business_applications').insert([{
-        user_id: userId, business_name: form.bizName, representative_name: form.repName,
-        phone: form.phone, address: form.address, biz_no: form.bizNo, animal_sale_no: form.animalNo, file_url: publicUrl
-      }]);
-      if (dbError) throw dbError;
+      if (error) throw new Error(error);
 
       alert('사업자 등록 신청 완료!');
       onClose();
-      const { data } = await supabase.from('business_applications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      const { data } = await api.business.getLastApplication();
       onSuccess(data);
     } catch (err) {
       alert('신청 실패: ' + err.message);
@@ -1275,9 +1198,9 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
           <div><label style={labelStyle}>주소</label><input required style={inputStyle} value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록번호</label><input required style={inputStyle} value={form.bizNo} onChange={e => setForm({...form, bizNo: e.target.value})} /></div>
           <div><label style={labelStyle}>동물판매업번호</label><input required style={inputStyle} value={form.animalNo} onChange={e => setForm({...form, animalNo: e.target.value})} /></div>
-          <div><label style={labelStyle}>파일첨부</label><input type="file" required onChange={e => setFile(e.target.files[0])} /></div>
+          <div><label style={labelStyle}>파일첨부 (선택)</label><input type="file" onChange={e => setFile(e.target.files[0])} /></div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-            <button type="submit" disabled={uploading} style={{ ...miniBtnStyle, flex: 1, padding: '15px' }}>확인</button>
+            <button type="submit" disabled={uploading} style={{ ...miniBtnStyle, flex: 1, padding: '15px' }}>{uploading ? '신청 중...' : '확인'}</button>
             <button type="button" onClick={onClose} style={{ ...miniBtnStyle, backgroundColor: '#eee', color: '#666', flex: 1 }}>취소</button>
           </div>
         </form>
@@ -1292,69 +1215,74 @@ const ChatWindow = ({ room, userId, onClose }) => {
   const scrollRef = useRef();
 
   const fetchMessages = async () => {
-    const { data } = await supabase.from('chat_messages').select('*').eq('room_id', room.id).order('created_at', { ascending: true });
-    if (data) setMessages(data);
+    const { data } = await api.chat.getMessages(room.id);
+    if (data) {
+      // API 응답 필드 매핑: message -> content
+      const normalized = data.map(m => ({
+        ...m,
+        content: m.content || m.message || '',
+      }));
+      setMessages(normalized);
+    }
   };
 
   useEffect(() => {
     fetchMessages();
-    const channel = supabase.channel(`room_${room.id}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${room.id}` }, (payload) => {
-      setMessages(prev => [...prev, payload.new]);
-    }).subscribe();
-    return () => { supabase.removeChannel(channel); };
+    // 실시간 대신 3초 폴링 방식으로 신규 메시지 감지
+    const intervalId = setInterval(fetchMessages, 3000);
+    return () => clearInterval(intervalId);
   }, [room.id]);
 
-  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [messages]);
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const newMessage = { 
-      room_id: room.id, 
-      sender_id: userId, 
-      content: input, 
-      created_at: new Date().toISOString() 
+    // 낙관적 UI 업데이트
+    const tempMessage = {
+      id: `temp_${Date.now()}`,
+      room_id: room.id,
+      sender_id: userId,
+      content: input,
+      created_at: new Date().toISOString(),
     };
-
-    // 로컬 상태 즉시 업데이트 (메시지가 바로 뜨도록)
-    setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, tempMessage]);
     const currentInput = input;
     setInput('');
 
-    const { error } = await supabase.from('chat_messages').insert([newMessage]);
-    if (!error) {
-      // 상대방을 '안읽음' 상태로 업데이트
-      const isBuyer = userId === room.buyer_id;
-      const updateData = { 
-        last_message: currentInput, 
-        updated_at: new Date().toISOString(),
-        [isBuyer ? 'seller_has_unread' : 'buyer_has_unread']: true 
-      };
-      await supabase.from('chat_rooms').update(updateData).eq('id', room.id);
-    } else {
+    const { error } = await api.chat.sendMessage(room.id, currentInput);
+    if (error) {
       console.error('메시지 전송 실패:', error);
       alert('메시지 전송에 실패했습니다.');
+      // 실패 시 낙관적 업데이트 롤백
+      setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+      setInput(currentInput);
     }
   };
 
   const getAvatar = (msg) => {
-    if (msg.sender_id === room.buyer_id) return room.buyer?.profile_image;
-    if (msg.sender_id === room.seller_id) return room.seller?.profile_image;
+    if (msg.sender_id === room.buyer_id) return room.buyer_profile_image || room.buyer?.profile_image;
+    if (msg.sender_id === room.seller_id) return room.seller_profile_image || room.seller?.profile_image;
     return null;
   };
+
+  // 채팅방 헤더 표시명 결정
+  const chatTitle = room.dog_nickname || room.dogs?.nickname || '상담';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ ...chatHeaderStyle }}>
-        <div><div style={{ fontWeight: '800' }}>{room.dogs?.nickname} 상담</div></div>
-        <button 
+        <div><div style={{ fontWeight: '800' }}>{chatTitle} 상담</div></div>
+        <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onClose();
-          }} 
-          style={{ 
+          }}
+          style={{
             background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer',
             padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}
@@ -1364,22 +1292,22 @@ const ChatWindow = ({ room, userId, onClose }) => {
       </div>
       <div ref={scrollRef} style={messageAreaStyle}>
         {messages.map((msg, i) => {
-           const isMe = msg.sender_id === userId;
-           const avatarUrl = getAvatar(msg);
-           return (
-             <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row', marginBottom: '15px' }}>
-               <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: '#eee', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="프사" /> : <span style={{ fontSize: '1.2rem' }}>🐶</span>}
-               </div>
-               <div style={{ padding: '10px 15px', borderRadius: '15px', maxWidth: '70%', backgroundColor: isMe ? 'var(--primary)' : '#f0f0f0', color: isMe ? 'white' : '#333' }}>
-                 {msg.content}
-               </div>
-             </div>
-           );
+          const isMe = msg.sender_id === userId;
+          const avatarUrl = getAvatar(msg);
+          return (
+            <div key={msg.id || i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row', marginBottom: '15px' }}>
+              <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: '#eee', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="프사" /> : <span style={{ fontSize: '1.2rem' }}>🐶</span>}
+              </div>
+              <div style={{ padding: '10px 15px', borderRadius: '15px', maxWidth: '70%', backgroundColor: isMe ? 'var(--primary)' : '#f0f0f0', color: isMe ? 'white' : '#333' }}>
+                {msg.content}
+              </div>
+            </div>
+          );
         })}
       </div>
       <form onSubmit={sendMessage} style={chatInputAreaStyle}>
-        <input value={input} onChange={(e) => setInput(e.target.value)} style={chatInputStyle} />
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="메시지를 입력하세요..." style={chatInputStyle} />
         <button type="submit" style={sendBtnStyle}>전송</button>
       </form>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 // 영상 URL 렌더링 헬퍼 (IIFE 대신 독립 함수로 분리 - Rolldown 파서 버그 우회)
 function renderVideoEmbed(videoUrl) {
@@ -124,7 +124,7 @@ const DetailPage = () => {
 
       if (!dog && dogId) {
         setLoading(true);
-        const { data, error } = await supabase.from('dogs').select('*').eq('id', dogId).single();
+        const { data, error } = await api.dogs.getDetail(dogId);
         if (!error && data) {
           setDog(data);
           currentDogId = data.id;
@@ -140,25 +140,20 @@ const DetailPage = () => {
         checkLikeStatus(dog.id);
       }
 
-      // 2. 조회수 기록 (Insert) - 완료 후 로컬 숫자 즉시 반영
+      // 2. 조회수 기록 - 완료 후 로컬 숫자 즉시 반영
       if (currentDogId) {
         try {
-          const { data: { user } } = await supabase.auth.getUser();
+          const { data: user } = await api.auth.getUser();
           setCurrentUser(user);
           
-          const { error: insError } = await supabase.from('analytics_logs').insert([{
-            user_id: user?.id || null,
-            event_type: 'page_view',
-            page_path: `/detail?id=${currentDogId}`
-          }]);
+          const { error: insError } = await api.analytics.logActivity(currentDogId, dog?.breed || '', 'view');
           
           if (!insError) {
-            // 낙관적 업데이트: DB 반영을 기다리기 전 화면 숫자를 먼저 1 올림
             setEngagement(prev => ({ ...prev, views: prev.views + 1 }));
           }
         } catch (e) { console.error(e); }
 
-        // 3. 통계 데이터 호출 (전체 인원 집계 업데이트)
+        // 3. 통계 데이터 호출
         fetchEngagementStats(currentDogId);
       }
     };
@@ -178,75 +173,45 @@ const DetailPage = () => {
 
   const fetchEngagementStats = async (dogId) => {
     try {
-      // 1. 관심(찜) 수 조회
-      const { count: likeCount } = await supabase
-        .from('bookmarks')
-        .select('*', { count: 'exact', head: true })
-        .eq('dog_id', dogId);
-
-      // 2. 조회수 조회 (상세페이지 로그 카운트)
-      const { count: viewCount } = await supabase
-        .from('analytics_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'page_view')
-        .ilike('page_path', `%id=${dogId}%`);
-
-      setEngagement(prev => ({
-        ...prev,
-        likes: likeCount || 0,
-        views: Math.max(prev.views, viewCount || 0) // 로컬에서 이미 올린 수치와 DB 수치 중 큰 것 선택
-      }));
+      const { data, error } = await api.dogs.getDetail(dogId);
+      if (!error && data) {
+        setEngagement(prev => ({
+          ...prev,
+          likes: data.bookmarks_count || 0,
+          views: Math.max(prev.views, data.views_count || 0)
+        }));
+      }
     } catch (err) {
       console.error('Failed to fetch engagement stats:', err);
     }
   };
 
   const fetchSellerInfo = async (sellerId) => {
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', sellerId).maybeSingle();
-    const { data: biz } = await supabase.from('business_applications').select('business_name, biz_no, animal_sale_no').eq('user_id', sellerId).eq('status', 'approved').maybeSingle();
-    const { count } = await supabase.from('dogs').select('*', { count: 'exact', head: true }).eq('seller_id', sellerId);
-    
-    // 이 스토어의 모든 리뷰 조회
-    const { data: reviews } = await supabase.from('store_reviews').select('*').eq('seller_id', sellerId);
-    
-    if (profile) {
-      setSellerInfo({
-        ...profile,
-        business_name: biz?.business_name || null,
-        biz_no: biz?.biz_no || null,
-        animal_sale_no: biz?.animal_sale_no || null
-      });
-    }
-    setActiveDogCount(count || 0);
-    
-    if (reviews && reviews.length > 0) {
-      const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
-      const { data: reviewersProfiles } = await supabase.from('profiles').select('id, nickname, profile_image').in('id', reviewerIds);
-      
-      const enrichedReviews = reviews.map(r => {
-        const reviewer = reviewersProfiles?.find(p => p.id === r.reviewer_id);
-        return {
-          ...r,
-          reviewer_nickname: reviewer?.nickname || '사용자',
-          reviewer_image: reviewer?.profile_image || 'https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?auto=format&fit=crop&q=80&w=40&h=40'
-        };
-      });
-      setStoreReviews(enrichedReviews);
-    } else {
-      setStoreReviews([]);
+    try {
+      const { data, error } = await api.store.getProfile(sellerId);
+      if (!error && data) {
+        setSellerInfo({
+          ...data.profile,
+          business_name: data.business?.business_name || null,
+          biz_no: data.business?.biz_no || null,
+          animal_sale_no: data.business?.animal_sale_no || null
+        });
+        setActiveDogCount(data.active_count || 0);
+        setStoreReviews(data.reviews || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch seller info:', err);
     }
   };
 
   const checkLikeStatus = async (dogId) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: bookmark } = await supabase
-        .from('bookmarks')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('dog_id', dogId)
-        .maybeSingle();
-      if (bookmark) setIsLiked(true);
+    try {
+      const { data } = await api.bookmarks.check(dogId);
+      if (data && data.bookmarked) {
+        setIsLiked(true);
+      }
+    } catch (e) {
+      console.error('Failed to check like status:', e);
     }
   };
 
@@ -257,18 +222,17 @@ const DetailPage = () => {
       return;
     }
 
-    if (isLiked) {
-      const { error } = await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', currentUser.id)
-        .eq('dog_id', dog.id);
-      if (!error) setIsLiked(false);
-    } else {
-      const { error } = await supabase
-        .from('bookmarks')
-        .insert([{ user_id: currentUser.id, dog_id: dog.id }]);
-      if (!error) setIsLiked(true);
+    try {
+      const { data, error } = await api.bookmarks.toggle(dog.id);
+      if (!error && data) {
+        setIsLiked(data.bookmarked);
+        setEngagement(prev => ({
+          ...prev,
+          likes: data.bookmarked ? prev.likes + 1 : Math.max(0, prev.likes - 1)
+        }));
+      }
+    } catch (e) {
+      console.error('Toggle like failed:', e);
     }
   };
 
@@ -284,36 +248,16 @@ const DetailPage = () => {
       return;
     }
 
-    // 1. 기존 채팅방이 있는지 확인
-    const { data: existingRoom } = await supabase
-      .from('chat_rooms')
-      .select('id')
-      .eq('buyer_id', currentUser.id)
-      .eq('dog_id', dog.id)
-      .maybeSingle();
-
-    if (existingRoom) {
-      navigate('/mypage', { state: { activeTab: 'chats', openRoomId: existingRoom.id } });
-    } else {
-      // 2. 새 채팅방 생성 (seller_id가 없으면 테스트용으로 임의 설정 혹은 에러)
-      const targetSellerId = dog?.seller_id || '00000000-0000-0000-0000-000000000000'; 
-      
-      const { data: newRoom, error } = await supabase
-        .from('chat_rooms')
-        .insert([{
-          buyer_id: currentUser.id,
-          seller_id: targetSellerId,
-          dog_id: dog.id,
-          last_message: '상담이 시작되었습니다.'
-        }])
-        .select()
-        .single();
-
-      if (error) {
-        alert('채팅방 생성에 실패했습니다: ' + error.message);
+    try {
+      const targetSellerId = dog?.seller_id || '00000000-0000-0000-0000-000000000000';
+      const { data, error } = await api.chat.createRoom(targetSellerId, currentUser.id, dog.id);
+      if (!error && data) {
+        navigate('/mypage', { state: { activeTab: 'chats', openRoomId: data.room_id } });
       } else {
-        navigate('/mypage', { state: { activeTab: 'chats', openRoomId: newRoom.id } });
+        alert('채팅방 생성에 실패했습니다: ' + (error || '알 수 없는 오류'));
       }
+    } catch (e) {
+      alert('채팅방 생성 중 오류 발생: ' + e.message);
     }
   };
 
@@ -376,40 +320,45 @@ const DetailPage = () => {
       return alert('리뷰 내용은 최대 200자까지만 작성 가능합니다.');
     }
 
-    const newReview = {
-      dog_id: dog.id,
-      seller_id: dog.seller_id,
-      reviewer_id: currentUser.id,
-      rating: reviewData.rating,
-      content: reviewData.content,
-      tags: reviewData.tags
-    };
+    try {
+      const { data, error } = await api.store.createReview({
+        dog_id: dog.id,
+        seller_id: dog.seller_id,
+        rating: reviewData.rating,
+        content: reviewData.content,
+        tags: reviewData.tags
+      });
 
-    const { error } = await supabase.from('store_reviews').insert([newReview]);
-
-    if (error) {
-      if (error.code === '23505') {
-        alert('이미 이 게시물에 평가를 남기셨습니다.');
-        setHasReviewedThisDog(true);
-        setShowReviewForm(false);
+      if (error) {
+        if (error.includes('이미 이 게시물에 평가')) {
+          alert('이미 이 게시물에 평가를 남기셨습니다.');
+          setHasReviewedThisDog(true);
+          setShowReviewForm(false);
+        } else {
+          alert('리뷰 등록 중 오류가 발생했습니다: ' + error);
+        }
       } else {
-        alert('리뷰 등록 중 오류가 발생했습니다: ' + error.message);
+        alert('소중한 리뷰가 등록되었습니다!');
+        setShowReviewForm(false);
+        setReviewData({ rating: 5, content: '', tags: [] });
+        setHasReviewedThisDog(true);
+        
+        const newReviewEnriched = {
+          id: Date.now(),
+          dog_id: dog.id,
+          seller_id: dog.seller_id,
+          reviewer_id: currentUser.id,
+          rating: reviewData.rating,
+          content: reviewData.content,
+          tags: reviewData.tags,
+          created_at: new Date().toISOString(),
+          reviewer_nickname: currentUser.nickname || '사용자',
+          reviewer_image: currentUser.profile_image || 'https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?auto=format&fit=crop&q=80&w=40&h=40'
+        };
+        setStoreReviews(prev => [...prev, newReviewEnriched]);
       }
-    } else {
-      const { data: myProfile } = await supabase.from('profiles').select('nickname, profile_image').eq('id', currentUser.id).single();
-      alert('소중한 리뷰가 등록되었습니다!');
-      setShowReviewForm(false);
-      setReviewData({ rating: 5, content: '', tags: [] });
-      setHasReviewedThisDog(true);
-      
-      const newReviewEnriched = {
-        ...newReview, 
-        id: Date.now(), 
-        created_at: new Date().toISOString(),
-        reviewer_nickname: myProfile?.nickname || '사용자',
-        reviewer_image: myProfile?.profile_image || 'https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?auto=format&fit=crop&q=80&w=40&h=40'
-      };
-      setStoreReviews(prev => [...prev, newReviewEnriched]);
+    } catch (err) {
+      alert('리뷰 등록 오류: ' + err.message);
     }
   };
 
@@ -442,36 +391,24 @@ const DetailPage = () => {
       return alert('기타입력의 경우 상세 내용을 기재해주세요.');
     }
 
-    // 1. 신고 내역 접수
-    const { error: reportError } = await supabase.from('reports').insert([{
-      dog_id: dog.id,
-      reporter_id: currentUser.id,
-      seller_id: dog.seller_id,
-      reason_type: reportData.reason,
-      details: reportData.details,
-      status: 'pending'
-    }]);
+    try {
+      const { error: reportError } = await api.reports.create(
+        dog.id,
+        reportData.reason,
+        reportData.details
+      );
 
-    if (reportError) {
-      alert('신고 접수 중 오류가 발생했습니다: ' + reportError.message);
-      return;
+      if (reportError) {
+        alert('신고 접수 중 오류가 발생했습니다: ' + reportError);
+        return;
+      }
+
+      alert('신고가 정상적으로 접수되었으며, 사실 확인 후 조치하겠습니다.');
+      setShowReportModal(false);
+      setReportData({ reason: '', details: '' });
+    } catch (e) {
+      alert('신고 처리 오류: ' + e.message);
     }
-
-    // 2. 판매자에게 알림 전송 (notifications 테이블 활용)
-    const { error: notiError } = await supabase.from('notifications').insert([{
-      user_id: dog.seller_id,
-      type: 'report',
-      message: `🚨 [신고 접수] 고객님의 게시물(${dog.nickname})에 신고('${reportData.reason}')가 접수되었습니다. 사실 여부를 확인해주세요.`,
-      link_url: '/mypage'
-    }]);
-
-    if (notiError) {
-      console.error('알림 전송 실패:', notiError.message);
-    }
-
-    alert('신고가 정상적으로 접수되었으며, 사실 확인 후 조치하겠습니다.');
-    setShowReportModal(false);
-    setReportData({ reason: '', details: '' });
   };
 
   const maxCount = Math.max(...reviewStats.map(s => s.count), 1);

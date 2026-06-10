@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 const SignupPage = () => {
   const [email, setEmail] = useState('');
@@ -47,28 +47,19 @@ const SignupPage = () => {
     
     setLoading(true);
     try {
-      // 1. Auth 회원가입 (nickname을 메타데이터로 함께 전달)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nickname: nickname
-          }
-        }
+      const { data: userData, error: signupError } = await api.auth.signup(email, password, {
+        nickname: nickname
       });
 
-      if (authError) {
-        if (authError.message.includes('already registered')) {
+      if (signupError) {
+        if (signupError.includes('사용 중인 이메일')) {
           setEmailStatus('duplicate');
-          throw new Error('이미 가입되어 있는 이메일 입니다.');
         }
-        throw authError;
+        throw new Error(signupError);
       }
 
-      // 2. 이제 프로필은 수파베이스 트리거가 자동으로 생성해줍니다.
-      if (authData.user) {
-        alert('회원가입 요청이 완료되었습니다! 이메일 인증 후 로그인이 가능합니다.');
+      if (userData) {
+        alert('회원가입이 완료되었습니다! 가입하신 이메일로 로그인해 주세요.');
         navigate('/login');
       }
     } catch (error) {

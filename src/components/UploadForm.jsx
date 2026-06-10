@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card'; // 미리보기용 컴포넌트 임포트
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const breedOptions = [
@@ -51,7 +51,7 @@ const UploadForm = () => {
         age: editDog.age ? editDog.age.replace('개월', '') : '',
         gender: editDog.gender || '수컷',
         birthday: editDog.birthday || '',
-        vaccination: editDog.vaccination || '',
+        vaccination: editDog.vaccine || '', // 기존의 vaccine 컬럼 맵핑
         description: editDog.description || '',
         isFree: editDog.price === 0 && !editDog.is_negotiable,
         isNegotiable: editDog.is_negotiable,
@@ -75,41 +75,30 @@ const UploadForm = () => {
 
   const fetchPostingStats = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: sessionData } = await api.auth.getSession();
+      const session = sessionData?.session;
       if (!session) {
         setPostingStats(prev => ({ ...prev, loading: false }));
         return;
       }
 
-      const now = new Date();
-      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      
-      const { count } = await supabase
-        .from('dogs')
-        .select('*', { count: 'exact', head: true })
-        .eq('seller_id', session.user.id)
-        .gte('created_at', firstDay);
-
-      const { data: ucData } = await supabase
-        .from('user_coupons')
-        .select(`
-          expires_at,
-          coupons (
-            benefit_type,
-            discount_amount
-          )
-        `)
-        .eq('user_id', session.user.id)
-        .gt('expires_at', now.toISOString());
-
-      let additionalLimit = 0;
-      if (ucData) {
-        ucData.forEach(item => {
-          if (item.coupons?.benefit_type?.startsWith('post_reg')) {
-            additionalLimit += (Number(item.coupons.discount_amount) || 20);
-          }
-        });
+      // 내 분양 매물 목록을 가져와 이번 달 글 등록 수 계산
+      const { data: listData, error: listError } = await api.dogs.getList({ seller_id: session.user.id });
+      if (listError || !listData) {
+        throw new Error(listError || '매물 목록을 조회하지 못했습니다.');
       }
+
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      // 이번 달 등록된 글 수 필터링
+      const count = listData.filter(dog => {
+        const createdAt = new Date(dog.created_at);
+        return createdAt >= firstDay;
+      }).length;
+
+      // 쿠폰 시스템 추가 한도 계산 (D1 마이그레이션 기준, 일단 0으로 셋팅하되 기본값 20으로 한도 보존)
+      let additionalLimit = 0;
 
       setPostingStats({
         used: count || 0,
@@ -129,7 +118,8 @@ const UploadForm = () => {
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: sessionData } = await api.auth.getSession();
+      const session = sessionData?.session;
       if (!session) {
         alert('로그인이 필요합니다.');
         return;
@@ -137,28 +127,34 @@ const UploadForm = () => {
 
       let uploadedUrls = [];
       
-      // 모든 이미지 스토리지 업로드 로직
+      // 이미지들을 순차적으로 R2 업로드 API로 업로드 처리
       if (images.length > 0) {
         for (let i = 0; i < images.length; i++) {
           const imgData = images[i];
           if (imgData.startsWith('data:')) {
             const res = await fetch(imgData);
             const blob = await res.blob();
-            const fileName = `dog_${session.user.id}_${Date.now()}_${i}.jpg`;
-            const { error: uploadError } = await supabase.storage.from('business-docs').upload('dogs/' + fileName, blob);
+            const file = new File([blob], `dog_${session.user.id}_${Date.now()}_${i}.jpg`, { type: 'image/jpeg' });
             
-            if (!uploadError) {
-              const { data } = supabase.storage.from('business-docs').getPublicUrl('dogs/' + fileName);
-              uploadedUrls.push(data.publicUrl);
+            const { data: uploadData, error: uploadError } = await api.uploadFile(file);
+            if (uploadError || !uploadData) {
+              throw new Error(uploadError || '이미지 업로드에 실패했습니다.');
             }
+            uploadedUrls.push(uploadData.url);
           } else {
             uploadedUrls.push(imgData); // 기존에 업로드되어 있던 URL
           }
         }
       }
 
+      // 대표 이미지가 항상 0번 인덱스에 위치하도록 이미지 배열 가공
+      let finalImages = [...uploadedUrls];
+      if (finalImages.length > 0) {
+        const primaryImg = finalImages.splice(primaryImageIdx, 1)[0] || finalImages[0];
+        finalImages.unshift(primaryImg);
+      }
+
       const postData = {
-        seller_id: session.user.id,
         nickname: formData.name,
         breed: formData.breed,
         age: formData.age ? `${formData.age}개월` : '',
@@ -167,39 +163,30 @@ const UploadForm = () => {
         price: formData.isFree ? 0 : (parseInt(formData.price) || 0),
         original_price: formData.isFree ? 0 : (parseInt(formData.originalPrice) || null),
         birthday: formData.birthday || null,
-        vaccination: formData.vaccination || '',
-        is_negotiable: formData.isNegotiable,
+        vaccine: formData.vaccination || '', // D1 dogs 테이블의 백엔드 필드명 vaccine에 맞추어 전송
+        is_negotiable: formData.isNegotiable ? 1 : 0,
         description: formData.description,
         video_url: formData.videoLink,
-        status: 'available'
+        images: finalImages
       };
 
-      if (uploadedUrls.length > 0) {
-        // 대표 사진과 나머지 사진 분리
-        const primaryUrl = uploadedUrls.splice(primaryImageIdx, 1)[0] || uploadedUrls[0];
-        postData.image_url = primaryUrl;
-        postData.additional_images = uploadedUrls; // 남은 url 모두 배열로 저장
-      } else {
-        postData.additional_images = [];
-      }
-
       if (editDog) {
-        const { error } = await supabase.from('dogs').update(postData).eq('id', editDog.id);
-        if (error) throw error;
+        const { error } = await api.dogs.update(editDog.id, postData);
+        if (error) throw new Error(error);
         alert('분양 게시물이 정상적으로 수정되었습니다!');
         navigate(-1);
       } else {
-        // 신규 등록 시 최종 한도 체크 (데이터 정합성 보장)
+        // 신규 등록 시 최종 한도 체크
         if (!postingStats.loading && postingStats.used >= postingStats.limit) {
-          throw new Error(`월간 등록 한도(${postingStats.limit}개)를 초과했습니다. 쿠폰을 이용하거나 다음 달에 등록해주세요.`);
+          throw new Error(`월간 등록 한도(${postingStats.limit}개)를 초과했습니다. 다음 달에 등록해주세요.`);
         }
-        const { error } = await supabase.from('dogs').insert([postData]);
-        if (error) throw error;
+        const { error } = await api.dogs.create(postData);
+        if (error) throw new Error(error);
         alert('분양 게시물이 정상적으로 등록되었습니다!');
         navigate('/');
       }
     } catch (err) {
-      alert('게시물 등록 실패: ' + err.message);
+      alert('게시물 처리 실패: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -254,7 +241,7 @@ const UploadForm = () => {
     // 만약 최초가격만 있으면 최초가격 리턴
     if (!mainPrice) return parseInt(origPrice).toLocaleString() + '만원';
     
-    // 둘 다 있을 때: 할인가격 리턴 (Card 컴포넌트 내부에서 original_price가 있을 시 할인 로직 수행하도록 data 넘김)
+    // 둘 다 있을 때: 할인가격 리턴
     return parseInt(mainPrice).toLocaleString() + '만원';
   };
 
@@ -383,10 +370,10 @@ const UploadForm = () => {
               <p style={{ fontSize: '0.95rem', marginBottom: '10px', fontWeight: '600' }}>한 게시물에 한 아이만 등록 가능합니다. (준수하시나요?)</p>
               <div style={{ display: 'flex', gap: '20px' }}>
                 <label style={{ cursor: 'pointer' }}>
-                  <input type="radio" name="oneDog" value="yes" onChange={() => setFormData({...formData, oneDogPerPost: true})} /> 예
+                  <input type="radio" name="oneDog" value="yes" checked={formData.oneDogPerPost === true} onChange={() => setFormData({...formData, oneDogPerPost: true})} /> 예
                 </label>
                 <label style={{ cursor: 'pointer' }}>
-                  <input type="radio" name="oneDog" value="no" onChange={() => setFormData({...formData, oneDogPerPost: false})} /> 아니요
+                  <input type="radio" name="oneDog" value="no" checked={formData.oneDogPerPost === false} onChange={() => setFormData({...formData, oneDogPerPost: false})} /> 아니요
                 </label>
               </div>
             </div>

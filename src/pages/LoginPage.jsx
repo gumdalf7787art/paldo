@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -16,12 +16,9 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await api.auth.login(email, password);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
 
       alert('로그인되었습니다!');
       navigate('/');
@@ -34,22 +31,10 @@ const LoginPage = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    if (!forgotEmail) return alert('이메일을 입력해 주세요.');
-    
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (error) throw error;
-      alert('비밀번호 재설정 메일이 발송되었습니다. 메일함을 확인해 주세요!');
-      setShowForgotModal(false);
-    } catch (error) {
-      alert('메일 발송 실패: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
+    alert('비밀번호 분실 시 관리자(goodduck2@naver.com)에게 문의해 주세요.');
+    setShowForgotModal(false);
   };
+
 
   return (
     <div className="fade-in" style={{ 

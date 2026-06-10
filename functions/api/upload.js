@@ -70,7 +70,8 @@ export async function onRequestPost(context) {
     }
 
     // 고유 키 생성
-    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = file.name || 'file.jpg';
+    const fileExt = fileName.split('.').pop() || 'jpg';
     const randomId = Math.random().toString(36).substring(2, 8);
     const key = `dogs/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
 

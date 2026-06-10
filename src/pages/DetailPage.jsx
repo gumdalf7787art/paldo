@@ -160,8 +160,53 @@ const DetailPage = () => {
     }
   };
 
+  const fetchEngagementStats = async (dogId) => {
+    try {
+      const { data, error } = await api.dogs.getDetail(dogId);
+      if (!error && data) {
+        setEngagement(prev => ({
+          ...prev,
+          likes: data.bookmarks_count || 0,
+          views: Math.max(prev.views, data.views_count || 0)
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch engagement stats:', err);
+    }
+  };
+
+  const fetchSellerInfo = async (sellerId) => {
+    try {
+      const { data, error } = await api.store.getProfile(sellerId);
+      if (!error && data) {
+        setSellerInfo({
+          ...data.profile,
+          business_name: data.business?.business_name || null,
+          biz_no: data.business?.biz_no || null,
+          animal_sale_no: data.business?.animal_sale_no || null
+        });
+        setActiveDogCount(data.active_count || 0);
+        setStoreReviews(data.reviews || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch seller info:', err);
+    }
+  };
+
+  const checkLikeStatus = async (dogId) => {
+    try {
+      const { data } = await api.bookmarks.check(dogId);
+      if (data && data.bookmarked) {
+        setIsLiked(true);
+      }
+    } catch (e) {
+      console.error('Failed to check like status:', e);
+    }
+  };
+
   useEffect(() => {
     if (dog) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchRecommendations(dog);
     }
   }, [dog?.id]);
@@ -219,6 +264,7 @@ const DetailPage = () => {
 
   useEffect(() => {
     if (dog) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (dog.seller_id) fetchSellerInfo(dog.seller_id);
     }
   }, [dog]);
@@ -226,49 +272,6 @@ const DetailPage = () => {
   // Hook 선언을 모두 마친 후 조건부 렌더링을 수행해야 합니다. (React Hook 규칙)
 
 
-  const fetchEngagementStats = async (dogId) => {
-    try {
-      const { data, error } = await api.dogs.getDetail(dogId);
-      if (!error && data) {
-        setEngagement(prev => ({
-          ...prev,
-          likes: data.bookmarks_count || 0,
-          views: Math.max(prev.views, data.views_count || 0)
-        }));
-      }
-    } catch (err) {
-      console.error('Failed to fetch engagement stats:', err);
-    }
-  };
-
-  const fetchSellerInfo = async (sellerId) => {
-    try {
-      const { data, error } = await api.store.getProfile(sellerId);
-      if (!error && data) {
-        setSellerInfo({
-          ...data.profile,
-          business_name: data.business?.business_name || null,
-          biz_no: data.business?.biz_no || null,
-          animal_sale_no: data.business?.animal_sale_no || null
-        });
-        setActiveDogCount(data.active_count || 0);
-        setStoreReviews(data.reviews || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch seller info:', err);
-    }
-  };
-
-  const checkLikeStatus = async (dogId) => {
-    try {
-      const { data } = await api.bookmarks.check(dogId);
-      if (data && data.bookmarked) {
-        setIsLiked(true);
-      }
-    } catch (e) {
-      console.error('Failed to check like status:', e);
-    }
-  };
 
   const toggleLike = async () => {
     if (!currentUser) {
@@ -344,6 +347,7 @@ const DetailPage = () => {
   useEffect(() => {
     if (currentUser && storeReviews.length > 0 && dog) {
       const alreadyReviewed = storeReviews.some(r => r.dog_id === dog.id && r.reviewer_id === currentUser.id);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasReviewedThisDog(alreadyReviewed);
     }
   }, [currentUser, storeReviews, dog?.id]);
@@ -352,6 +356,7 @@ const DetailPage = () => {
   useEffect(() => {
     if (dog) {
       const firstImg = [dog.image_url || dog.image, ...(dog.additional_images || [])].filter(Boolean)[0];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (firstImg) setSelectedImage(firstImg);
     }
   }, [dog]);
@@ -376,7 +381,7 @@ const DetailPage = () => {
     }
 
     try {
-      const { data, error } = await api.store.createReview({
+      const { error } = await api.store.createReview({
         dog_id: dog.id,
         seller_id: dog.seller_id,
         rating: reviewData.rating,
@@ -470,7 +475,7 @@ const DetailPage = () => {
   const totalReviews = storeReviews.length;
   const avgRating = totalReviews > 0 ? (storeReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1) : '5.0';
 
-  const isOwnPost = currentUser && dog.seller_id === currentUser.id;
+
 
   return (
     <div className="fade-in" style={{ paddingBottom: '100px' }}>
@@ -701,6 +706,7 @@ const DetailPage = () => {
             </div>
           </div>
         </div>
+      </div>
 
         {/* 유사한 댕댕이 추천 섹션 */}
         {recommendDogs.length > 0 && (

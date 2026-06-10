@@ -12,7 +12,13 @@ CREATE TABLE IF NOT EXISTS profiles (
     role TEXT DEFAULT 'buyer',                 -- 'buyer', 'seller', 'admin'
     grade TEXT DEFAULT '일반',                 -- 유저 등급
     completed_adoption_count INTEGER DEFAULT 0, -- 분양 완료 수
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    store_header_image TEXT,                   -- 상단 배너 이미지
+    store_contact TEXT,                        -- 스토어 연락처
+    kakao_channel TEXT,                        -- 카카오채널 주소
+    store_description TEXT,                    -- 스토어 설명글
+    store_address TEXT,                        -- 스토어 실주소
+    store_additional_images TEXT               -- 스토어 사진첩 JSON 리스트
 );
 
 

@@ -100,6 +100,8 @@ export async function onRequestGet(context) {
   const gender = url.searchParams.get('gender');
   const status = url.searchParams.get('status');
   const seller_id = url.searchParams.get('seller_id');
+  const exclude_id = url.searchParams.get('exclude_id');
+  const limit = url.searchParams.get('limit');
 
   try {
     let sql = `
@@ -127,8 +129,20 @@ export async function onRequestGet(context) {
       sql += ' AND d.seller_id = ?';
       bindings.push(seller_id);
     }
+    if (exclude_id) {
+      sql += ' AND d.id != ?';
+      bindings.push(exclude_id);
+    }
 
     sql += ' ORDER BY d.created_at DESC';
+
+    if (limit) {
+      const parsedLimit = parseInt(limit, 10);
+      if (!isNaN(parsedLimit)) {
+        sql += ' LIMIT ?';
+        bindings.push(parsedLimit);
+      }
+    }
 
     const { results } = await env.DB.prepare(sql)
       .bind(...bindings)

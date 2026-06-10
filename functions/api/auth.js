@@ -110,12 +110,31 @@ export async function onRequestGet(context) {
 
   // 2. D1 DB에서 최신 정보 조회 (기본값)
   try {
-    const dbUser = await env.DB.prepare('SELECT id, email, nickname, phone, address, profile_image, role, grade, completed_adoption_count, created_at FROM profiles WHERE id = ?')
+    const dbUser = await env.DB.prepare(`
+      SELECT p.id, p.email, p.nickname, p.phone, p.address, p.profile_image, p.role, p.grade, 
+             p.completed_adoption_count, p.created_at,
+             p.store_header_image, p.store_contact, p.kakao_channel, p.store_description, p.store_address, p.store_additional_images,
+             b.business_name, b.biz_no, b.animal_sale_no
+      FROM profiles p
+      LEFT JOIN business_applications b ON p.id = b.user_id AND b.status = 'approved'
+      WHERE p.id = ?
+    `)
       .bind(user.id)
       .first();
 
     if (!dbUser) {
       return createResponse({ error: '존재하지 않는 사용자 계정입니다.' }, 404);
+    }
+
+    // JSON 문자열 파싱
+    if (dbUser.store_additional_images) {
+      try {
+        dbUser.store_additional_images = JSON.parse(dbUser.store_additional_images);
+      } catch (e) {
+        dbUser.store_additional_images = [];
+      }
+    } else {
+      dbUser.store_additional_images = [];
     }
 
     return createResponse({ user: dbUser });
@@ -210,20 +229,72 @@ export async function onRequestPost(context) {
     const authUser = getAuthenticatedUser(request);
     if (!authUser) return createResponse({ error: '로그인이 필요합니다.' }, 401);
 
-    const { nickname, phone, address, profile_image } = body;
+    const { 
+      nickname, phone, address, profile_image,
+      store_header_image, store_contact, kakao_channel, store_description, store_address, store_additional_images
+    } = body;
+
+    let additionalImagesStr = undefined;
+    if (store_additional_images !== undefined) {
+      additionalImagesStr = Array.isArray(store_additional_images) 
+        ? JSON.stringify(store_additional_images) 
+        : store_additional_images;
+    }
 
     try {
       // 유저 정보 업데이트
-      await env.DB.prepare(
-        'UPDATE profiles SET nickname = COALESCE(?, nickname), phone = COALESCE(?, phone), address = COALESCE(?, address), profile_image = COALESCE(?, profile_image) WHERE id = ?'
-      )
-        .bind(nickname, phone, address, profile_image, authUser.id)
+      await env.DB.prepare(`
+        UPDATE profiles 
+        SET nickname = COALESCE(?, nickname), 
+            phone = COALESCE(?, phone), 
+            address = COALESCE(?, address), 
+            profile_image = COALESCE(?, profile_image),
+            store_header_image = COALESCE(?, store_header_image),
+            store_contact = COALESCE(?, store_contact),
+            kakao_channel = COALESCE(?, kakao_channel),
+            store_description = COALESCE(?, store_description),
+            store_address = COALESCE(?, store_address),
+            store_additional_images = COALESCE(?, store_additional_images)
+        WHERE id = ?
+      `)
+        .bind(
+          nickname !== undefined ? nickname : null,
+          phone !== undefined ? phone : null,
+          address !== undefined ? address : null,
+          profile_image !== undefined ? profile_image : null,
+          store_header_image !== undefined ? store_header_image : null,
+          store_contact !== undefined ? store_contact : null,
+          kakao_channel !== undefined ? kakao_channel : null,
+          store_description !== undefined ? store_description : null,
+          store_address !== undefined ? store_address : null,
+          additionalImagesStr !== undefined ? additionalImagesStr : null,
+          authUser.id
+        )
         .run();
 
-      // 수정된 최신 사용자 정보 조회
-      const updatedUser = await env.DB.prepare('SELECT id, email, nickname, phone, address, profile_image, role, grade, completed_adoption_count, created_at FROM profiles WHERE id = ?')
+      // 수정된 최신 사용자 정보 조회 (JOIN 추가)
+      const updatedUser = await env.DB.prepare(`
+        SELECT p.id, p.email, p.nickname, p.phone, p.address, p.profile_image, p.role, p.grade, 
+               p.completed_adoption_count, p.created_at,
+               p.store_header_image, p.store_contact, p.kakao_channel, p.store_description, p.store_address, p.store_additional_images,
+               b.business_name, b.biz_no, b.animal_sale_no
+        FROM profiles p
+        LEFT JOIN business_applications b ON p.id = b.user_id AND b.status = 'approved'
+        WHERE p.id = ?
+      `)
         .bind(authUser.id)
         .first();
+
+      // JSON 문자열 파싱
+      if (updatedUser && updatedUser.store_additional_images) {
+        try {
+          updatedUser.store_additional_images = JSON.parse(updatedUser.store_additional_images);
+        } catch (e) {
+          updatedUser.store_additional_images = [];
+        }
+      } else if (updatedUser) {
+        updatedUser.store_additional_images = [];
+      }
 
       return createResponse(updatedUser);
     } catch (err) {

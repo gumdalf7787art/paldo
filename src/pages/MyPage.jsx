@@ -340,14 +340,12 @@ const MyPage = () => {
       }
 
       const { error } = await api.auth.updateProfile({
-        store_header_image: bannerUrl,
-        store_contact: storeContact,
-        kakao_channel: kakaoChannel,
-        store_description: storeDescription,
-        store_address: storeAddress,
-        biz_no: bizNo,
-        animal_sale_no: animalSaleNo,
-        store_additional_images: finalStoreImages
+        store_header_image: bannerUrl || null,
+        store_contact: storeContact || null,
+        kakao_channel: kakaoChannel || null,
+        store_description: storeDescription || null,
+        store_address: storeAddress || null,
+        store_additional_images: finalStoreImages || []
       });
 
       if (error) throw new Error(error);
@@ -776,12 +774,12 @@ const MyPage = () => {
                         <input value={businessApp?.business_name || '등록된 상호명 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
                       </div>
                       <div>
-                         <label style={labelStyle}>사업자등록번호</label>
-                         <input value={bizNo} onChange={e => setBizNo(e.target.value)} placeholder="000-00-00000" style={inputStyle} />
+                         <label style={labelStyle}>사업자등록번호 (자동 연동)</label>
+                         <input value={businessApp?.biz_no || bizNo || '등록된 번호 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
                       </div>
                       <div>
-                         <label style={labelStyle}>동물판매등록번호</label>
-                         <input value={animalSaleNo} onChange={e => setAnimalSaleNo(e.target.value)} placeholder="제0000-0000-0000호" style={inputStyle} />
+                         <label style={labelStyle}>동물판매등록번호 (자동 연동)</label>
+                         <input value={businessApp?.animal_sale_no || animalSaleNo || '등록된 번호 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
                       </div>
                       <div>
                          <label style={labelStyle}>스토어 문의 연락처</label>

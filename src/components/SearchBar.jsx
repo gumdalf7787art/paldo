@@ -35,7 +35,7 @@ const SearchBar = () => {
         display: 'flex', 
         flexDirection: 'column', 
         gap: '10px',
-        backgroundColor: 'rgba(248, 250, 252, 0.95)',
+        backgroundColor: 'rgba(241, 245, 249, 0.95)',
         backdropFilter: 'blur(10px)',
         borderRadius: '12px',
         border: '1px solid #cbd5e1',

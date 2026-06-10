@@ -354,13 +354,19 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef(null);
 
-  // 2개씩 짝지어서 1개의 열(Column) 구성
-  const pairs = [];
-  for (let i = 0; i < dogs.length; i += 2) {
-    pairs.push(dogs.slice(i, i + 2));
+  // 홀수 개수일 경우 빈 칸이 생기지 않도록 첫 번째 강아지를 복제해서 맨 뒤에 추가해 짝수로 만듭니다.
+  const adjustedDogs = [...dogs];
+  if (adjustedDogs.length > 0 && adjustedDogs.length % 2 !== 0) {
+    adjustedDogs.push(adjustedDogs[0]);
   }
 
-  const showSlider = dogs.length > 8;
+  // 2개씩 짝지어서 1개의 열(Column) 구성
+  const pairs = [];
+  for (let i = 0; i < adjustedDogs.length; i += 2) {
+    pairs.push(adjustedDogs.slice(i, i + 2));
+  }
+
+  const showSlider = adjustedDogs.length > 8;
 
   // 자동 롤링 타이머
   useEffect(() => {
@@ -512,7 +518,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
             gap: '12px' 
           }}
         >
-          {dogs.map((dog, i) => (
+          {adjustedDogs.map((dog, i) => (
             <Card 
               key={`${badge}-${dog.id}-${i}`} 
               type="middle" 

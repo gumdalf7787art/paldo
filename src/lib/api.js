@@ -666,23 +666,24 @@ export const api = {
   // 10. 파일 업로드 (R2)
   async uploadFile(file, fileName = null) {
     try {
-      const formData = new FormData();
-      if (fileName) {
-        formData.append('file', file, fileName);
-      } else {
-        formData.append('file', file);
-      }
-
       const token = localStorage.getItem('paldo_session_token');
-      const headers = {};
+      const targetFileName = fileName || file.name || 'file.jpg';
+      
+      const headers = {
+        'Content-Type': file.type || 'application/octet-stream',
+        // 서버에서 디코딩할 수 있도록 파일명 URL 인코딩하여 커스텀 헤더로 전달
+        'X-File-Name': encodeURIComponent(targetFileName),
+      };
+
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
+      // FormData를 쓰지 않고 Blob(File) 자체를 body로 넘겨 원시 스트림 유지
       const response = await fetch(`${BASE_URL}/api/upload`, {
         method: 'POST',
         headers,
-        body: formData
+        body: file
       });
 
       const text = await response.text();

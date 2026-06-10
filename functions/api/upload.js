@@ -58,52 +58,29 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const formData = await request.formData();
-    const file = formData.get('file');
-    if (!file) {
+    // 1. 헤더에서 메타데이터 추출
+    const fileNameHeader = request.headers.get('X-File-Name');
+    const fileName = fileNameHeader ? decodeURIComponent(fileNameHeader) : 'file.jpg';
+    const contentType = request.headers.get('Content-Type') || 'application/octet-stream';
+
+    // 2. 바디를 온전한 버퍼로 추출 (FormData 파싱 개입 차단)
+    const uploadBody = await request.arrayBuffer();
+
+    if (!uploadBody || uploadBody.byteLength === 0) {
       return createResponse({ error: '업로드할 파일이 전송되지 않았습니다.' }, 400);
     }
 
-    const isString = typeof file === 'string';
-    const fileSize = isString ? file.length : (file.size || 0);
-
     // 파일 크기 검증 (예: 5MB)
-    if (fileSize > 5 * 1024 * 1024) {
+    if (uploadBody.byteLength > 5 * 1024 * 1024) {
       return createResponse({ error: '파일 크기는 최대 5MB까지 가능합니다.' }, 400);
     }
 
-    // 고유 키 생성
-    const fileName = (!isString && file.name) ? file.name : 'file.jpg';
+    // 3. 고유 키 생성
     const fileExt = fileName.split('.').pop() || 'jpg';
     const randomId = Math.random().toString(36).substring(2, 8);
     const key = `dogs/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
 
-    // 바이너리 데이터 및 Content-Type 추출
-    let uploadBody;
-    let contentType = 'image/jpeg';
-
-    if (isString) {
-      if (file.startsWith('data:')) {
-        const parts = file.split(',');
-        const mimeMatch = parts[0].match(/:(.*?);/);
-        contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const binary = atob(parts[1]);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-        uploadBody = bytes.buffer;
-      } else {
-        contentType = 'text/plain';
-        uploadBody = new TextEncoder().encode(file).buffer;
-      }
-    } else {
-      contentType = file.type || 'image/jpeg';
-      // File/Blob 객체인 경우 R2.put에 바로 넘겨 스트림 형태로 바이너리가 깨짐 없이 안전하게 업로드되도록 합니다.
-      uploadBody = file;
-    }
-
-    // R2 업로드
+    // 4. R2 업로드 (원시 바이트 스트림 저장)
     await env.R2.put(key, uploadBody, {
       httpMetadata: { contentType }
     });

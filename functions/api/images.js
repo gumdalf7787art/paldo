@@ -57,9 +57,8 @@ export async function onRequestGet(context) {
       else headers.set('content-type', 'image/jpeg');
     }
 
-    // ReadableStream 대신 ArrayBuffer를 통하여 온전한 바이너리 상태로 클라이언트에 전달
-    const arrayBuffer = await object.arrayBuffer();
-    return new Response(arrayBuffer, {
+    // 스트림을 직접 반환하여 메모리 낭비 없이 클라이언트에 파일 제공
+    return new Response(object.body, {
       headers
     });
   } catch (err) {

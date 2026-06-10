@@ -537,11 +537,11 @@ const PetInsuranceBanner = () => {
     <div 
       style={{
         width: '100%',
-        height: '110px',
+        height: '140px',
         borderRadius: '12px',
         overflow: 'hidden',
         position: 'relative',
-        marginBottom: '18px',
+        marginBottom: '20px',
         border: '1px solid #cbd5e1',
         boxShadow: 'var(--shadow)',
         cursor: 'pointer',
@@ -551,7 +551,7 @@ const PetInsuranceBanner = () => {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.08)';
+        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
         const bg = e.currentTarget.querySelector('.banner-bg');
         if (bg) bg.style.transform = 'scale(1.03)';
       }}
@@ -586,7 +586,7 @@ const PetInsuranceBanner = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0) 100%)',
           zIndex: 2
         }}
       />
@@ -595,34 +595,37 @@ const PetInsuranceBanner = () => {
         style={{
           position: 'relative',
           zIndex: 3,
-          padding: '0 30px',
+          padding: '0 40px',
           color: 'white',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px'
+          gap: '8px',
+          maxWidth: '70%'
         }}
       >
         <span 
           style={{
-            fontSize: '0.7rem',
+            fontSize: '0.8rem',
             fontWeight: '800',
             backgroundColor: '#ff4757',
-            padding: '3px 8px',
+            padding: '4px 10px',
             borderRadius: '20px',
             width: 'fit-content',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '1px'
           }}
         >
           마이펫 케어
         </span>
         <h2 
           style={{
-            fontSize: '1.2rem',
-            fontWeight: '800',
+            fontSize: '1.9rem',
+            fontWeight: '900',
             margin: 0,
-            letterSpacing: '-0.5px',
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            lineHeight: '1.25',
+            letterSpacing: '-1px',
+            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
+            wordBreak: 'keep-all'
           }}
         >
           우리 아이 건강을 지켜주는 평생 건강보험
@@ -633,23 +636,23 @@ const PetInsuranceBanner = () => {
       <div 
         style={{
           position: 'absolute',
-          right: '30px',
+          right: '40px',
           zIndex: 3,
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          color: '#333',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          fontSize: '0.75rem',
-          fontWeight: '700',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          color: '#111',
+          padding: '10px 20px',
+          borderRadius: '30px',
+          fontSize: '0.8rem',
+          fontWeight: '800',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '6px',
           transition: 'all 0.3s ease'
         }}
       >
         <span>자세히 보기</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </div>
     </div>
   );

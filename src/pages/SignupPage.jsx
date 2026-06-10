@@ -59,7 +59,7 @@ const SignupPage = () => {
       }
 
       if (userData) {
-        alert('회원가입이 완료되었습니다! 가입하신 이메일로 로그인해 주세요.');
+        alert('회원가입이 완료되었습니다!');
         navigate('/login');
       }
     } catch (error) {

@@ -368,7 +368,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 
   return (
     <section style={{ 
-      padding: '24px', 
+      padding: '20px 20px 10px 20px', 
       backgroundColor: 'white', 
       borderRadius: '12px', 
       border: '1px solid #cbd5e1', 
@@ -413,23 +413,23 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
           <div 
             style={{
               display: 'flex',
-              gap: '15px',
+              gap: '12px',
               transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-              transform: `translateX(calc(-${currentIndex} * (25% + 3.75px)))`
+              transform: `translateX(calc(-${currentIndex} * (25% + 3px)))`
             }}
           >
             {pairs.map((pair, idx) => (
               <div 
                 key={`pair-${idx}`}
                 style={{
-                  flex: '0 0 calc(25% - 11.25px)',
+                  flex: '0 0 calc(25% - 9px)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '15px'
+                  gap: '8px'
                 }}
               >
                 {pair.map((dog, i) => (
-                  <div key={`${badge}-${dog.id}-${i}`} style={{ height: '225px' }}>
+                  <div key={`${badge}-${dog.id}-${i}`} style={{ height: '195px' }}>
                     <Card 
                       type="middle" 
                       badgeText={dog.badgeText || badge} 
@@ -447,7 +447,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
           className="responsive-grid-2" 
           style={{ 
             gridTemplateColumns: 'repeat(4, 1fr)', 
-            gap: '15px' 
+            gap: '12px' 
           }}
         >
           {dogs.map((dog, i) => (

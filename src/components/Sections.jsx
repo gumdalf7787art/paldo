@@ -349,6 +349,9 @@ const defaultSpecialDogs = [
 
 const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitionActive, setIsTransitionActive] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef(null);
 
   // 2개씩 짝지어서 1개의 열(Column) 구성
   const pairs = [];
@@ -356,15 +359,72 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
     pairs.push(dogs.slice(i, i + 2));
   }
 
+  const showSlider = dogs.length > 8;
+
+  // 자동 롤링 타이머
+  useEffect(() => {
+    if (!showSlider || isPaused) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      return;
+    }
+
+    timerRef.current = setTimeout(() => {
+      setIsTransitionActive(true);
+      setCurrentIndex((prev) => {
+        if (prev === pairs.length) {
+          setIsTransitionActive(false);
+          setCurrentIndex(0);
+          setTimeout(() => {
+            setIsTransitionActive(true);
+            setCurrentIndex(1);
+          }, 30);
+          return 0;
+        }
+        return prev + 1;
+      });
+    }, 4000); // 4초마다 자동으로 다음으로 이동
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [currentIndex, pairs.length, isPaused, showSlider]);
+
   const handlePrev = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    if (timerRef.current) clearTimeout(timerRef.current);
+    
+    if (currentIndex === 0) {
+      setIsTransitionActive(false);
+      setCurrentIndex(pairs.length);
+      setTimeout(() => {
+        setIsTransitionActive(true);
+        setCurrentIndex(pairs.length - 1);
+      }, 30);
+    } else {
+      setIsTransitionActive(true);
+      setCurrentIndex(prev => prev - 1);
+    }
   };
 
   const handleNext = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, pairs.length - 4));
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    setIsTransitionActive(true);
+    setCurrentIndex((prev) => {
+      if (prev === pairs.length) {
+        setIsTransitionActive(false);
+        setCurrentIndex(0);
+        setTimeout(() => {
+          setIsTransitionActive(true);
+          setCurrentIndex(1);
+        }, 30);
+        return 0;
+      }
+      return prev + 1;
+    });
   };
 
-  const showSlider = dogs.length > 8;
+  // extendedPairs 구성 (뒤에 처음 4개 pair 복제)
+  const extendedPairs = showSlider ? [...pairs, ...pairs.slice(0, 4)] : pairs;
 
   return (
     <section style={{ 
@@ -387,38 +447,39 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
           등록된 분양 매물이 없습니다.
         </p>
       ) : showSlider ? (
-        /* 슬라이드 뷰 (8개 초과 시 가로 1열씩 슬라이드) */
-        <div style={{ position: 'relative', overflow: 'hidden' }}>
+        /* 슬라이드 뷰 (8개 초과 시 가로 1열씩 무한 슬라이드) */
+        <div 
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          style={{ position: 'relative', overflow: 'hidden' }}
+        >
           {/* 좌측 버튼 */}
-          {currentIndex > 0 && (
-            <button 
-              onClick={handlePrev}
-              className="ad-carousel-btn left"
-              aria-label="이전 슬라이드"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-          )}
+          <button 
+            onClick={handlePrev}
+            className="ad-carousel-btn left"
+            aria-label="이전 슬라이드"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          
           {/* 우측 버튼 */}
-          {currentIndex < pairs.length - 4 && (
-            <button 
-              onClick={handleNext}
-              className="ad-carousel-btn right"
-              aria-label="다음 슬라이드"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          )}
+          <button 
+            onClick={handleNext}
+            className="ad-carousel-btn right"
+            aria-label="다음 슬라이드"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
           <div 
             style={{
               display: 'flex',
               gap: '12px',
-              transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: isTransitionActive ? 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)' : 'none',
               transform: `translateX(calc(-${currentIndex} * (25% + 3px)))`
             }}
           >
-            {pairs.map((pair, idx) => (
+            {extendedPairs.map((pair, idx) => (
               <div 
                 key={`pair-${idx}`}
                 style={{

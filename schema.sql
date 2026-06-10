@@ -136,6 +136,8 @@ CREATE TABLE IF NOT EXISTS coupons (
     name TEXT NOT NULL,
     discount_rate INTEGER DEFAULT 0,           -- 할인율 (%)
     code TEXT UNIQUE NOT NULL,
+    auto_issue_type TEXT DEFAULT 'none',       -- 자동발급 구분 ('welcome', 'none' 등)
+    valid_until TEXT,                          -- 유효 기간 설정
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -146,6 +148,7 @@ CREATE TABLE IF NOT EXISTS user_coupons (
     coupon_id INTEGER NOT NULL,
     is_used INTEGER DEFAULT 0,                 -- 0: 미사용, 1: 사용됨
     used_at TEXT,
+    expires_at TEXT,                           -- 유저별 쿠폰 만료 기한
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES profiles(id) ON DELETE CASCADE,
     FOREIGN KEY(coupon_id) REFERENCES coupons(id) ON DELETE CASCADE

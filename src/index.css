@@ -936,3 +936,25 @@ html, body {
   background-color: #fff5f5;
   color: #c53030;
 }
+
+/* Header User Dropdown Item */
+.header-dropdown-item {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--body-text) !important;
+  text-decoration: none;
+  display: block;
+  transition: var(--transition);
+  text-align: left;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.header-dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: var(--primary) !important;
+}

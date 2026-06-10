@@ -6,12 +6,15 @@ import { api } from '../lib/api';
 const Header = () => {
   const [session, setSession] = useState(null);
   const [role, setRole] = useState('user');
+  const [nickname, setNickname] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const userDropdownRef = useRef(null);
 
   useEffect(() => {
     const initSession = async () => {
@@ -20,10 +23,14 @@ const Header = () => {
       setSession(session);
       if (session?.user) {
         const { data: profileData } = await api.auth.getUser();
-        if (profileData) setRole(profileData.role || 'user');
+        if (profileData) {
+          setRole(profileData.role || 'user');
+          setNickname(profileData.nickname || profileData.email?.split('@')[0] || '사용자');
+        }
         fetchNotifications();
       } else {
         setRole('user');
+        setNickname('');
         setNotifications([]);
         setTotalUnreadCount(0);
       }
@@ -39,6 +46,9 @@ const Header = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setShowUserDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -174,11 +184,89 @@ const Header = () => {
                   )}
                 </div>
 
-                {role === 'admin' && (
-                  <Link to="/admin" style={{ ...navLinkStyle, color: 'var(--primary-dark)', fontWeight: '800' }}>👑 관리자 모드</Link>
-                )}
-                <Link to="/mypage" style={navLinkStyle}>마이페이지</Link>
-                <button onClick={handleLogout} style={navBtnStyle}>로그아웃</button>
+                <div style={{ position: 'relative' }} ref={userDropdownRef}>
+                  <button 
+                    onClick={() => setShowUserDropdown(!showUserDropdown)} 
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--body-text)',
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      backgroundColor: 'rgba(0,0,0,0.02)',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.02)'}
+                  >
+                    <span>👤 {nickname}님</span>
+                    <span style={{ fontSize: '0.65rem', color: '#888' }}>▼</span>
+                  </button>
+
+                  {showUserDropdown && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '45px',
+                      right: '0',
+                      width: '160px',
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+                      border: '1px solid #cbd5e1',
+                      overflow: 'hidden',
+                      zIndex: 1001,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      padding: '6px 0'
+                    }}>
+                      {role === 'admin' && (
+                        <Link 
+                          to="/admin" 
+                          onClick={() => setShowUserDropdown(false)}
+                          className="header-dropdown-item"
+                        >
+                          👑 관리자 모드
+                        </Link>
+                      )}
+                      
+                      <Link 
+                        to="/mypage" 
+                        onClick={() => setShowUserDropdown(false)}
+                        className="header-dropdown-item"
+                      >
+                        👤 마이페이지
+                      </Link>
+
+                      <Link 
+                        to="/mypage" 
+                        state={{ tab: 'chats' }}
+                        onClick={() => setShowUserDropdown(false)}
+                        className="header-dropdown-item"
+                      >
+                        💬 팔톡메시지
+                      </Link>
+
+                      <div style={{ borderTop: '1px solid #e2e8f0', margin: '6px 0' }} />
+
+                      <button 
+                        onClick={() => {
+                          setShowUserDropdown(false);
+                          handleLogout();
+                        }}
+                        className="header-dropdown-item"
+                        style={{ color: '#e53e3e' }}
+                      >
+                        🚪 로그아웃
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import { api } from '../lib/api';
+import sidebarAd from '../assets/images/sidebar_ad.png';
 import { calculateAge } from '../utils/age';
 
 // 배열 요소를 무작위로 섞는 함수 (Fisher-Yates Shuffle)
@@ -448,75 +449,43 @@ const AdoptionList = () => {
 
 
 const LoginWidget = () => {
-  const [session, setSession] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const initWidget = async () => {
-      const { data: sessionData } = await api.auth.getSession();
-      const session = sessionData?.session;
-      setSession(session);
-      if (session?.user) {
-        const { data: profileData } = await api.auth.getUser();
-        if (profileData) setProfile(profileData);
-      } else {
-        setProfile(null);
-      }
-    };
-    initWidget();
-
-    window.addEventListener('auth-change', initWidget);
-    return () => window.removeEventListener('auth-change', initWidget);
-  }, []);
-
-  const handleLogout = async () => {
-    await api.auth.logout();
-    setSession(null);
-    setProfile(null);
-    window.dispatchEvent(new Event('auth-change'));
-    alert('로그아웃되었습니다.');
-    navigate('/');
-  };
-
-  if (!session) {
-    return (
-      <div className="naver-login-widget">
-        <p className="naver-login-widget-text">🐾 팔도댕댕을 로그인하고 더 안전하고 편리하게 분양을 이용해보세요.</p>
-        <button onClick={() => navigate('/login')} className="naver-login-btn">팔도댕댕 로그인</button>
-        <div className="naver-login-links">
-          <a href="/signup">회원가입</a>
-          <span>|</span>
-          <a href="/reset-password">비밀번호 찾기</a>
-        </div>
-      </div>
-    );
-  }
-
-  const userNickname = profile?.nickname || session.user.email?.split('@')[0] || '사용자';
-
   return (
-    <div className="naver-profile-widget">
-      <div className="profile-widget-header">
-        <div className="profile-widget-avatar">
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            userNickname.charAt(0).toUpperCase()
-          )}
-        </div>
-        <div className="profile-widget-info">
-          <h4>{userNickname} 님</h4>
-          <span style={{ color: 'var(--primary-dark)', fontWeight: 'bold' }}>
-            {profile?.role === 'admin' ? '👑 관리자' : profile?.role === 'seller' ? '🏢 안심 분양 파트너' : '👤 일반 회원'}
-          </span>
-        </div>
-      </div>
-      <div className="profile-widget-menu">
-        <button onClick={() => navigate('/mypage')} className="profile-widget-menu-btn">마이페이지</button>
-        <button onClick={() => navigate('/mypage')} className="profile-widget-menu-btn">팔톡 메시지</button>
-        <button onClick={handleLogout} className="profile-widget-menu-btn profile-widget-logout-btn">로그아웃</button>
-      </div>
+    <div 
+      className="naver-profile-widget" 
+      style={{ 
+        padding: '0', 
+        overflow: 'hidden', 
+        cursor: 'pointer',
+        display: 'block',
+        height: '160px',
+        position: 'relative'
+      }}
+      onClick={() => window.open('https://github.com/gumdalf7787art/paldo', '_blank')}
+    >
+      <img 
+        src={sidebarAd} 
+        alt="광고 배너" 
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          objectFit: 'cover',
+          display: 'block'
+        }} 
+      />
+      <span style={{
+        position: 'absolute',
+        bottom: '8px',
+        right: '8px',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        color: 'white',
+        fontSize: '0.62rem',
+        padding: '2px 6px',
+        borderRadius: '4px',
+        fontWeight: 'bold',
+        letterSpacing: '0.5px'
+      }}>
+        AD
+      </span>
     </div>
   );
 };

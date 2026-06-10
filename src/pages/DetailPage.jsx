@@ -7,16 +7,22 @@ import { calculateAge } from '../utils/age';
 function renderVideoEmbed(videoUrl) {
   if (!videoUrl) return null;
   const url = videoUrl;
-  const ytWatch = 'youtube.com' + '/watch';
-  const ytShort = 'youtu.be' + '/';
-  if (url.includes(ytWatch) || url.includes(ytShort)) {
+  const ytWatch = 'youtube.com/watch';
+  const ytShort = 'youtu.be/';
+  const ytShorts = 'youtube.com/shorts/';
+  
+  if (url.includes(ytWatch) || url.includes(ytShort) || url.includes(ytShorts)) {
     let videoId = '';
-    if (url.includes(ytShort)) {
+    if (url.includes(ytShorts)) {
+      videoId = url.split(ytShorts)[1].split('?')[0];
+    } else if (url.includes(ytShort)) {
       videoId = url.split(ytShort)[1].split('?')[0];
     } else {
       videoId = new URLSearchParams(url.split('?')[1]).get('v');
     }
-    const embedSrc = 'https:' + '//' + 'www.youtube.com' + '/embed/' + videoId;
+    
+    // 자동재생(autoplay) 및 음소거(mute) 필수 (브라우저 정책에 의해 자동재생은 음소거 시에만 동작)
+    const embedSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
     return (
       <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px' }}>
         <iframe
@@ -30,7 +36,8 @@ function renderVideoEmbed(videoUrl) {
       </div>
     );
   }
-  const externalHref = url.startsWith('http') ? url : ('https:' + '//' + url);
+
+  const externalHref = url.startsWith('http') ? url : ('https://' + url);
   return (
     <a
       href={externalHref}

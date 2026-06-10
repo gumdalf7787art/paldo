@@ -1,5 +1,5 @@
 # Cloudflare Pages / D1 Configuration for Paldo
-name = "paldo"
+name = "paldo-dog"
 pages_build_output_dir = "dist"
 
 [[d1_databases]]

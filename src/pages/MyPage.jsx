@@ -545,11 +545,20 @@ const MyPage = () => {
                 <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
 
                 {!isSeller && (
-                  !businessApp ? (
-                    <button onClick={() => setIsApplyModalOpen(true)} style={{ ...actionBtnStyle, border: 'none', background: 'none', color: '#888', fontSize: '0.75rem', textDecoration: 'underline' }}>사업자로 등록하기</button>
-                  ) : (
-                    businessApp.status === 'pending' ? <div style={{ fontSize:'0.75rem', color:'var(--primary)', textAlign:'center' }}>사업자 등록 검토 중</div> : null
-                  )
+                  <>
+                    {(!businessApp || businessApp.status === 'rejected') ? (
+                      <button onClick={() => setIsApplyModalOpen(true)} style={{ ...actionBtnStyle, border: 'none', background: 'none', color: '#888', fontSize: '0.75rem', textDecoration: 'underline' }}>
+                        사업자로 등록하기
+                      </button>
+                    ) : (
+                      businessApp.status === 'pending' ? <div style={{ fontSize:'0.75rem', color:'var(--primary)', textAlign:'center' }}>사업자 등록 검토 중</div> : null
+                    )}
+                    {businessApp && businessApp.status === 'rejected' && (
+                      <div style={{ fontSize:'0.75rem', color:'#ff4757', textAlign:'center', marginTop: '5px' }}>
+                        이전 신청이 반려되었습니다.<br/>(사유: {businessApp.rejected_reason || '사유 미기재'})
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

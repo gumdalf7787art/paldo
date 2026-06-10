@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import { api } from '../lib/api';
 import sidebarAd from '../assets/images/sidebar_ad.png';
+import petInsuranceBanner from '../assets/images/pet_insurance_banner.png';
 import { calculateAge } from '../utils/age';
 
 // 배열 요소를 무작위로 섞는 함수 (Fisher-Yates Shuffle)
@@ -525,6 +526,129 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   );
 };
 
+const PetInsuranceBanner = () => {
+  return (
+    <div 
+      style={{
+        width: '100%',
+        height: '110px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        position: 'relative',
+        marginBottom: '18px',
+        border: '1px solid #cbd5e1',
+        boxShadow: 'var(--shadow)',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        transition: 'all 0.3s ease'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.08)';
+        const bg = e.currentTarget.querySelector('.banner-bg');
+        if (bg) bg.style.transform = 'scale(1.03)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--shadow)';
+        const bg = e.currentTarget.querySelector('.banner-bg');
+        if (bg) bg.style.transform = 'scale(1)';
+      }}
+    >
+      {/* 배경 이미지 */}
+      <div 
+        className="banner-bg"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${petInsuranceBanner})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          transition: 'transform 0.6s ease',
+          zIndex: 1
+        }}
+      />
+      {/* 어두운 그라데이션 오버레이 (텍스트 가독성 확보) */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%)',
+          zIndex: 2
+        }}
+      />
+      {/* 배너 텍스트 및 버튼 콘텐츠 */}
+      <div 
+        style={{
+          position: 'relative',
+          zIndex: 3,
+          padding: '0 30px',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px'
+        }}
+      >
+        <span 
+          style={{
+            fontSize: '0.7rem',
+            fontWeight: '800',
+            backgroundColor: '#ff4757',
+            padding: '3px 8px',
+            borderRadius: '20px',
+            width: 'fit-content',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}
+        >
+          마이펫 케어
+        </span>
+        <h2 
+          style={{
+            fontSize: '1.2rem',
+            fontWeight: '800',
+            margin: 0,
+            letterSpacing: '-0.5px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+          }}
+        >
+          우리 아이 건강을 지켜주는 평생 건강보험
+        </h2>
+      </div>
+      
+      {/* 오른쪽 끝 장식 버튼 */}
+      <div 
+        style={{
+          position: 'absolute',
+          right: '30px',
+          zIndex: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          color: '#333',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          fontSize: '0.75rem',
+          fontWeight: '700',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <span>자세히 보기</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </div>
+    </div>
+  );
+};
+
 const AdSections = () => {
   const [safeDogs, setSafeDogs] = useState([]);
   const [popularDogs, setPopularDogs] = useState([]);
@@ -558,6 +682,7 @@ const AdSections = () => {
   return (
     <>
       <AdSectionItem title="🛡️ 안심 분양 정보" sub="팔도댕댕이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
+      <PetInsuranceBanner />
       <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
       <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />
     </>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import Card from '../components/Card';
 
 const StorePage = () => {
@@ -16,17 +16,17 @@ const StorePage = () => {
   const fetchStoreData = async () => {
     setLoading(true);
     
-    // 1. 판매자 프로필 정보 (스토어 정보 포함)
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', sellerId).maybeSingle();
+    // 1. 판매자 프로필 정보 및 사업자 정보 조회 (REST API)
+    const { data: storeData, error: storeError } = await api.store.getProfile(sellerId);
     
-    if (!profile || profile.role === 'user') {
+    if (storeError || !storeData || !storeData.profile || storeData.profile.role === 'user') {
       alert('존재하지 않거나 유효하지 않은 스토어입니다.');
       navigate('/');
       return;
     }
 
-    // 2. 사업자 등록된 상호명
-    const { data: biz } = await supabase.from('business_applications').select('business_name, biz_no, animal_sale_no').eq('user_id', sellerId).eq('status', 'approved').maybeSingle();
+    const profile = storeData.profile;
+    const biz = storeData.biz;
     
     setStoreInfo({
       ...profile,
@@ -35,30 +35,18 @@ const StorePage = () => {
       animal_sale_no: profile.animal_sale_no || biz?.animal_sale_no
     });
 
-    // 3. 해당 스토어의 게시물
-    const { data: dogs } = await supabase
-      .from('dogs')
-      .select('*')
-      .eq('seller_id', sellerId)
-      .order('created_at', { ascending: false });
-      
+    // 2. 해당 스토어의 게시물 (REST API)
+    const { data: dogs } = await api.dogs.getList({ seller_id: sellerId });
     if (dogs) setStoreDogs(dogs);
 
-    // 4. 스토어 리뷰 정보
-    const { data: reviews } = await supabase.from('store_reviews').select('*').eq('seller_id', sellerId).order('created_at', { ascending: false });
-    
-    if (reviews && reviews.length > 0) {
-      const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
-      const { data: reviewersProfiles } = await supabase.from('profiles').select('id, nickname, profile_image').in('id', reviewerIds);
-      
-      const enrichedReviews = reviews.map(r => {
-        const reviewer = reviewersProfiles?.find(p => p.id === r.reviewer_id);
-        return {
-          ...r,
-          reviewer_nickname: reviewer?.nickname || '사용자',
-          reviewer_image: reviewer?.profile_image || 'https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?auto=format&fit=crop&q=80&w=40&h=40'
-        };
-      });
+    // 3. 스토어 리뷰 정보 (REST API)
+    const { data: reviews } = await api.store.getReviews(sellerId);
+    if (reviews) {
+      const enrichedReviews = reviews.map(r => ({
+        ...r,
+        reviewer_nickname: r.nickname || '사용자',
+        reviewer_image: r.profile_image || 'https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?auto=format&fit=crop&q=80&w=40&h=40'
+      }));
       setStoreReviews(enrichedReviews);
     }
 

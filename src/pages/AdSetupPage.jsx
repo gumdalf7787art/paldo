@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 
 const AdSetupPage = () => {
   const { id: dogId } = useParams();
@@ -27,23 +27,20 @@ const AdSetupPage = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const { data: sessionData, error: sessionErr } = await api.auth.getSession();
+    if (sessionErr || !sessionData?.session) {
       alert('로그인이 필요합니다.');
       navigate('/login');
       return;
     }
-    setSession(session);
+    const currentSession = sessionData.session;
+    setSession(currentSession);
 
-    // 강아지 상세 정보 가져오기
-    const { data: dogData } = await supabase
-      .from('dogs')
-      .select('*')
-      .eq('id', dogId)
-      .single();
+    // 강아지 상세 정보 가져오기 (REST API)
+    const { data: dogData } = await api.dogs.getDetail(dogId);
     
     if (dogData) {
-      if (dogData.seller_id !== session.user.id && session.user.user_metadata?.role !== 'admin') {
+      if (dogData.seller_id !== currentSession.user.id && currentSession.user.role !== 'admin') {
         alert('본인의 게시물만 광고 설정이 가능합니다.');
         navigate('/mypage');
         return;
@@ -51,33 +48,15 @@ const AdSetupPage = () => {
       setDog(dogData);
     }
 
-    // 본인 소유의 사용 가능한 쿠폰 가져오기 (쿠폰 정보 조인)
-    const { data: couponData } = await supabase
-      .from('user_coupons')
-      .select(`
-        *,
-        coupons:coupon_id(display_name, benefit_type)
-      `)
-      .eq('user_id', session.user.id)
-      .eq('is_used', false);
+    // 본인 소유의 사용 가능한 쿠폰 가져오기 (REST API)
+    const { data: couponData } = await api.auth.getMyCoupons();
     
     if (couponData) {
-      // 광고 관련 쿠폰(ad_로 시작하는 타입)만 필터링하되, 
-      // Join 실패로 정보를 알 수 없는 경우(null)에도 일단 사용자에게 노출하도록 허용 (안전장치)
-      const adCoupons = couponData.filter(c => {
-        const type = c.coupons?.benefit_type;
-        return !type || type.startsWith('ad_');
-      });
-      setCoupons(adCoupons);
+      setCoupons(couponData);
     }
 
-    // 현재 진행 중인 메인광고 수 조회
-    const { count: mainAdsCount } = await supabase
-      .from('advertisements')
-      .select('*', { count: 'exact', head: true })
-      .eq('ad_type', 'main')
-      .eq('status', 'active');
-      
+    // 현재 진행 중인 메인광고 수 조회 (REST API)
+    const { data: mainAdsCount } = await api.ads.getCount('main', 'active');
     setActiveMainAds(mainAdsCount || 0);
 
     setLoading(false);
@@ -103,29 +82,18 @@ const AdSetupPage = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. 광고 내역 저장
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + parseInt(duration));
-
-      const { error: adError } = await supabase.from('advertisements').insert([{
-        dog_id: dogId,
-        seller_id: session.user.id,
+      // REST API: 광고 생성 및 쿠폰 소모 동시 처리
+      const { data, error } = await api.ads.create({
+        dog_id: parseInt(dogId),
         ad_type: adType,
-        start_date: new Date().toISOString(),
-        end_date: endDate.toISOString(),
-        status: 'active',
-        used_coupon_id: selectedCoupon
-      }]);
+        title: `${dog.nickname} 분양 광고 (${adTypeDisplay[adType]})`,
+        duration: parseInt(duration),
+        used_coupon_id: parseInt(selectedCoupon)
+      });
 
-      if (adError) throw adError;
+      if (error) throw new Error(error);
 
-      // 2. 쿠폰 사용 처리
-      const { error: couponUpdateError } = await supabase
-        .from('user_coupons')
-        .update({ is_used: true, used_at: new Date().toISOString() })
-        .eq('id', selectedCoupon);
-
-      if (couponUpdateError) throw couponUpdateError;
+      const endDate = data?.endDate ? new Date(data.endDate) : new Date();
 
       alert(`광고 설정이 완료되었습니다!\n진행 기간: ${duration}일 (${endDate.toLocaleDateString()} 까지)\n내 게시물이 즉시 홍보됩니다.`);
       navigate('/mypage');
@@ -236,7 +204,7 @@ const AdSetupPage = () => {
               >
                 <option value="">🎁 사용할 쿠폰을 선택해 주세요</option>
                 {coupons.map(c => (
-                  <option key={c.id} value={c.id}>{c.coupons?.display_name || '무명 쿠폰'}</option>
+                  <option key={c.id} value={c.id}>{c.name || '무명 쿠폰'} ({c.discount_rate}% 할인)</option>
                 ))}
               </select>
               {coupons.length === 0 && (

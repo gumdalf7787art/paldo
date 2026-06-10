@@ -115,12 +115,19 @@ CREATE TABLE IF NOT EXISTS analytics_logs (
 CREATE TABLE IF NOT EXISTS advertisements (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
+    dog_id INTEGER,                            -- 연결된 강아지 매물 ID 추가
+    ad_type TEXT DEFAULT 'main',               -- 'main', 'safe', 'popular', 'special'
     title TEXT NOT NULL,
     status TEXT DEFAULT 'pending',             -- 'pending', 'active', 'ended'
     budget INTEGER DEFAULT 0,
     duration INTEGER DEFAULT 0,                -- 광고 기간 (일 단위)
+    start_date TEXT,
+    end_date TEXT,
+    used_coupon_id INTEGER,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES profiles(id) ON DELETE CASCADE
+    FOREIGN KEY(user_id) REFERENCES profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY(dog_id) REFERENCES dogs(id) ON DELETE CASCADE,
+    FOREIGN KEY(used_coupon_id) REFERENCES user_coupons(id) ON DELETE SET NULL
 );
 
 -- 10. 쿠폰 테이블

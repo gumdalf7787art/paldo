@@ -78,16 +78,37 @@ export async function onRequestOptions() {
   });
 }
 
-// GET 요청 처리 (세션 확인)
+// GET 요청 처리 (세션 확인 및 쿠폰 조회)
 export async function onRequestGet(context) {
   const { request, env } = context;
+  const url = new URL(request.url);
+  const action = url.searchParams.get('action');
   const user = getAuthenticatedUser(request);
   
   if (!user) {
     return createResponse({ error: '인증 세션이 유효하지 않습니다.' }, 401);
   }
 
-  // D1 DB에서 최신 정보 조회
+  // 1. 내 쿠폰 목록 조회
+  if (action === 'coupons') {
+    try {
+      const { results: coupons } = await env.DB.prepare(`
+        SELECT uc.id, uc.user_id, uc.coupon_id, uc.is_used, uc.used_at, uc.created_at,
+               c.name, c.discount_rate, c.code
+        FROM user_coupons uc
+        INNER JOIN coupons c ON uc.coupon_id = c.id
+        WHERE uc.user_id = ? AND uc.is_used = 0
+      `)
+        .bind(user.id)
+        .all();
+
+      return createResponse(coupons);
+    } catch (err) {
+      return createResponse({ error: `쿠폰 조회 오류: ${err.message}` }, 500);
+    }
+  }
+
+  // 2. D1 DB에서 최신 정보 조회 (기본값)
   try {
     const dbUser = await env.DB.prepare('SELECT id, email, nickname, phone, address, profile_image, role, grade, completed_adoption_count, created_at FROM profiles WHERE id = ?')
       .bind(user.id)

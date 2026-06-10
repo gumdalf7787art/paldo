@@ -128,6 +128,15 @@ export const api = {
       } catch (err) {
         return { data: null, error: err.message };
       }
+    },
+
+    async getMyCoupons() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/auth?action=coupons`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: [], error: err.message };
+      }
     }
   },
 
@@ -391,6 +400,30 @@ export const api = {
 
   // 8. 광고 및 분석 (Ads/Analytics)
   ads: {
+    async getCount(adType, status = 'active') {
+      try {
+        const { data } = await request(`${BASE_URL}/api/ads?action=count&ad_type=${adType}&status=${status}`);
+        return { data: data?.count || 0, error: null };
+      } catch (err) {
+        return { data: 0, error: err.message };
+      }
+    },
+
+    async getList(filters = {}) {
+      try {
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, val]) => {
+          if (val !== undefined && val !== null && val !== '') {
+            params.append(key, val);
+          }
+        });
+        const { data } = await request(`${BASE_URL}/api/ads?${params.toString()}`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: [], error: err.message };
+      }
+    },
+
     async create(adData) {
       try {
         const { data } = await request(`${BASE_URL}/api/ads`, {
@@ -539,6 +572,53 @@ export const api = {
         const { data } = await request(`${BASE_URL}/api/admin?action=issue_user`, {
           method: 'POST',
           body: JSON.stringify({ coupon_id: couponId, user_id: userId }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
+    async sendGlobalNotice(message) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=send_global_notice`, {
+          method: 'POST',
+          body: JSON.stringify({ message }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
+    async deleteDog(dogId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=delete_dog`, {
+          method: 'POST',
+          body: JSON.stringify({ dog_id: dogId }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
+    async resolveReport(reportId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=resolve_report`, {
+          method: 'POST',
+          body: JSON.stringify({ id: reportId }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
+    async expireAds() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=expire_ads`, {
+          method: 'POST',
         });
         return { data, error: null };
       } catch (err) {

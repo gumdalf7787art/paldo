@@ -68,13 +68,26 @@ export async function onRequestGet(context) {
       const uCount = await env.DB.prepare('SELECT COUNT(*) AS count FROM profiles').first('count');
       const dCount = await env.DB.prepare('SELECT COUNT(*) AS count FROM dogs').first('count');
       const appCount = await env.DB.prepare('SELECT COUNT(*) AS count FROM business_applications WHERE status = "pending"').first('count');
-      const rCount = await env.DB.prepare('SELECT COUNT(*) AS count FROM reports').first('count');
+      const clickCount = await env.DB.prepare('SELECT COUNT(*) AS count FROM analytics_logs').first('count');
+
+      // 최근 7일간의 트렌드 로그 데이터 조회
+      const { results: chartData } = await env.DB.prepare(`
+        SELECT 
+          SUBSTR(created_at, 1, 10) as date, 
+          SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) as views, 
+          SUM(CASE WHEN event_type != 'page_view' THEN 1 ELSE 0 END) as clicks 
+        FROM analytics_logs 
+        GROUP BY SUBSTR(created_at, 1, 10) 
+        ORDER BY date ASC 
+        LIMIT 7
+      `).all();
 
       return createResponse({
         userCount: uCount || 0,
         dogCount: dCount || 0,
         pendingApplications: appCount || 0,
-        reportCount: rCount || 0
+        clickCount: clickCount || 0,
+        chartData: chartData || []
       });
     } catch (err) {
       return createResponse({ error: `통계 조회 실패: ${err.message}` }, 500);
@@ -128,9 +141,18 @@ export async function onRequestGet(context) {
   // 6. 신고 내역 목록 조회 (action = reports)
   if (action === 'reports') {
     try {
-      const { results: reports } = await env.DB.prepare(
-        'SELECT r.*, p.nickname AS reporter_nickname, d.nickname AS target_dog_name FROM reports r JOIN profiles p ON r.user_id = p.id JOIN dogs d ON r.target_id = d.id ORDER BY r.created_at DESC'
-      ).all();
+      const { results: reports } = await env.DB.prepare(`
+        SELECT 
+          r.id, r.dog_id, r.seller_id, r.reporter_id, r.reason_type, r.details, r.status, r.created_at,
+          rep.nickname AS reporter_nickname, rep.email AS reporter_email,
+          sel.nickname AS seller_nickname, sel.email AS seller_email,
+          d.nickname AS target_dog_name, d.breed AS target_dog_breed
+        FROM reports r
+        LEFT JOIN profiles rep ON r.reporter_id = rep.id
+        LEFT JOIN profiles sel ON r.seller_id = sel.id
+        LEFT JOIN dogs d ON r.dog_id = d.id
+        ORDER BY r.created_at DESC
+      `).all();
       return createResponse(reports);
     } catch (err) {
       return createResponse({ error: `신고 내역 조회 실패: ${err.message}` }, 500);
@@ -166,13 +188,22 @@ export async function onRequestPost(context) {
     }
 
     try {
-      // D1 트랜잭션 대신 개별 순차 실행
       await env.DB.prepare('UPDATE business_applications SET status = "approved" WHERE id = ?').bind(id).run();
       await env.DB.prepare('UPDATE profiles SET role = "seller" WHERE id = ?').bind(user_id).run();
       
+      // 자동 발급 쿠폰(welcome 타입) 지급
+      const { results: welcomeCoupons } = await env.DB.prepare('SELECT id, valid_until FROM coupons WHERE auto_issue_type = "welcome"').all();
+      if (welcomeCoupons && welcomeCoupons.length > 0) {
+        for (const coupon of welcomeCoupons) {
+          await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) VALUES (?, ?, ?, 0)')
+            .bind(user_id, coupon.id, coupon.valid_until || null)
+            .run();
+        }
+      }
+
       // 알림 생성
       await env.DB.prepare(
-        'INSERT INTO notifications (user_id, type, message) VALUES (?, "system", "축하합니다! 판매자 자격 신청이 최종 승인되었습니다. 이제 분양 매물을 등록하실 수 있습니다.")'
+        'INSERT INTO notifications (user_id, type, message, link_url) VALUES (?, "system", "🎉 축하합니다! 판매자 자격 신청이 승인되었고, 웰컴 광고 쿠폰이 지급되었습니다.", "/mypage")'
       )
         .bind(user_id)
         .run();
@@ -196,7 +227,7 @@ export async function onRequestPost(context) {
         return createResponse({ error: '해당 신청서를 찾을 수 없습니다.' }, 404);
       }
 
-      await env.DB.prepare('UPDATE business_applications SET status = "rejected", rejected_reason = ? WHERE id = ?')
+      await env.DB.prepare('UPDATE business_applications SET status = "rejected", rejection_reason = ? WHERE id = ?')
         .bind(reason, id)
         .run();
 
@@ -230,14 +261,14 @@ export async function onRequestPost(context) {
 
   // 4. 쿠폰 신규 생성 (create_coupon)
   if (action === 'create_coupon') {
-    const { name, discount_rate, code } = body;
+    const { name, discount_rate, code, auto_issue_type, valid_until } = body;
     if (!name || discount_rate === undefined || !code) {
       return createResponse({ error: '쿠폰 이름, 할인율, 코드는 필수입니다.' }, 400);
     }
 
     try {
-      await env.DB.prepare('INSERT INTO coupons (name, discount_rate, code) VALUES (?, ?, ?)')
-        .bind(name, discount_rate, code)
+      await env.DB.prepare('INSERT INTO coupons (name, discount_rate, code, auto_issue_type, valid_until) VALUES (?, ?, ?, ?, ?)')
+        .bind(name, discount_rate, code, auto_issue_type || 'none', valid_until || null)
         .run();
       return createResponse({ success: true, message: '쿠폰이 성공적으로 생성되었습니다.' });
     } catch (err) {
@@ -253,11 +284,22 @@ export async function onRequestPost(context) {
     }
 
     try {
+      const coupon = await env.DB.prepare('SELECT valid_until, name FROM coupons WHERE id = ?').bind(coupon_id).first();
+      if (!coupon) return createResponse({ error: '해당 쿠폰을 찾을 수 없습니다.' }, 404);
+
       // profiles 테이블의 모든 사용자에게 쿠폰 매핑 일괄 인서트
       await env.DB.prepare(
-        'INSERT INTO user_coupons (user_id, coupon_id, is_used) SELECT id, ?, 0 FROM profiles'
+        'INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) SELECT id, ?, ?, 0 FROM profiles'
       )
-        .bind(coupon_id)
+        .bind(coupon_id, coupon.valid_until || null)
+        .run();
+
+      // 알림 생성
+      await env.DB.prepare(
+        `INSERT INTO notifications (user_id, type, message, link_url) 
+         SELECT id, 'system', ?, '/mypage' FROM profiles`
+      )
+        .bind(`🎁 관리자가 모든 회원에게 '${coupon.name}' 쿠폰을 선물했습니다!`)
         .run();
 
       return createResponse({ success: true, message: '모든 사용자에게 쿠폰이 정상 발급되었습니다.' });
@@ -274,13 +316,103 @@ export async function onRequestPost(context) {
     }
 
     try {
-      await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, is_used) VALUES (?, ?, 0)')
-        .bind(user_id, coupon_id)
+      const coupon = await env.DB.prepare('SELECT valid_until, name FROM coupons WHERE id = ?').bind(coupon_id).first();
+      if (!coupon) return createResponse({ error: '해당 쿠폰을 찾을 수 없습니다.' }, 404);
+
+      await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) VALUES (?, ?, ?, 0)')
+        .bind(user_id, coupon_id, coupon.valid_until || null)
+        .run();
+
+      await env.DB.prepare(
+        'INSERT INTO notifications (user_id, type, message, link_url) VALUES (?, "system", ?, "/mypage")'
+      )
+        .bind(user_id, `🎁 관리자가 '${coupon.name}' 쿠폰을 선물했습니다! 마이페이지에서 확인해 보세요.`)
         .run();
 
       return createResponse({ success: true, message: '대상 사용자에게 쿠폰이 정상 발급되었습니다.' });
     } catch (err) {
       return createResponse({ error: `개별 쿠폰 발급 실패: ${err.message}` }, 500);
+    }
+  }
+
+  // 7. 전체 회원 공지 알림 발송 (send_global_notice)
+  if (action === 'send_global_notice') {
+    const { message } = body;
+    if (!message) {
+      return createResponse({ error: '공지 메시지 내용은 필수입니다.' }, 400);
+    }
+
+    try {
+      await env.DB.prepare(
+        `INSERT INTO notifications (user_id, type, message, link_url) 
+         SELECT id, 'system', ?, '/' FROM profiles`
+      )
+        .bind(message)
+        .run();
+
+      return createResponse({ success: true, message: '전체 회원에게 공지 알림 발송이 완료되었습니다.' });
+    } catch (err) {
+      return createResponse({ error: `공지 알림 발송 실패: ${err.message}` }, 500);
+    }
+  }
+
+  // 8. 게시물 강제 삭제 (delete_dog)
+  if (action === 'delete_dog') {
+    const { dog_id } = body;
+    if (!dog_id) {
+      return createResponse({ error: '삭제할 게시물 ID는 필수입니다.' }, 400);
+    }
+
+    try {
+      const dog = await env.DB.prepare('SELECT seller_id, nickname FROM dogs WHERE id = ?').bind(dog_id).first();
+      if (!dog) {
+        return createResponse({ error: '이미 삭제되었거나 존재하지 않는 게시물입니다.' }, 404);
+      }
+
+      // 게시물 삭제
+      await env.DB.prepare('DELETE FROM dogs WHERE id = ?').bind(dog_id).run();
+
+      // 판매자 알림 통보
+      await env.DB.prepare(
+        'INSERT INTO notifications (user_id, type, message) VALUES (?, "system", ?)'
+      )
+        .bind(dog.seller_id, `🚨 [관리자 조치] 고객님의 분양 게시물(${dog.nickname})이 규정 위반 또는 관리자 검토에 의해 강제 삭제되었습니다.`)
+        .run();
+
+      // 관련된 신고들도 모두 처리 완료 처리
+      await env.DB.prepare('UPDATE reports SET status = "resolved" WHERE dog_id = ?').bind(dog_id).run();
+
+      return createResponse({ success: true, message: '게시물이 삭제되었고 관련 신고 처리가 완료되었습니다.' });
+    } catch (err) {
+      return createResponse({ error: `게시물 삭제 중 오류: ${err.message}` }, 500);
+    }
+  }
+
+  // 9. 신고 반려 및 패스 처리 (resolve_report)
+  if (action === 'resolve_report') {
+    const { id } = body;
+    if (!id) {
+      return createResponse({ error: '신고 내역 ID는 필수입니다.' }, 400);
+    }
+
+    try {
+      await env.DB.prepare('UPDATE reports SET status = "resolved" WHERE id = ?').bind(id).run();
+      return createResponse({ success: true, message: '신고가 정상적으로 처리 완료(반려)되었습니다.' });
+    } catch (err) {
+      return createResponse({ error: `신고 처리 실패: ${err.message}` }, 500);
+    }
+  }
+
+  // 10. 광고 만료 처리 자동 동기화 (expire_ads)
+  if (action === 'expire_ads') {
+    try {
+      const nowStr = new Date().toISOString();
+      const info = await env.DB.prepare('UPDATE advertisements SET status = "ended" WHERE end_date < ? AND status = "active"')
+        .bind(nowStr)
+        .run();
+      return createResponse({ success: true, changes: info.meta.changes });
+    } catch (err) {
+      return createResponse({ error: `광고 만료 동기화 실패: ${err.message}` }, 500);
     }
   }
 

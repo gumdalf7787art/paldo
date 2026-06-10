@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import Logo from '../components/Logo';
 
 const ResetPasswordPage = () => {
@@ -33,16 +33,14 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
     try {
-      // Supabase: 현재 세션(링크 타고 들어옴)의 사용자의 정보를 업데이트
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
+      // REST API: 현재 세션의 사용자 비밀번호 변경
+      const { error } = await api.auth.updatePassword(password);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
 
       alert('비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해 주세요.');
       // 변경 후 로그아웃 처리하여 깔끔하게 재로그인 유도
-      await supabase.auth.signOut();
+      await api.auth.logout();
       navigate('/login');
     } catch (error) {
       alert('비밀번호 변경 실패: ' + error.message);

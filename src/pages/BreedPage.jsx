@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import Card from '../components/Card';
 
 const BreedPage = () => {
@@ -18,45 +18,27 @@ const BreedPage = () => {
       const searchParams = new URLSearchParams(location.search);
       const region = searchParams.get('region');
 
-      // 1. 유료 광고 데이터 가져오기
-      let adQuery = supabase
-        .from('advertisements')
-        .select('*, dogs!inner(*)')
-        .eq('status', 'active');
-      
-      if (breedName !== '전체') {
-        adQuery = adQuery.eq('dogs.breed', breedName);
-      }
-      
-      if (region && region !== '전국') {
-        adQuery = adQuery.eq('dogs.region', region);
-      }
-
-      const { data: adData } = await adQuery.order('created_at', { foreignTable: 'dogs', ascending: false });
+      // 1. 유료 광고 데이터 가져오기 (REST API)
+      const { data: adData } = await api.ads.getList({
+        status: 'active',
+        breed: breedName,
+        region: region
+      });
 
       const ads = (adData || []).map(ad => ({
-        ...ad.dogs,
+        ...ad,
         isAd: true,
-        image: ad.dogs.image_url,
+        image: ad.image_url,
         badgeText: 'AD'
       }));
       setAdDogs(ads.slice(0, 8));
 
-      // 2. 일반 분양 리스트 가져오기
-      let dogQuery = supabase
-        .from('dogs')
-        .select('*')
-        .eq('status', 'available');
-
-      if (breedName !== '전체') {
-        dogQuery = dogQuery.eq('breed', breedName);
-      }
-
-      if (region && region !== '전국') {
-        dogQuery = dogQuery.eq('region', region);
-      }
-
-      const { data: dogData } = await dogQuery.order('created_at', { ascending: false });
+      // 2. 일반 분양 리스트 가져오기 (REST API)
+      const { data: dogData } = await api.dogs.getList({
+        status: 'available',
+        breed: breedName,
+        region: region
+      });
 
       if (dogData) {
         const adDogIds = new Set(ads.map(ad => ad.id));

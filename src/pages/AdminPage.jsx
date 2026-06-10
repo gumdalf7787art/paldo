@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { api } from '../lib/api';
 import { useNavigate } from 'react-router-dom';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -21,7 +21,6 @@ const AdminPage = () => {
   const navigate = useNavigate();
 
   // 쿠폰 생성용 상태
-  // 쿠폰 생성용 상태
   const [newCoupon, setNewCoupon] = useState({ 
     code: '', 
     name: '', 
@@ -39,14 +38,10 @@ const AdminPage = () => {
   }, []);
 
   const checkAdmin = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return navigate('/login');
+    const { data: sessionData, error: sessionErr } = await api.auth.getSession();
+    if (sessionErr || !sessionData?.session) return navigate('/login');
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
+    const { data: profile } = await api.auth.getUser();
 
     if (profile?.role !== 'admin') {
       alert('관리자만 접근 가능합니다.');
@@ -54,8 +49,8 @@ const AdminPage = () => {
     }
 
     setIsAdmin(true);
-    // 진입 시 광고 만료 처리 (RPC 호출)
-    await supabase.rpc('check_and_expire_ads');
+    // 진입 시 광고 만료 처리
+    await api.admin.expireAds();
     fetchAdminData();
   };
 
@@ -63,95 +58,44 @@ const AdminPage = () => {
     setLoading(true);
 
     try {
-      // 1. 요약 통계
-      const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-      const { count: appCount } = await supabase.from('business_applications').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const { count: dogCount } = await supabase.from('dogs').select('*', { count: 'exact', head: true });
-      const { count: clickCount } = await supabase.from('analytics_logs').select('*', { count: 'exact', head: true });
+      // 1. 요약 통계 및 차트
+      const { data: statsData } = await api.admin.getStats();
+      if (statsData) {
+        setStats({ 
+          users: statsData.userCount || 0, 
+          applications: statsData.pendingApplications || 0, 
+          dogs: statsData.dogCount || 0, 
+          clicks: statsData.clickCount || 0 
+        });
+        setChartData(statsData.chartData || []);
+        
+        const totalViews = statsData.chartData?.reduce((acc, c) => acc + c.views, 0) || 0;
+        const totalClicks = statsData.chartData?.reduce((acc, c) => acc + c.clicks, 0) || 0;
+        setEventData([
+          { name: '페이지 뷰', value: totalViews },
+          { name: '클릭 액션', value: totalClicks },
+        ]);
+      }
 
-      setStats({ 
-        users: userCount || 0, 
-        applications: appCount || 0, 
-        dogs: dogCount || 0, 
-        clicks: clickCount || 0 
-      });
-
-      // 2. 활동 그래프 데이터
-      const { data: logData } = await supabase
-        .from('analytics_logs')
-        .select('created_at, event_type')
-        .order('created_at', { ascending: true });
-
-      const dailyMap = {};
-      logData?.forEach(log => {
-        const date = new Date(log.created_at).toLocaleDateString();
-        if (!dailyMap[date]) dailyMap[date] = { date, views: 0, clicks: 0 };
-        if (log.event_type === 'page_view') dailyMap[date].views++;
-        else dailyMap[date].clicks++;
-      });
-      setChartData(Object.values(dailyMap).slice(-7));
-
-      setEventData([
-        { name: '페이지 뷰', value: logData?.filter(l => l.event_type === 'page_view').length || 0 },
-        { name: '클릭 액션', value: logData?.filter(l => l.event_type !== 'page_view').length || 0 },
-      ]);
-
-      // 3. 신청 리스트
-      const { data: apps } = await supabase
-        .from('business_applications')
-        .select(`
-          *,
-          profiles:user_id(nickname)
-        `)
-        .order('created_at', { ascending: false });
+      // 2. 신청 리스트
+      const { data: apps } = await api.admin.getApplications();
       setApplications(apps || []);
 
-      // 4. 전체 회원
-      const { data: userList } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      // 3. 전체 회원
+      const { data: userList } = await api.admin.getUsers();
       setUsers(userList || []);
 
-      // 5. 전체 게시물
-      const { data: dogList } = await supabase.from('dogs').select('*').order('created_at', { ascending: false });
+      // 4. 전체 게시물
+      const { data: dogList } = await api.admin.getDogs();
       setDogs(dogList || []);
 
-      // 6. 쿠폰 목록
-      const { data: couponList } = await supabase.from('coupons').select('*').order('created_at', { ascending: false });
+      // 5. 쿠폰 목록
+      const { data: couponList } = await api.admin.getCoupons();
       setCoupons(couponList || []);
 
-      // 7. 신고 내역 목록
-      const { data: reportList } = await supabase
-        .from('reports')
-        .select(`
-          *,
-          seller:profiles!reports_seller_id_fkey(nickname, email),
-          reporter:profiles!reports_reporter_id_fkey(nickname, email),
-          dog:dogs!reports_dog_id_fkey(nickname, breed)
-        `)
-        .order('created_at', { ascending: false });
-      
-      // 만약 fkey 조인 에러가 발생할 것에 대비해 단일 쿼리 후 매핑으로 대체
-      if (!reportList || reportList.length === 0) {
-        // Fallback or empty logic
-        const { data: rawReports } = await supabase.from('reports').select('*').order('created_at', { ascending: false });
-        if (rawReports && rawReports.length > 0) {
-          const uIds = [...new Set([...rawReports.map(r => r.seller_id), ...rawReports.map(r => r.reporter_id)])];
-          const dIds = [...new Set(rawReports.map(r => r.dog_id))];
-          const [ {data: profs}, {data: dgs} ] = await Promise.all([
-             supabase.from('profiles').select('id, nickname, email').in('id', uIds),
-             supabase.from('dogs').select('id, nickname, breed').in('id', dIds)
-          ]);
-          setReports(rawReports.map(r => ({
-            ...r,
-            seller: profs?.find(p => p.id === r.seller_id) || {},
-            reporter: profs?.find(p => p.id === r.reporter_id) || {},
-            dog: dgs?.find(d => d.id === r.dog_id) || {}
-          })));
-        } else {
-          setReports([]);
-        }
-      } else {
-        setReports(reportList || []);
-      }
+      // 6. 신고 내역 목록
+      const { data: reportList } = await api.admin.getReports();
+      setReports(reportList || []);
 
     } catch (error) {
       console.error('Data fetch error:', error);
@@ -163,67 +107,51 @@ const AdminPage = () => {
   const handleApprove = async (app) => {
     if (!window.confirm(`${app.business_name} 승인하시겠습니까?`)) return;
     
-    await supabase.from('business_applications').update({ status: 'approved' }).eq('id', app.id);
-    await supabase.from('profiles').update({ role: 'seller' }).eq('id', app.user_id);
-    
-    // 자동 발급 쿠폰(welcome 타입) 지급
-    const { data: welcomeCoupons } = await supabase
-      .from('coupons')
-      .select('id, valid_until')
-      .eq('auto_issue_type', 'welcome');
-    
-    if (welcomeCoupons && welcomeCoupons.length > 0) {
-      const inserts = welcomeCoupons.map(c => ({
-        user_id: app.user_id,
-        coupon_id: c.id,
-        expires_at: c.valid_until // 쿠폰에 설정된 기한 반영
-      }));
-      await supabase.from('user_coupons').insert(inserts);
-      
-      // 알림 추가
-      await supabase.from('notifications').insert([{
-        user_id: app.user_id,
-        type: 'system',
-        message: `🎉 사업자 승인을 축하드립니다! 웰컴 광고 쿠폰 ${welcomeCoupons.length}장이 발급되었습니다.`,
-        link_url: '/mypage'
-      }]);
+    const { error } = await api.admin.approveApplication(app.id, app.user_id);
+    if (error) {
+      alert('승인 처리 중 오류가 발생했습니다: ' + error);
+    } else {
+      alert('승인되었습니다. (자동 쿠폰 지급 완료)');
+      fetchAdminData();
     }
-
-    alert('승인되었습니다. (자동 쿠폰 지급 완료)');
-    fetchAdminData();
   };
 
   const handleReject = async (app) => {
     const reason = window.prompt(`${app.business_name} 신청을 반려하시겠습니까?\n반려 사유를 입력해 주세요:`);
     if (reason === null) return; // 사용자가 취소한 경우
 
-    await supabase.from('business_applications').update({ 
-      status: 'rejected',
-      rejection_reason: reason || '관리자 반려' 
-    }).eq('id', app.id);
-    
-    alert('반려 처리되었습니다.');
-    fetchAdminData();
+    const { error } = await api.admin.rejectApplication(app.id, reason || '관리자 반려');
+    if (error) {
+      alert('반려 처리 중 오류가 발생했습니다: ' + error);
+    } else {
+      alert('반려 처리되었습니다.');
+      fetchAdminData();
+    }
   };
 
   const handleUpdateGrade = async (userId, newGrade) => {
-    await supabase.from('profiles').update({ grade: newGrade }).eq('id', userId);
-    alert('등급이 변경되었습니다.');
-    fetchAdminData();
+    const { error } = await api.admin.updateUserGrade(userId, newGrade);
+    if (error) {
+      alert('등급 변경 실패: ' + error);
+    } else {
+      alert('등급이 변경되었습니다.');
+      fetchAdminData();
+    }
   };
 
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.from('coupons').insert([{
+    const { error } = await api.admin.createCoupon({
       code: newCoupon.code,
-      display_name: newCoupon.name,
-      discount_amount: parseInt(newCoupon.amount),
-      benefit_type: newCoupon.benefit_type,
+      name: newCoupon.name,
+      discount_rate: parseInt(newCoupon.amount),
       auto_issue_type: newCoupon.auto_issue_type,
       valid_until: newCoupon.valid_until || null
-    }]);
-    if (error) alert('생성 실패: ' + error.message);
-    else {
+    });
+
+    if (error) {
+      alert('생성 실패: ' + error);
+    } else {
       alert('쿠폰이 생성되었습니다.');
       setNewCoupon({ code: '', name: '', amount: 0, benefit_type: 'ad_exemption', auto_issue_type: 'none', valid_until: '' });
       fetchAdminData();
@@ -235,57 +163,28 @@ const AdminPage = () => {
     if (!issueData.couponId) return alert('발급할 쿠폰을 선택해 주세요.');
 
     const selectedCoupon = coupons.find(c => c.id == issueData.couponId);
-    const expireDate = selectedCoupon?.valid_until || null;
 
     if (issueTargetType === 'all_sellers') {
       if (!window.confirm('모든 사업자 회원에게 쿠폰을 일괄 발급하시겠습니까?')) return;
       
-      const sellers = users.filter(u => u.role === 'seller');
-      if (sellers.length === 0) return alert('발급 대상 사업자가 없습니다.');
-
-      const inserts = sellers.map(seller => ({
-        user_id: seller.id,
-        coupon_id: issueData.couponId,
-        expires_at: expireDate
-      }));
-
-      const { error } = await supabase.from('user_coupons').insert(inserts);
-      if (error) return alert('일괄 발급 실패: ' + error.message);
-
-      // 개별 알림 추가는 너무 많아질 수 있으니 글로벌/또는 생략할 수 있지만, 요구사항대로 알림을 넣겠습니다.
-      const noticeInserts = sellers.map(seller => ({
-        user_id: seller.id,
-        type: 'system',
-        message: `🎁 관리자가 '${selectedCoupon.display_name}' 쿠폰을 선물했습니다! 마이페이지에서 확인하세요.`,
-        link_url: '/mypage'
-      }));
-      await supabase.from('notifications').insert(noticeInserts);
-
-      alert(`총 ${sellers.length}명의 사업자에게 쿠폰이 발급되었습니다.`);
+      const { error } = await api.admin.issueCouponToAll(parseInt(issueData.couponId));
+      if (error) {
+        return alert('일괄 발급 실패: ' + error);
+      }
+      alert('모든 사업자에게 쿠폰이 발급되었습니다.');
       setIssueData({ userId: '', couponId: '' });
-      
+      fetchAdminData();
     } else {
       // 개별 유저 발급
       if (!issueData.userId) return alert('대상 유저를 선택해 주세요.');
 
-      const { error } = await supabase.from('user_coupons').insert([{
-        user_id: issueData.userId,
-        coupon_id: issueData.couponId,
-        expires_at: expireDate
-      }]);
-
+      const { error } = await api.admin.issueCouponToUser(parseInt(issueData.couponId), issueData.userId);
       if (error) {
-        alert('발급 실패: ' + error.message);
+        alert('발급 실패: ' + error);
       } else {
-        await supabase.from('notifications').insert([{
-          user_id: issueData.userId,
-          type: 'system',
-          message: `🎁 관리자가 '${selectedCoupon.display_name}' 쿠폰을 선물했습니다! 마이페이지에서 확인하세요.`,
-          link_url: '/mypage'
-        }]);
-        
         alert('개별 쿠폰이 성공적으로 발급되었습니다.');
         setIssueData({ userId: '', couponId: '' });
+        fetchAdminData();
       }
     }
   };
@@ -296,78 +195,45 @@ const AdminPage = () => {
 
     if (!window.confirm('정말 모든 회원(일반, 사업자 포함)에게 알림을 발송하시겠습니까?')) return;
 
-    try {
-      const { data: allUsers } = await supabase.from('profiles').select('id');
-      if (!allUsers || allUsers.length === 0) return;
-
-      const notifications = allUsers.map(u => ({
-        user_id: u.id,
-        type: 'system',
-        message: message,
-        link_url: '/'
-      }));
-
-      const { error } = await supabase.from('notifications').insert(notifications);
-      if (error) throw error;
-
+    const { error } = await api.admin.sendGlobalNotice(message);
+    if (error) {
+      alert('발송 실패: ' + error);
+    } else {
       alert('성공적으로 모든 회원에게 공지 알림이 발송되었습니다!');
-    } catch (err) {
-      alert('발송 실패: ' + err.message);
     }
   };
 
   const handleDeleteReportedDog = async (report) => {
     if (!window.confirm(`정말 해당 게시물(ID: ${report.dog_id})을 강제 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     
-    // 강아지 게시물 삭제
-    const { error: dogError } = await supabase.from('dogs').delete().eq('id', report.dog_id);
-    if (dogError) {
-      return alert('게시물 삭제 중 오류: ' + dogError.message);
+    const { error } = await api.admin.deleteDog(report.dog_id);
+    if (error) {
+      alert('게시물 삭제 중 오류: ' + error);
+    } else {
+      alert('게시물이 삭제되었고, 판매자에게 알림이 전송되었습니다.');
+      fetchAdminData();
     }
-    
-    // 리포트 상태 변경 (처리완료)
-    await supabase.from('reports').update({ status: 'resolved' }).eq('dog_id', report.dog_id);
-    
-    // 판매자에게 삭제 통보 알림
-    await supabase.from('notifications').insert([{
-      user_id: report.seller_id,
-      type: 'report',
-      message: `🚨 [신고 관리 조치] 고객님의 게시물(${report.dog?.nickname})이 신고 누적으로 인해 관리자에 의해 강제 삭제되었습니다.`,
-      link_url: '/mypage'
-    }]);
-
-    alert('게시물이 삭제되었고, 판매자에게 알림이 전송되었습니다.');
-    fetchAdminData();
   };
 
   const handleDeletePost = async (dogId) => {
-    // 해당 게시물 정보 먼저 조회 (판매자 ID와 이름을 알림 전송에 사용)
-    const { data: dog } = await supabase.from('dogs').select('*').eq('id', dogId).single();
-    if (!dog) return alert('이미 삭제되었거나 존재하지 않는 게시물입니다.');
-
-    // 게시물 삭제
-    const { error: dogError } = await supabase.from('dogs').delete().eq('id', dogId);
-    if (dogError) {
-      return alert('게시물 삭제 중 오류: ' + dogError.message);
+    const { error } = await api.admin.deleteDog(dogId);
+    if (error) {
+      alert('게시물 삭제 중 오류: ' + error);
+    } else {
+      alert('게시물이 강제 삭제되었고, 판매자에게 시스템 알림이 전송되었습니다.');
+      fetchAdminData();
     }
-    
-    // 판매자에게 삭제 통보 알림
-    await supabase.from('notifications').insert([{
-      user_id: dog.seller_id,
-      type: 'system',
-      message: `🚫 [관리자 조치] 고객님의 게시물(${dog.nickname})이 관리자에 의해 강제 삭제되었습니다. 운영 규정을 확인해 주세요.`,
-      link_url: '/mypage'
-    }]);
-
-    alert('게시물이 강제 삭제되었고, 판매자에게 시스템 알림이 전송되었습니다.');
-    fetchAdminData();
   };
 
   const handleResolveReport = async (reportId) => {
     if (!window.confirm('게시물 삭제 없이 이 신고를 반려(패스)하시겠습니까?')) return;
-    await supabase.from('reports').update({ status: 'resolved' }).eq('id', reportId);
-    alert('반려 처리되었습니다.');
-    fetchAdminData();
+    const { error } = await api.admin.resolveReport(reportId);
+    if (error) {
+      alert('처리 실패: ' + error);
+    } else {
+      alert('반려 처리되었습니다.');
+      fetchAdminData();
+    }
   };
 
   if (!isAdmin || loading) return <div style={fullCenterStyle}>데이터를 동기화 중입니다...</div>;
@@ -632,10 +498,10 @@ const AdminPage = () => {
                 {reports.map(report => (
                   <tr key={report.id} style={{ borderBottom: '1px solid #eee', opacity: report.status === 'resolved' ? 0.6 : 1 }}>
                     <td style={tdStyle}>{new Date(report.created_at).toLocaleString()}</td>
-                    <td style={tdStyle}>{report.reporter?.nickname} ({report.reporter?.email})</td>
+                    <td style={tdStyle}>{report.reporter_nickname || '알 수 없음'} ({report.reporter_email || '-'})</td>
                     <td style={tdStyle}>
-                      <b>{report.dog?.dog_breed || report.dog?.nickname || `ID: ${report.dog_id}`}</b>
-                      <br/><small style={{color: '#888'}}>판매자: {report.seller?.nickname}</small>
+                      <b>{report.target_dog_breed || report.target_dog_name || `ID: ${report.dog_id}`}</b>
+                      <br/><small style={{color: '#888'}}>판매자: {report.seller_nickname || '알 수 없음'} ({report.seller_email || '-'})</small>
                     </td>
                     <td style={tdStyle}><span style={{ color: '#e63946', fontWeight: 'bold' }}>{report.reason_type}</span></td>
                     <td style={tdStyle}><div style={{ maxWidth: '200px', fontSize: '0.85rem' }}>{report.details || '-'}</div></td>
@@ -779,7 +645,7 @@ const AdminPage = () => {
                     <select required style={adminInput} value={issueData.couponId} onChange={e => setIssueData({...issueData, couponId: e.target.value})}>
                       <option value="">쿠폰을 선택하세요</option>
                       {coupons.map(c => (
-                        <option key={c.id} value={c.id}>{c.display_name} ({c.code})</option>
+                        <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
                       ))}
                     </select>
                   </div>
@@ -795,7 +661,7 @@ const AdminPage = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
                 {coupons.map(c => (
                   <div key={c.id} style={{ padding: '15px', border: '1px solid #eee', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
-                    <div style={{ fontWeight: 'bold' }}>{c.display_name}</div>
+                    <div style={{ fontWeight: 'bold' }}>{c.name}</div>
                     <div style={{ fontSize: '0.8rem', color: '#666' }}>코드: {c.code}</div>
                     <div style={{ fontSize: '0.75rem', marginTop: '5px', color: 'var(--primary)' }}>
                       {c.auto_issue_type === 'welcome' ? '✅ 사업자 웰컴 자동발급' : '👤 수동 발급용'}

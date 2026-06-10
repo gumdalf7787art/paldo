@@ -227,7 +227,7 @@ export async function onRequestPost(context) {
         return createResponse({ error: '해당 신청서를 찾을 수 없습니다.' }, 404);
       }
 
-      await env.DB.prepare('UPDATE business_applications SET status = "rejected", rejection_reason = ? WHERE id = ?')
+      await env.DB.prepare('UPDATE business_applications SET status = "rejected", rejected_reason = ? WHERE id = ?')
         .bind(reason, id)
         .run();
 

@@ -99,23 +99,37 @@ export async function onRequestPost(context) {
       }
     } else {
       contentType = file.type || 'image/jpeg';
-      if (typeof file.slice === 'function') {
-        // file.slice()는 표준 Blob 복사본을 반환하므로 Response 래퍼를 통해 안전하게 바이너리를 추출할 수 있습니다.
+      if (typeof file.arrayBuffer === 'function') {
         try {
-          arrayBuffer = await new Response(file.slice()).arrayBuffer();
+          arrayBuffer = await file.arrayBuffer();
         } catch (e) {
-          if (typeof file.arrayBuffer === 'function') {
-            arrayBuffer = await file.arrayBuffer();
-          } else {
-            throw e;
-          }
+          arrayBuffer = null;
         }
-      } else if (typeof file.arrayBuffer === 'function') {
-        arrayBuffer = await file.arrayBuffer();
-      } else if (typeof file.stream === 'function') {
-        arrayBuffer = await new Response(file.stream()).arrayBuffer();
-      } else {
-        arrayBuffer = await new Response(file).arrayBuffer();
+      }
+      if (!arrayBuffer) {
+        if (typeof file.stream === 'function') {
+          try {
+            const reader = file.stream().getReader();
+            const chunks = [];
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+            }
+            const totalLength = chunks.reduce((acc, val) => acc + val.length, 0);
+            const result = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+              result.set(chunk, offset);
+              offset += chunk.length;
+            }
+            arrayBuffer = result.buffer;
+          } catch (streamErr) {
+            arrayBuffer = await new Response(file).arrayBuffer();
+          }
+        } else {
+          arrayBuffer = await new Response(file).arrayBuffer();
+        }
       }
     }
 

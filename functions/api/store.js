@@ -11,7 +11,7 @@ function verifyToken(token) {
     const payload = JSON.parse(new TextDecoder().decode(bytes));
     if (payload.exp < Date.now()) return null;
     return payload;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -78,12 +78,23 @@ export async function onRequestGet(context) {
 
   // 2. 상점 프로필 상세 조회 (기본값)
   try {
-    const profile = await env.DB.prepare('SELECT id, email, nickname, phone, address, profile_image, role, grade, completed_adoption_count, created_at FROM profiles WHERE id = ?')
+    const profile = await env.DB.prepare('SELECT id, email, nickname, phone, address, profile_image, role, grade, completed_adoption_count, created_at, store_header_image, store_contact, kakao_channel, store_description, store_address, store_additional_images FROM profiles WHERE id = ?')
       .bind(sellerId)
       .first();
 
     if (!profile) {
       return createResponse({ error: '상점을 찾을 수 없습니다.' }, 404);
+    }
+
+    // JSON 문자열 파싱
+    if (profile.store_additional_images) {
+      try {
+        profile.store_additional_images = JSON.parse(profile.store_additional_images);
+      } catch {
+        profile.store_additional_images = [];
+      }
+    } else {
+      profile.store_additional_images = [];
     }
 
     // 사업자 신청 승인 이력 조회
@@ -114,7 +125,7 @@ export async function onRequestPost(context) {
   let body;
   try {
     body = await request.json();
-  } catch (e) {
+  } catch {
     body = {};
   }
 

@@ -58,7 +58,13 @@ export async function onRequestGet(context) {
   // 1. 단일 매물 상세 조회
   if (id) {
     try {
-      const dog = await env.DB.prepare('SELECT * FROM dogs WHERE id = ?')
+      const dog = await env.DB.prepare(`
+        SELECT d.*, p.nickname AS seller_nickname, b.business_name AS seller_business_name
+        FROM dogs d
+        LEFT JOIN profiles p ON d.seller_id = p.id
+        LEFT JOIN business_applications b ON d.seller_id = b.user_id AND b.status = 'approved'
+        WHERE d.id = ?
+      `)
         .bind(id)
         .first();
 
@@ -96,27 +102,33 @@ export async function onRequestGet(context) {
   const seller_id = url.searchParams.get('seller_id');
 
   try {
-    let sql = 'SELECT * FROM dogs WHERE 1=1';
+    let sql = `
+      SELECT d.*, p.nickname AS seller_nickname, b.business_name AS seller_business_name
+      FROM dogs d
+      LEFT JOIN profiles p ON d.seller_id = p.id
+      LEFT JOIN business_applications b ON d.seller_id = b.user_id AND b.status = 'approved'
+      WHERE 1=1
+    `;
     const bindings = [];
 
     if (breed) {
-      sql += ' AND breed = ?';
+      sql += ' AND d.breed = ?';
       bindings.push(breed);
     }
     if (gender) {
-      sql += ' AND gender = ?';
+      sql += ' AND d.gender = ?';
       bindings.push(gender);
     }
     if (status) {
-      sql += ' AND status = ?';
+      sql += ' AND d.status = ?';
       bindings.push(status);
     }
     if (seller_id) {
-      sql += ' AND seller_id = ?';
+      sql += ' AND d.seller_id = ?';
       bindings.push(seller_id);
     }
 
-    sql += ' ORDER BY created_at DESC';
+    sql += ' ORDER BY d.created_at DESC';
 
     const { results } = await env.DB.prepare(sql)
       .bind(...bindings)

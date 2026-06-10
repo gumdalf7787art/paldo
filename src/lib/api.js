@@ -664,10 +664,14 @@ export const api = {
   },
 
   // 10. 파일 업로드 (R2)
-  async uploadFile(file) {
+  async uploadFile(file, fileName = null) {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (fileName) {
+        formData.append('file', file, fileName);
+      } else {
+        formData.append('file', file);
+      }
 
       const token = localStorage.getItem('paldo_session_token');
       const headers = {};

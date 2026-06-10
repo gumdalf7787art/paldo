@@ -284,9 +284,8 @@ const MyPage = () => {
     try {
       if (profileImagePreview && typeof profileImage !== 'string') {
         const resizedBlob = await resizeImage(profileImage);
-        const fileToUpload = new File([resizedBlob], profileImage?.name || 'avatar.jpg', { type: 'image/jpeg' });
-        
-        const { data: uploadData, error: uploadError } = await api.uploadFile(fileToUpload);
+        const fileName = profileImage?.name || 'avatar.jpg';
+        const { data: uploadData, error: uploadError } = await api.uploadFile(resizedBlob, fileName);
         if (uploadError || !uploadData) {
           throw new Error(uploadError || '프로필 이미지 업로드에 실패했습니다.');
         }
@@ -318,8 +317,8 @@ const MyPage = () => {
       if (storeHeaderPreview && storeHeader) {
         if (typeof storeHeader !== 'string') {
           const resizedBlob = await resizeImage(storeHeader);
-          const fileToUpload = new File([resizedBlob], storeHeader?.name || 'banner.jpg', { type: 'image/jpeg' });
-          const { data: uploadData, error: uploadError } = await api.uploadFile(fileToUpload);
+          const fileName = storeHeader?.name || 'banner.jpg';
+          const { data: uploadData, error: uploadError } = await api.uploadFile(resizedBlob, fileName);
           if (uploadError || !uploadData) {
             throw new Error(uploadError || '배너 이미지 업로드에 실패했습니다.');
           }

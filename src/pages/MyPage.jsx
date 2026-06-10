@@ -283,12 +283,14 @@ const MyPage = () => {
 
     try {
       if (profileImagePreview && typeof profileImage !== 'string') {
-        avatarUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (e) => reject(e);
-          reader.readAsDataURL(profileImage);
-        });
+        const resizedBlob = await resizeImage(profileImage);
+        const fileToUpload = new File([resizedBlob], profileImage.name || 'avatar.jpg', { type: 'image/jpeg' });
+        
+        const { data: uploadData, error: uploadError } = await api.uploadFile(fileToUpload);
+        if (uploadError || !uploadData) {
+          throw new Error(uploadError || '프로필 이미지 업로드에 실패했습니다.');
+        }
+        avatarUrl = uploadData.url;
       }
 
       const { error } = await api.auth.updateProfile({ nickname, phone, address, profile_image: avatarUrl });
@@ -297,6 +299,8 @@ const MyPage = () => {
         setIsEditingProfile(false);
         setProfile({ ...profile, nickname, phone, address, profile_image: avatarUrl });
         setProfileImage(avatarUrl);
+        setProfileImagePreview(null);
+        window.dispatchEvent(new Event('auth-change'));
       } else {
         alert('저장 실패: ' + error);
       }
@@ -313,12 +317,13 @@ const MyPage = () => {
     try {
       if (storeHeaderPreview && storeHeader) {
         if (typeof storeHeader !== 'string') {
-          bannerUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsDataURL(storeHeader);
-          });
+          const resizedBlob = await resizeImage(storeHeader);
+          const fileToUpload = new File([resizedBlob], storeHeader.name || 'banner.jpg', { type: 'image/jpeg' });
+          const { data: uploadData, error: uploadError } = await api.uploadFile(fileToUpload);
+          if (uploadError || !uploadData) {
+            throw new Error(uploadError || '배너 이미지 업로드에 실패했습니다.');
+          }
+          bannerUrl = uploadData.url;
         }
       }
 
@@ -327,13 +332,11 @@ const MyPage = () => {
         if (typeof img === 'string') {
           finalStoreImages.push(img);
         } else {
-          const b64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsDataURL(img);
-          });
-          finalStoreImages.push(b64);
+          const { data: uploadData, error: uploadError } = await api.uploadFile(img);
+          if (uploadError || !uploadData) {
+            throw new Error(uploadError || '스토어 이미지 업로드에 실패했습니다.');
+          }
+          finalStoreImages.push(uploadData.url);
         }
       }
 
@@ -354,6 +357,7 @@ const MyPage = () => {
       if (updatedProfile) {
         setProfile(updatedProfile);
         setStoreHeader(updatedProfile.store_header_image);
+        setStoreHeaderPreview(null);
         setStoreImages(updatedProfile.store_additional_images || []);
         setStoreImagePreviews(updatedProfile.store_additional_images || []);
       }

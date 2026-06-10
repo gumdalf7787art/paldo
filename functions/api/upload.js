@@ -76,7 +76,7 @@ export async function onRequestPost(context) {
     const key = `dogs/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
 
     // R2 업로드
-    await env.R2.put(key, file.stream(), {
+    await env.R2.put(key, await file.arrayBuffer(), {
       httpMetadata: { contentType: file.type || 'image/jpeg' }
     });
 

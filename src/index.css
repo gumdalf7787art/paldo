@@ -127,6 +127,18 @@ ul {
   }
 }
 
+.recommend-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .recommend-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 .responsive-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

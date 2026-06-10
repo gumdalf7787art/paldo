@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
+import Card from '../components/Card';
 
 // 영상 URL 렌더링 헬퍼 (IIFE 대신 독립 함수로 분리 - Rolldown 파서 버그 우회)
 function renderVideoEmbed(videoUrl) {
@@ -118,6 +119,52 @@ const DetailPage = () => {
     tags: []
   });
   const reviewTagsList = ['허위등록 없음', '친절해요.', '설명문 그대로예요.', '방문했는데 깔끔해요.'];
+
+  // 유사 매물 추천 관련
+  const [recommendDogs, setRecommendDogs] = useState([]);
+
+  const fetchRecommendations = async (currentDog) => {
+    try {
+      // 1. 동일 품종의 분양가능 매물 조회
+      const { data: sameBreed } = await api.dogs.getList({
+        breed: currentDog.breed,
+        exclude_id: currentDog.id,
+        status: 'available',
+        limit: 4
+      });
+
+      let finalDogs = sameBreed || [];
+
+      // 2. 만약 4개 미만이라면, 최근 전체 매물로 채우기
+      if (finalDogs.length < 4) {
+        const { data: recentDogs } = await api.dogs.getList({
+          exclude_id: currentDog.id,
+          status: 'available',
+          limit: 10
+        });
+
+        if (recentDogs) {
+          const idsInFinal = new Set(finalDogs.map(d => d.id));
+          for (let d of recentDogs) {
+            if (!idsInFinal.has(d.id)) {
+              finalDogs.push(d);
+              if (finalDogs.length >= 4) break;
+            }
+          }
+        }
+      }
+
+      setRecommendDogs(finalDogs.slice(0, 4));
+    } catch (e) {
+      console.error('Failed to fetch recommendations:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (dog) {
+      fetchRecommendations(dog);
+    }
+  }, [dog?.id]);
 
   // 다중 이미지 배열화
   const allImages = dog ? [dog.image_url || dog.image, ...(dog.additional_images || [])].filter(Boolean) : [];
@@ -651,12 +698,39 @@ const DetailPage = () => {
                       </div>
                     </>
                   )}
-                  </div>
-                </div>
-              </div>
             </div>
+          </div>
+        </div>
 
-          <div className="mobile-bottom-bar">
+        {/* 유사한 댕댕이 추천 섹션 */}
+        {recommendDogs.length > 0 && (
+          <div style={{ marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '30px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🐾 이 아이와 비슷한 다른 댕댕이들
+            </h3>
+            <div className="recommend-grid">
+              {recommendDogs.map((d) => (
+                <Card 
+                  key={d.id} 
+                  type="small" 
+                  data={{
+                    ...d,
+                    image: d.image_url || d.image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
+                    breed: d.breed || '견종 미상',
+                    nickname: d.nickname || '이름 없음',
+                    gender: d.gender || '-',
+                    region: d.region || '지역 미지정',
+                    age: calculateAge(d.birthday, d.age),
+                    price: d.price,
+                    date: new Date(d.created_at).toLocaleDateString()
+                  }} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mobile-bottom-bar">
                <button 
                  onClick={() => {
                     const phone = sellerInfo?.store_contact || sellerInfo?.phone;

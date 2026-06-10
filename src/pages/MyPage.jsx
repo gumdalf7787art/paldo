@@ -1154,9 +1154,30 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
   const [form, setForm] = useState({ bizName: '', repName: '', phone: '', address: '', bizNo: '', animalNo: '' });
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+
+  const handleVerify = () => {
+    const confirmVerify = window.confirm(
+      "[가상 본인인증 시뮬레이션]\n\n확인을 누르면 '홍길동 / 010-9876-5432'로 휴대폰 본인인증이 완료됩니다. 진행하시겠습니까?"
+    );
+    if (confirmVerify) {
+      setForm(prev => ({
+        ...prev,
+        repName: '홍길동',
+        phone: '010-9876-5432'
+      }));
+      setIsVerified(true);
+      alert("휴대폰 본인인증이 완료되었습니다!");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isVerified) {
+      alert('휴대폰 본인인증을 먼저 완료해 주세요.');
+      return;
+    }
 
     if (!form.bizName.trim() || !form.repName.trim() || !form.phone.trim() || !form.address.trim() || !form.bizNo.trim() || !form.animalNo.trim()) {
       alert('모든 신청 항목을 입력해 주세요.');
@@ -1214,10 +1235,54 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
         <h2 style={{ marginBottom: '10px' }}>사업자 등록 신청</h2>
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '15px', marginTop: '20px' }}>
           <div><label style={labelStyle}>사업장 이름</label><input required style={inputStyle} value={form.bizName} onChange={e => setForm({...form, bizName: e.target.value})} /></div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div><label style={labelStyle}>대표 이름</label><input required style={inputStyle} value={form.repName} onChange={e => setForm({...form, repName: e.target.value})} /></div>
-            <div><label style={labelStyle}>핸드폰</label><input required style={inputStyle} value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
+          
+          {/* 본인인증 영역 */}
+          <div style={{ padding: '15px', backgroundColor: '#fcfcfc', borderRadius: '12px', border: '1px solid #eee', display: 'grid', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#333' }}>👤 대표자 신원 확인 (필수)</span>
+              <button 
+                type="button" 
+                onClick={handleVerify}
+                disabled={isVerified}
+                style={{ 
+                  padding: '6px 12px', 
+                  borderRadius: '6px', 
+                  border: 'none', 
+                  backgroundColor: isVerified ? '#eefbe7' : 'var(--primary)', 
+                  color: isVerified ? '#7ed321' : 'white', 
+                  fontSize: '0.75rem', 
+                  fontWeight: 'bold', 
+                  cursor: isVerified ? 'default' : 'pointer' 
+                }}
+              >
+                {isVerified ? '✓ 인증 완료' : '휴대폰 본인인증'}
+              </button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div>
+                <label style={labelStyle}>대표 이름</label>
+                <input 
+                  required 
+                  readOnly 
+                  style={{ ...inputStyle, backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} 
+                  placeholder="인증 시 자동 입력" 
+                  value={form.repName} 
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>핸드폰</label>
+                <input 
+                  required 
+                  readOnly 
+                  style={{ ...inputStyle, backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} 
+                  placeholder="인증 시 자동 입력" 
+                  value={form.phone} 
+                />
+              </div>
+            </div>
           </div>
+
           <div><label style={labelStyle}>주소</label><input required style={inputStyle} value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록번호</label><input required style={inputStyle} value={form.bizNo} onChange={e => setForm({...form, bizNo: e.target.value})} /></div>
           <div><label style={labelStyle}>동물판매업번호</label><input required style={inputStyle} value={form.animalNo} onChange={e => setForm({...form, animalNo: e.target.value})} /></div>

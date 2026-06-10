@@ -5,7 +5,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"                               # Pages Functions에서 env.DB로 호출될 바인딩 이름
 database_name = "paldo-db"                  # D1 데이터베이스 이름
-database_id = "local-db-placeholder"         # 실제 배포 시 클라우드플레어 대시보드에 생성될 DB ID
+database_id = "049c3da8-77fa-45f4-8d18-8c22d2a73a53"         # 실제 배포 시 클라우드플레어 대시보드에 생성될 DB ID
 
 [[r2_buckets]]
 binding = "R2"

@@ -64,21 +64,53 @@ export async function onRequestPost(context) {
       return createResponse({ error: '업로드할 파일이 전송되지 않았습니다.' }, 400);
     }
 
+    const isString = typeof file === 'string';
+    const fileSize = isString ? file.length : (file.size || 0);
+
     // 파일 크기 검증 (예: 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (fileSize > 5 * 1024 * 1024) {
       return createResponse({ error: '파일 크기는 최대 5MB까지 가능합니다.' }, 400);
     }
 
     // 고유 키 생성
-    const fileName = file.name || 'file.jpg';
+    const fileName = (!isString && file.name) ? file.name : 'file.jpg';
     const fileExt = fileName.split('.').pop() || 'jpg';
     const randomId = Math.random().toString(36).substring(2, 8);
     const key = `dogs/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
 
+    // 바이너리 데이터 및 Content-Type 추출
+    let arrayBuffer;
+    let contentType = 'image/jpeg';
+
+    if (isString) {
+      if (file.startsWith('data:')) {
+        const parts = file.split(',');
+        const mimeMatch = parts[0].match(/:(.*?);/);
+        contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const binary = atob(parts[1]);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        arrayBuffer = bytes.buffer;
+      } else {
+        contentType = 'text/plain';
+        arrayBuffer = new TextEncoder().encode(file).buffer;
+      }
+    } else {
+      contentType = file.type || 'image/jpeg';
+      if (typeof file.arrayBuffer === 'function') {
+        arrayBuffer = await file.arrayBuffer();
+      } else if (typeof file.stream === 'function') {
+        arrayBuffer = await new Response(file.stream()).arrayBuffer();
+      } else {
+        arrayBuffer = await new Response(file).arrayBuffer();
+      }
+    }
+
     // R2 업로드
-    const arrayBuffer = await new Response(file).arrayBuffer();
     await env.R2.put(key, arrayBuffer, {
-      httpMetadata: { contentType: file.type || 'image/jpeg' }
+      httpMetadata: { contentType }
     });
 
     // 서빙용 상대경로 반환

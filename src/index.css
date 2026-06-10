@@ -977,3 +977,37 @@ html, body {
     gap: 12px;
   }
 }
+
+/* Ad Section Carousel Arrow Button */
+.ad-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  color: #475569;
+}
+
+.ad-carousel-btn:hover {
+  background-color: #ffffff;
+  transform: translateY(-50%) scale(1.1);
+  color: #26A69A; /* var(--primary) */
+}
+
+.ad-carousel-btn.left {
+  left: 5px;
+}
+
+.ad-carousel-btn.right {
+  right: 5px;
+}

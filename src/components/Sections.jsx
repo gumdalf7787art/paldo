@@ -309,25 +309,160 @@ const SectionTitle = ({ title, sub }) => (
 );
 
 const defaultSafeDogs = [
-  { id: 'safe-1', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '골든 리트리버', nickname: '인절미', gender: '남아', region: '서울', age: '2개월', price: 350000 },
-  { id: 'safe-2', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '빵둥이', gender: '여아', region: '부산', age: '2개월', price: 400000 },
-  { id: 'safe-3', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '비숑 프리제', nickname: '솜이', gender: '여아', region: '대구', age: '3개월', price: 500000 },
-  { id: 'safe-4', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '말티즈', nickname: '두부', gender: '남아', region: '광주', age: '2.5개월', price: 300000 }
+  { id: 'safe-1', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '골든 리트리버', nickname: '인절미', gender: '남아', region: '서울', age: '2개월', price: 35 },
+  { id: 'safe-2', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '빵둥이', gender: '여아', region: '부산', age: '2개월', price: 40 },
+  { id: 'safe-3', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '비숑 프리제', nickname: '솜이', gender: '여아', region: '대구', age: '3개월', price: 50 },
+  { id: 'safe-4', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '말티즈', nickname: '두부', gender: '남아', region: '광주', age: '2.5개월', price: 30 },
+  { id: 'safe-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '시바 이누', nickname: '누리', gender: '여아', region: '대전', age: '3개월', price: 45 },
+  { id: 'safe-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '토이 푸들', nickname: '별이', gender: '여아', region: '인천', age: '2개월', price: 32 },
+  { id: 'safe-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '포메라니안', nickname: '코코', gender: '남아', region: '경기', age: '3개월', price: 48 },
+  { id: 'safe-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '요크셔 테리어', nickname: '초코', gender: '남아', region: '서울', age: '2.5개월', price: 28 },
+  { id: 'safe-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '진도견', nickname: '백구', gender: '남아', region: '전남', age: '3개월', price: 15 },
+  { id: 'safe-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '닥스훈트', nickname: '까막', gender: '여아', region: '경북', age: '2.5개월', price: 35 }
 ];
 
 const defaultPopularDogs = [
-  { id: 'pop-1', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '포메라니안', nickname: '구름이', gender: '여아', region: '경기', age: '3개월', price: 450000 },
-  { id: 'pop-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '토이 푸들', nickname: '초코', gender: '남아', region: '서울', age: '2개월', price: 280000 },
-  { id: 'pop-3', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '시바 이누', nickname: '단풍이', gender: '남아', region: '인천', age: '2.5개월', price: 600000 },
-  { id: 'pop-4', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '시츄', nickname: '사랑이', gender: '여아', region: '대전', age: '3개월', price: 250000 }
+  { id: 'pop-1', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '포메라니안', nickname: '구름이', gender: '여아', region: '경기', age: '3개월', price: 45 },
+  { id: 'pop-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '토이 푸들', nickname: '초코', gender: '남아', region: '서울', age: '2개월', price: 28 },
+  { id: 'pop-3', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '시바 이누', nickname: '단풍이', gender: '남아', region: '인천', age: '2.5개월', price: 60 },
+  { id: 'pop-4', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '시츄', nickname: '사랑이', gender: '여아', region: '대전', age: '3개월', price: 25 },
+  { id: 'pop-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '몽이', gender: '여아', region: '광주', age: '2개월', price: 42 },
+  { id: 'pop-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '비숑 프리제', nickname: '솜사탕', gender: '여아', region: '부산', age: '3개월', price: 55 },
+  { id: 'pop-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '말티즈', nickname: '우유', gender: '남아', region: '대구', age: '2개월', price: 30 },
+  { id: 'pop-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '프렌치 불독', nickname: '만두', gender: '남아', region: '서울', age: '2.5개월', price: 65 },
+  { id: 'pop-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '치와와', nickname: '초미니', gender: '여아', region: '충남', age: '2개월', price: 38 },
+  { id: 'pop-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '골든 리트리버', nickname: '골디', gender: '남아', region: '경남', age: '3개월', price: 40 }
 ];
 
 const defaultSpecialDogs = [
-  { id: 'spec-1', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '프렌치 불독', nickname: '까망이', gender: '남아', region: '인천', age: '2.5개월', price: 600000 },
-  { id: 'spec-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '사모예드', nickname: '설탕이', gender: '여아', region: '강원', age: '3개월', price: 800000 },
-  { id: 'spec-3', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '그레이하운드', nickname: '스피디', gender: '남아', region: '경기', age: '3.5개월', price: 700000 },
-  { id: 'spec-4', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '둥이', gender: '남아', region: '울산', age: '2개월', price: 420000 }
+  { id: 'spec-1', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '프렌치 불독', nickname: '까망이', gender: '남아', region: '인천', age: '2.5개월', price: 60 },
+  { id: 'spec-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '사모예드', nickname: '설탕이', gender: '여아', region: '강원', age: '3개월', price: 80 },
+  { id: 'spec-3', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '그레이하운드', nickname: '스피디', gender: '남아', region: '경기', age: '3.5개월', price: 70 },
+  { id: 'spec-4', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '둥이', gender: '남아', region: '울산', age: '2개월', price: 42 },
+  { id: 'spec-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '보스턴 테리어', nickname: '시크', gender: '여아', region: '서울', age: '3개월', price: 50 },
+  { id: 'spec-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '말티푸', nickname: '루루', gender: '여아', region: '인천', age: '2개월', price: 48 },
+  { id: 'spec-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '보더 콜리', nickname: '천재', gender: '남아', region: '충북', age: '3개월', price: 55 },
+  { id: 'spec-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '스피츠', nickname: '뽀삐', gender: '여아', region: '경기', age: '2.5개월', price: 25 },
+  { id: 'spec-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '차우차우', nickname: '사자', gender: '남아', region: '제주', age: '3개월', price: 90 },
+  { id: 'spec-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '이탈리안 그레이하운드', nickname: '달리', gender: '여아', region: '서울', age: '2.5개월', price: 65 }
 ];
+
+const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // 2개씩 짝지어서 1개의 열(Column) 구성
+  const pairs = [];
+  for (let i = 0; i < dogs.length; i += 2) {
+    pairs.push(dogs.slice(i, i + 2));
+  }
+
+  const handlePrev = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, pairs.length - 4));
+  };
+
+  const showSlider = dogs.length > 8;
+
+  return (
+    <section style={{ 
+      padding: '24px', 
+      backgroundColor: 'white', 
+      borderRadius: '12px', 
+      border: '1px solid #cbd5e1', 
+      boxShadow: 'var(--shadow)',
+      marginBottom: '10px',
+      position: 'relative'
+    }}>
+      <SectionTitle title={title} sub={sub} />
+      
+      {loading && dogs.length === 0 ? (
+        <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
+          매물을 불러오는 중입니다...
+        </p>
+      ) : dogs.length === 0 ? (
+        <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
+          등록된 분양 매물이 없습니다.
+        </p>
+      ) : showSlider ? (
+        /* 슬라이드 뷰 (8개 초과 시 가로 1열씩 슬라이드) */
+        <div style={{ position: 'relative', overflow: 'hidden' }}>
+          {/* 좌측 버튼 */}
+          {currentIndex > 0 && (
+            <button 
+              onClick={handlePrev}
+              className="ad-carousel-btn left"
+              aria-label="이전 슬라이드"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+          )}
+          {/* 우측 버튼 */}
+          {currentIndex < pairs.length - 4 && (
+            <button 
+              onClick={handleNext}
+              className="ad-carousel-btn right"
+              aria-label="다음 슬라이드"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          )}
+
+          <div 
+            style={{
+              display: 'flex',
+              gap: '15px',
+              transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+              transform: `translateX(calc(-${currentIndex} * (25% + 3.75px)))`
+            }}
+          >
+            {pairs.map((pair, idx) => (
+              <div 
+                key={`pair-${idx}`}
+                style={{
+                  flex: '0 0 calc(25% - 11.25px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '15px'
+                }}
+              >
+                {pair.map((dog, i) => (
+                  <div key={`${badge}-${dog.id}-${i}`} style={{ height: '225px' }}>
+                    <Card 
+                      type="middle" 
+                      badgeText={dog.badgeText || badge} 
+                      data={dog} 
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* 일반 그리드 뷰 (4개 이하 1줄, 5~8개 2줄) */
+        <div 
+          className="responsive-grid-2" 
+          style={{ 
+            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gap: '15px' 
+          }}
+        >
+          {dogs.map((dog, i) => (
+            <Card 
+              key={`${badge}-${dog.id}-${i}`} 
+              type="middle" 
+              badgeText={dog.badgeText || badge} 
+              data={dog} 
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+};
 
 const AdSections = () => {
   const [safeDogs, setSafeDogs] = useState([]);
@@ -339,14 +474,14 @@ const AdSections = () => {
     const loadAllSections = async () => {
       try {
         const [safe, popular, special] = await Promise.all([
-          Promise.race([fetchAdsAndFill('safe', 4, '안심'), timeoutPromise(2500)]),
-          Promise.race([fetchAdsAndFill('popular', 4, '인기'), timeoutPromise(2500)]),
-          Promise.race([fetchAdsAndFill('special', 4, '스페셜'), timeoutPromise(2500)])
+          Promise.race([fetchAdsAndFill('safe', 20, '안심'), timeoutPromise(2500)]),
+          Promise.race([fetchAdsAndFill('popular', 20, '인기'), timeoutPromise(2500)]),
+          Promise.race([fetchAdsAndFill('special', 20, '스페셜'), timeoutPromise(2500)])
         ]);
 
-        setSafeDogs(safe && safe.length > 0 ? safe.slice(0, 4) : defaultSafeDogs);
-        setPopularDogs(popular && popular.length > 0 ? popular.slice(0, 4) : defaultPopularDogs);
-        setSpecialDogs(special && special.length > 0 ? special.slice(0, 4) : defaultSpecialDogs);
+        setSafeDogs(safe && safe.length > 0 ? safe : defaultSafeDogs);
+        setPopularDogs(popular && popular.length > 0 ? popular : defaultPopularDogs);
+        setSpecialDogs(special && special.length > 0 ? special : defaultSpecialDogs);
       } catch (err) {
         console.error('Failed to load sections, using fallback:', err);
         setSafeDogs(defaultSafeDogs);
@@ -359,44 +494,11 @@ const AdSections = () => {
     loadAllSections();
   }, []);
 
-  const renderSection = (title, sub, dogs, badge) => (
-    <section style={{ 
-      padding: '24px', 
-      backgroundColor: 'white', 
-      borderRadius: '12px', 
-      border: '1px solid #cbd5e1', 
-      boxShadow: 'var(--shadow)',
-      marginBottom: '10px'
-    }}>
-      <SectionTitle title={title} sub={sub} />
-      <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
-        {loading && dogs.length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px 0', color: '#888' }}>
-            매물을 불러오는 중입니다...
-          </p>
-        ) : dogs.length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px 0', color: '#888' }}>
-            등록된 분양 매물이 없습니다.
-          </p>
-        ) : (
-          dogs.map((dog, i) => (
-            <Card 
-              key={`${badge}-${dog.id}-${i}`} 
-              type="middle" 
-              badgeText={dog.badgeText || badge} 
-              data={dog} 
-            />
-          ))
-        )}
-      </div>
-    </section>
-  );
-
   return (
     <>
-      {renderSection("🛡️ 안심 분양 정보", "팔도댕댕이 직접 검증한 깨끗한 안심 분양", safeDogs, "안심")}
-      {renderSection("🔥 인기 분양 정보", "지금 많은 분들이 주목하고 있는 댕댕이", popularDogs, "인기")}
-      {renderSection("✨ 스페셜 분양 정보", "선택받은 특별한 케어와 혜택의 분양", specialDogs, "스페셜")}
+      <AdSectionItem title="🛡️ 안심 분양 정보" sub="팔도댕댕이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
+      <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
+      <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />
     </>
   );
 };

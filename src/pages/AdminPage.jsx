@@ -366,7 +366,23 @@ const AdminPage = () => {
                             <button onClick={() => handleReject(app)} style={{ ...tableBtnStyle, backgroundColor: '#ff4757' }}>반려</button>
                           </>
                         )}
-                        <button onClick={() => window.open(app.file_url)} style={{ ...tableBtnStyle, backgroundColor: '#eee', color: '#666' }}>서류 확인</button>
+                        <button 
+                          onClick={() => {
+                            if (app.file_url) {
+                              window.open(app.file_url);
+                            } else {
+                              alert('첨부된 증빙 서류가 없습니다.');
+                            }
+                          }} 
+                          style={{ 
+                            ...tableBtnStyle, 
+                            backgroundColor: app.file_url ? '#eee' : '#f5f5f5', 
+                            color: app.file_url ? '#666' : '#ccc',
+                            cursor: app.file_url ? 'pointer' : 'not-allowed'
+                          }}
+                        >
+                          서류 확인
+                        </button>
                       </div>
                     </td>
                   </tr>

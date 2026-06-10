@@ -64,7 +64,7 @@ export async function onRequestGet(context) {
   if (action === 'last_application') {
     try {
       const app = await env.DB.prepare(
-        'SELECT id, user_id, business_name, biz_no, animal_sale_no, status, rejected_reason, created_at FROM business_applications WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
+        'SELECT id, user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, rejected_reason, file_url, created_at FROM business_applications WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
       )
         .bind(authUser.id)
         .first();
@@ -98,7 +98,7 @@ export async function onRequestPost(context) {
 
   // 사업자 자격 신청 (apply)
   if (action === 'apply') {
-    const { business_name, biz_no, animal_sale_no } = body;
+    const { business_name, representative_name, phone, address, biz_no, animal_sale_no, file_base64, file_name } = body;
     if (!business_name || !biz_no || !animal_sale_no) {
       return createResponse({ error: '상호명, 사업자 번호, 판매업 허가 번호는 필수 입력 사항입니다.' }, 400);
     }
@@ -119,11 +119,48 @@ export async function onRequestPost(context) {
         }
       }
 
+      // R2 파일 업로드 처리
+      let fileUrl = null;
+      if (file_base64 && env.R2) {
+        try {
+          const parts = file_base64.split(',');
+          const mimeMatch = parts[0].match(/:(.*?);/);
+          const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+          const binary = atob(parts[1]);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          const arrayBuffer = bytes.buffer;
+
+          const fileExt = (file_name || 'file.jpg').split('.').pop() || 'jpg';
+          const randomId = Math.random().toString(36).substring(2, 8);
+          const key = `business/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
+
+          await env.R2.put(key, arrayBuffer, {
+            httpMetadata: { contentType }
+          });
+          fileUrl = `/api/images?key=${encodeURIComponent(key)}`;
+        } catch (uploadErr) {
+          console.error('Business file upload to R2 failed:', uploadErr);
+          return createResponse({ error: `증빙 서류 업로드 실패: ${uploadErr.message}` }, 500);
+        }
+      }
+
       // 신청서 등록
       await env.DB.prepare(
-        'INSERT INTO business_applications (user_id, business_name, biz_no, animal_sale_no, status) VALUES (?, ?, ?, ?, "pending")'
+        'INSERT INTO business_applications (user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, file_url) VALUES (?, ?, ?, ?, ?, ?, ?, "pending", ?)'
       )
-        .bind(authUser.id, business_name, biz_no, animal_sale_no)
+        .bind(
+          authUser.id,
+          business_name,
+          representative_name || '',
+          phone || '',
+          address || '',
+          biz_no,
+          animal_sale_no,
+          fileUrl
+        )
         .run();
 
       return createResponse({ success: true, message: '판매자 자격 신청서가 성공적으로 접수되었습니다.' });

@@ -48,7 +48,18 @@ export async function onRequestGet(context) {
     headers.set('etag', object.httpEtag);
     headers.set('Cache-Control', 'public, max-age=86400');
 
-    return new Response(object.body, {
+    // Content-Type 보강 처리
+    if (!headers.has('content-type') || headers.get('content-type') === 'text/plain') {
+      const ext = key.split('.').pop().toLowerCase();
+      if (ext === 'png') headers.set('content-type', 'image/png');
+      else if (ext === 'gif') headers.set('content-type', 'image/gif');
+      else if (ext === 'webp') headers.set('content-type', 'image/webp');
+      else headers.set('content-type', 'image/jpeg');
+    }
+
+    // ReadableStream 대신 ArrayBuffer를 통하여 온전한 바이너리 상태로 클라이언트에 전달
+    const arrayBuffer = await object.arrayBuffer();
+    return new Response(arrayBuffer, {
       headers
     });
   } catch (err) {

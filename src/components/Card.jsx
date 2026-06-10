@@ -61,6 +61,7 @@ const Card = ({ type, data, badgeText }) => {
       style={{
         width: '100%',
         height: '100%',
+        minWidth: 0,
         cursor: 'pointer',
         transition: 'var(--transition)',
         display: 'flex',
@@ -101,7 +102,8 @@ const Card = ({ type, data, badgeText }) => {
         flexDirection: 'column', 
         flexGrow: 1, 
         justifyContent: 'flex-start',
-        gap: '4px'
+        gap: '4px',
+        minWidth: 0
       }}>
         {/* 첫째줄: 품종(좌) / 지역(우) */}
         <div style={{ 

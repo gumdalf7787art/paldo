@@ -633,7 +633,7 @@ const MyPage = () => {
               {activeTab === 'dashboard' && (
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px' }}>{profile?.nickname}님의 대시보드</h2>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+                  <div className={`dashboard-stats-grid ${isSeller ? '' : 'buyer'}`}>
                     {isSeller ? (
                       <>
                         <StatBox title="총 방문자 분석" value={totalViews} suffix="명" color="#F5A623" icon="👀" onClick={() => setActiveTab('stats')} />
@@ -1119,24 +1119,29 @@ const StatBox = ({ title, value, suffix, color, icon, onClick }) => (
   <div 
     onClick={onClick}
     style={{ 
-      padding: '25px', 
-      borderRadius: '20px', 
+      padding: '18px 15px', 
+      borderRadius: '16px', 
       border: '1px solid #eee', 
       backgroundColor: 'white', 
       display: 'flex', 
       alignItems: 'center', 
-      gap: '20px', 
+      gap: '12px', 
       boxShadow: '0 5px 15px rgba(0,0,0,0.02)',
       cursor: onClick ? 'pointer' : 'default',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      width: '100%',
+      minWidth: '0'
     }}
-    onMouseEnter={(e) => { if(onClick) e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)'; }}
+    onMouseEnter={(e) => { if(onClick) e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.06)'; }}
     onMouseLeave={(e) => { if(onClick) e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(0,0,0,0.02)'; }}
   >
-    <div style={{ width: '50px', height: '50px', borderRadius: '15px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>{icon}</div>
-    <div>
-      <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: '5px' }}>{title}</div>
-      <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#333' }}>{(value || 0).toLocaleString()}<span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#666', marginLeft: '5px' }}>{suffix}</span></div>
+    <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>{icon}</div>
+    <div style={{ minWidth: '0', flex: 1 }}>
+      <div style={{ color: '#888', fontSize: '0.8rem', marginBottom: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+      <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {(value || 0).toLocaleString()}
+        <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: '#666', marginLeft: '3px' }}>{suffix}</span>
+      </div>
     </div>
   </div>
 );

@@ -958,3 +958,22 @@ html, body {
   background-color: #f1f5f9;
   color: var(--primary) !important;
 }
+
+/* MyPage Dashboard Stats Grid */
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.dashboard-stats-grid.buyer {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+}

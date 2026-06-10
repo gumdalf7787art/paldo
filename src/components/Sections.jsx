@@ -416,7 +416,7 @@ const AdoptionList = () => {
   return (
     <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'var(--shadow)' }}>
       <SectionTitle title="전체 분양 리스트" sub="실시간 등록 정보" />
-      <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="adoption-grid">
         {loading ? (
            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>리스트를 불러오는 중입니다...</p>
         ) : dogs.length === 0 ? (

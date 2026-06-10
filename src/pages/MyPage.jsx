@@ -544,7 +544,7 @@ const MyPage = () => {
                 <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ ...actionBtnStyle, fontSize: '0.85rem', marginBottom: '10px' }}>⚙️ 프로필 설정</button>
                 <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
 
-                {profile?.role === 'user' && (
+                {!isSeller && (
                   !businessApp ? (
                     <button onClick={() => setIsApplyModalOpen(true)} style={{ ...actionBtnStyle, border: 'none', background: 'none', color: '#888', fontSize: '0.75rem', textDecoration: 'underline' }}>사업자로 등록하기</button>
                   ) : (

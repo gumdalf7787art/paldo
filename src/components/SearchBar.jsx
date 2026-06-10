@@ -29,13 +29,13 @@ const SearchBar = () => {
   ];
 
   return (
-    <section className="fade-in search-bar-section" style={{ padding: '10px 0 5px 0' }}>
+    <section className="fade-in search-bar-section" style={{ padding: '5px 0' }}>
       <div className="glass-card search-bar-container" style={{ 
-        padding: '16px 20px', 
+        padding: '10px 16px', 
         display: 'flex', 
         flexDirection: 'column', 
-        gap: '16px',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        gap: '10px',
+        backgroundColor: 'rgba(248, 250, 252, 0.95)',
         backdropFilter: 'blur(10px)',
         borderRadius: '12px',
         border: '1px solid #cbd5e1',
@@ -46,7 +46,7 @@ const SearchBar = () => {
           display: 'flex', 
           flexDirection: 'row', 
           flexWrap: 'wrap',
-          gap: '12px',
+          gap: '8px',
           alignItems: 'flex-end',
           width: '100%'
         }}>
@@ -131,18 +131,18 @@ const SearchBar = () => {
         <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
 
         {/* 하단 인기 견종 칩 영역 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
           {/* 인기견종 레이블 */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '3px',
             whiteSpace: 'nowrap',
-            fontSize: '0.78rem',
+            fontSize: '0.72rem',
             fontWeight: '800',
             color: '#475569',
-            backgroundColor: '#f1f5f9',
-            padding: '3px 8px',
+            backgroundColor: '#e2e8f0',
+            padding: '2px 6px',
             borderRadius: '6px',
             flexShrink: 0
           }}>
@@ -156,7 +156,7 @@ const SearchBar = () => {
             justifyContent: 'space-between',
             gap: '6px', 
             overflowX: 'auto', 
-            padding: '4px 0', 
+            padding: '0', 
             margin: 0,
             border: 'none',
             flexGrow: 1,
@@ -168,15 +168,15 @@ const SearchBar = () => {
                 className="breed-chip"
                 onClick={() => navigate(`/breed/${breed.name}`)}
                 style={{
-                  padding: '3px 0',
+                  padding: '2px 0',
                   flex: '1',
-                  minWidth: '70px',
-                  borderRadius: '8px',
-                  fontSize: '0.75rem',
+                  minWidth: '65px',
+                  borderRadius: '6px',
+                  fontSize: '0.72rem',
                   gap: '4px',
                   border: '1px solid #cbd5e1',
                   backgroundColor: 'white',
-                  height: '26px',
+                  height: '23px',
                   boxSizing: 'border-box',
                   display: 'flex',
                   justifyContent: 'center',
@@ -194,17 +194,17 @@ const SearchBar = () => {
               className="breed-chip"
               onClick={() => navigate('/breed/전체')}
               style={{
-                padding: '3px 0',
+                padding: '2px 0',
                 flex: '1',
-                minWidth: '70px',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
+                minWidth: '65px',
+                borderRadius: '6px',
+                fontSize: '0.72rem',
                 gap: '4px',
                 border: '1px solid #cbd5e1',
                 backgroundColor: '#f8fafc',
                 color: 'var(--primary)',
                 fontWeight: '700',
-                height: '26px',
+                height: '23px',
                 boxSizing: 'border-box',
                 display: 'flex',
                 justifyContent: 'center',

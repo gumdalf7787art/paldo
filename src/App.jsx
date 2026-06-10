@@ -71,7 +71,7 @@ const Home = () => (
           borderRadius: '12px',
           padding: '20px',
           boxShadow: 'var(--shadow)',
-          marginBottom: '20px'
+          marginBottom: '10px'
         }}>
           <h4 style={{ color: '#E65100', fontSize: '0.9rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             💡 안심 입양 가이드

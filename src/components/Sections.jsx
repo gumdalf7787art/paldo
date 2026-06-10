@@ -169,15 +169,15 @@ const HeroCarousel = () => {
     <section 
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      style={{ padding: '15px 0 10px 0', position: 'relative' }}
+      style={{ padding: '8px 0 5px 0', position: 'relative' }}
     >
       <div 
         style={{ 
           overflow: 'hidden', 
           borderRadius: '16px',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #cbd5e1',
           padding: '16px',
-          backgroundColor: '#f8fafc',
+          backgroundColor: 'white',
           boxShadow: 'var(--shadow-sm)',
           position: 'relative'
         }}
@@ -363,9 +363,9 @@ const AdSections = () => {
       padding: '24px', 
       backgroundColor: 'white', 
       borderRadius: '12px', 
-      border: '1px solid #e2e8f0', 
+      border: '1px solid #cbd5e1', 
       boxShadow: 'var(--shadow)',
-      marginBottom: '20px'
+      marginBottom: '10px'
     }}>
       <SectionTitle title={title} sub={sub} />
       <div className="responsive-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
@@ -414,7 +414,7 @@ const AdoptionList = () => {
   }, []);
 
   return (
-    <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'var(--shadow)' }}>
+    <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
       <SectionTitle title="전체 분양 리스트" sub="실시간 등록 정보" />
       <div className="adoption-grid">
         {loading ? (
@@ -657,11 +657,11 @@ const PersonalRecommendWidget = () => {
 
 const widgetContainerStyle = {
   backgroundColor: 'white',
-  border: '1px solid #e2e8f0',
+  border: '1px solid #cbd5e1',
   borderRadius: '12px',
   padding: '14px',
   boxShadow: 'var(--shadow)',
-  marginBottom: '20px'
+  marginBottom: '10px'
 };
 
 const widgetTitleStyle = {

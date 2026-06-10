@@ -11,7 +11,7 @@ html {
   --primary-dark: #00796B;
   --secondary: #4E342E; /* Deep Brown */
   --accent: #80CBC4;
-  --bg-primary: #FFFDF7;
+  --bg-primary: #FFFFFF;
   --bg-secondary: #FFFFFF;
   --body-text: #3E2723;
   --muted-text: #6D4C41;
@@ -677,8 +677,8 @@ html, body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px; /* Width reduced from 340px to 320px */
   gap: 20px; /* Reduced from 24px */
-  margin-top: 20px; /* Reduced from 30px */
-  margin-bottom: 45px; /* Reduced from 60px */
+  margin-top: 10px; /* Reduced by 50% */
+  margin-bottom: 22px; /* Reduced by 50% */
 }
 
 @media (max-width: 1024px) {
@@ -810,11 +810,11 @@ html, body {
 /* Login Widget (Sidebar) */
 .naver-login-widget {
   background-color: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .naver-login-widget-text {
@@ -863,11 +863,11 @@ html, body {
 /* Profile Widget (Sidebar - Logged In) */
 .naver-profile-widget {
   background-color: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   padding: 20px;
   box-shadow: var(--shadow);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .profile-widget-header {
@@ -916,7 +916,7 @@ html, body {
   text-align: center;
   border-radius: 6px;
   background-color: #f7fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   transition: var(--transition);
 }
 

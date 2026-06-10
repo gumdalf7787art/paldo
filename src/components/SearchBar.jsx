@@ -29,7 +29,7 @@ const SearchBar = () => {
   ];
 
   return (
-    <section className="fade-in search-bar-section" style={{ padding: '20px 0 10px 0' }}>
+    <section className="fade-in search-bar-section" style={{ padding: '10px 0 5px 0' }}>
       <div className="glass-card search-bar-container" style={{ 
         padding: '16px 20px', 
         display: 'flex', 
@@ -38,7 +38,7 @@ const SearchBar = () => {
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
         backdropFilter: 'blur(10px)',
         borderRadius: '12px',
-        border: '1px solid #e2e8f0',
+        border: '1px solid #cbd5e1',
         boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
       }}>
         {/* 상단 검색 필터 영역 */}
@@ -128,7 +128,7 @@ const SearchBar = () => {
         </div>
 
         {/* 구분선 */}
-        <div style={{ borderTop: '1px solid #f1f5f9', width: '100%' }} />
+        <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
 
         {/* 하단 인기 견종 칩 영역 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
@@ -174,7 +174,7 @@ const SearchBar = () => {
                   borderRadius: '8px',
                   fontSize: '0.75rem',
                   gap: '4px',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #cbd5e1',
                   backgroundColor: 'white',
                   height: '26px',
                   boxSizing: 'border-box',
@@ -200,7 +200,7 @@ const SearchBar = () => {
                 borderRadius: '8px',
                 fontSize: '0.75rem',
                 gap: '4px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #cbd5e1',
                 backgroundColor: '#f8fafc',
                 color: 'var(--primary)',
                 fontWeight: '700',

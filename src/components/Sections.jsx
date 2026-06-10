@@ -269,7 +269,7 @@ const HeroCarousel = () => {
               key={`hero-slide-${dog.id}-${i}`}
               style={{
                 flex: '0 0 calc(20% - 8px)',
-                height: '250px',
+                height: '210px', /* Reduced from 250px */
                 backgroundColor: 'white',
                 borderRadius: '12px',
                 transition: 'transform 0.2s ease',
@@ -627,8 +627,8 @@ const PersonalRecommendWidget = () => {
               src={dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200'} 
               alt={dog.nickname} 
               style={{
-                width: '50px',
-                height: '50px',
+                width: '42px', /* Reduced from 50px */
+                height: '42px', /* Reduced from 50px */
                 borderRadius: '8px',
                 objectFit: 'cover',
                 flexShrink: 0

@@ -54,15 +54,12 @@ const StorePage = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStoreData();
     window.scrollTo(0, 0);
   }, [sellerId]);
 
-  const handleKakaoClick = () => {
-    if (storeInfo?.kakao_channel) {
-      window.open(storeInfo.kakao_channel, '_blank');
-    }
-  };
+
 
   if (loading) {
     return <div style={{ height: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>스토어 정보를 불러오는 중입니다...</div>;
@@ -106,13 +103,7 @@ const StorePage = () => {
             </p>
           </div>
 
-          {storeInfo.kakao_channel && (
-            <div style={{ flexShrink: 0 }}>
-              <button onClick={handleKakaoClick} style={{ padding: '15px 30px', borderRadius: '30px', backgroundColor: '#FEE500', color: '#3E2723', fontWeight: '800', fontSize: '1.1rem', border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(254, 229, 0, 0.4)' }}>
-                💬 카카오톡 스토어 상담
-              </button>
-            </div>
-          )}
+
         </div>
 
         {/* 3. 스토어 사진첩 (갤러리) */}

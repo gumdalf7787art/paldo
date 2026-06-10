@@ -672,11 +672,7 @@ const DetailPage = () => {
                   <button onClick={handleStartChat} style={chatBtnStyle}>
                      💬 팔톡으로 상담하기
                   </button>
-                  {sellerInfo?.kakao_channel && (
-                    <button onClick={() => window.open(sellerInfo.kakao_channel, '_blank')} style={kakaoBtnStyle}>
-                      💬 카카오톡으로 상담하기
-                    </button>
-                  )}
+
                   {sellerInfo && (
                     <button onClick={() => navigate(`/store/${dog.seller_id}`)} style={{ ...chatBtnStyle, backgroundColor: '#f0f0f0', color: '#555' }}>
                       🏪 이 스토어의 모든 게시물 보기
@@ -861,6 +857,5 @@ const DetailPage = () => {
 };
 
 const chatBtnStyle = { padding: '15px', borderRadius: '12px', backgroundColor: 'var(--primary-dark)', color: 'white', fontWeight: '700', fontSize: '1rem', border: 'none', cursor: 'pointer' };
-const kakaoBtnStyle = { padding: '14px', borderRadius: '12px', backgroundColor: '#FEE500', color: '#3E2723', fontWeight: '700', fontSize: '1rem', border: 'none', cursor: 'pointer' };
 
 export default DetailPage;

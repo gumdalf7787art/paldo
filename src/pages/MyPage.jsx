@@ -65,7 +65,6 @@ const MyPage = () => {
   const [storeHeader, setStoreHeader] = useState(null);
   const [storeHeaderPreview, setStoreHeaderPreview] = useState(null);
   const [storeContact, setStoreContact] = useState('');
-  const [kakaoChannel, setKakaoChannel] = useState('');
   const [storeDescription, setStoreDescription] = useState('');
   const [storeAddress, setStoreAddress] = useState('');
   const [storeUploading, setStoreUploading] = useState(false);
@@ -161,7 +160,6 @@ const MyPage = () => {
 
       setStoreHeader(profileData.store_header_image || null);
       setStoreContact(profileData.store_contact || '');
-      setKakaoChannel(profileData.kakao_channel || '');
       setStoreDescription(profileData.store_description || '');
       setStoreAddress(profileData.store_address || '');
       setBizNo(profileData.biz_no || '');
@@ -237,7 +235,7 @@ const MyPage = () => {
     setChartData(chartArr);
   };
 
-  const fetchChatRooms = async (userId) => {
+  const fetchChatRooms = async () => {
     const { data: rooms } = await api.chat.getRooms();
     if (rooms && rooms.length > 0) {
       const enrichedRooms = rooms.map(room => {
@@ -252,7 +250,7 @@ const MyPage = () => {
     }
   };
 
-  const fetchMyNotifications = async (userId) => {
+  const fetchMyNotifications = async () => {
     const { data } = await api.notifications.getList();
     if (data) setMyNotifications(data);
   };
@@ -342,7 +340,7 @@ const MyPage = () => {
       const { error } = await api.auth.updateProfile({
         store_header_image: bannerUrl || null,
         store_contact: storeContact || null,
-        kakao_channel: kakaoChannel || null,
+        kakao_channel: null,
         store_description: storeDescription || null,
         store_address: storeAddress || null,
         store_additional_images: finalStoreImages || []
@@ -787,11 +785,7 @@ const MyPage = () => {
                       </div>
                     </div>
 
-                    <div style={{ marginBottom: '20px' }}>
-                      <label style={labelStyle}>카카오채널 URL (선택)</label>
-                      <input value={kakaoChannel} onChange={e => setKakaoChannel(e.target.value)} placeholder="예: http://pf.kakao.com/_xxxxxx" style={inputStyle} />
-                      <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px' }}>등록하면 상세 페이지에 '카카오톡으로 상담하기' 버튼이 노출됩니다.</div>
-                    </div>
+
 
                     <div style={{ marginBottom: '20px' }}>
                       <label style={{ ...labelStyle, display: 'flex', justifyContent: 'space-between' }}>
@@ -1115,7 +1109,7 @@ const MyPage = () => {
         </div> {/* mypage-layout */}
       </div>
 
-      {isApplyModalOpen && <BusinessApplyModal userId={session.user.id} onClose={() => setIsApplyModalOpen(false)} onSuccess={setBusinessApp} />}
+      {isApplyModalOpen && <BusinessApplyModal onClose={() => setIsApplyModalOpen(false)} onSuccess={setBusinessApp} />}
     </div>
   );
 };
@@ -1188,7 +1182,7 @@ const resizeImageToBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 
 };
 
 // --- 나머지 기존 컴포넌트들 (BusinessApplyModal, ChatWindow) ---
-const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
+const BusinessApplyModal = ({ onClose, onSuccess }) => {
   const [form, setForm] = useState({ bizName: '', repName: '', phone: '', address: '', bizNo: '', animalNo: '' });
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -1369,6 +1363,7 @@ const ChatWindow = ({ room, userId, onClose }) => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMessages();
     // 실시간 대신 3초 폴링 방식으로 신규 메시지 감지
     const intervalId = setInterval(fetchMessages, 3000);

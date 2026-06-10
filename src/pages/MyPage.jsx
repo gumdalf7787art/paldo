@@ -1149,6 +1149,46 @@ const StatBox = ({ title, value, suffix, color, icon, onClick }) => (
   </div>
 );
 
+// --- 이미지 리사이징 & 압축 헬퍼 함수 ---
+const resizeImageToBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.75) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 // --- 나머지 기존 컴포넌트들 (BusinessApplyModal, ChatWindow) ---
 const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
   const [form, setForm] = useState({ bizName: '', repName: '', phone: '', address: '', bizNo: '', animalNo: '' });
@@ -1192,17 +1232,33 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
     setUploading(true);
 
     try {
-      // 파일을 base64로 변환 (서버로 전송)
+      // 이미지 파일인 경우 리사이징 및 압축 최적화 적용
       let fileBase64 = null;
-      let fileName = null;
-      if (file) {
+      let fileName = file.name;
+
+      if (file.type.startsWith('image/')) {
+        try {
+          fileBase64 = await resizeImageToBase64(file, 1200, 1200, 0.75);
+          if (!fileName.toLowerCase().endsWith('.jpg') && !fileName.toLowerCase().endsWith('.jpeg')) {
+            fileName = fileName.substring(0, fileName.lastIndexOf('.')) + '.jpg';
+          }
+        } catch (e) {
+          console.error('이미지 압축 실패, 원본 파일로 진행합니다:', e);
+          fileBase64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (err) => reject(err);
+            reader.readAsDataURL(file);
+          });
+        }
+      } else {
+        // 이미지가 아닌 경우(PDF 등) 원본 base64 변환
         fileBase64 = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.onerror = (err) => reject(err);
           reader.readAsDataURL(file);
         });
-        fileName = file.name;
       }
 
       const { error } = await api.business.apply({

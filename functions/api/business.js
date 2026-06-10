@@ -99,8 +99,11 @@ export async function onRequestPost(context) {
   // 사업자 자격 신청 (apply)
   if (action === 'apply') {
     const { business_name, representative_name, phone, address, biz_no, animal_sale_no, file_base64, file_name } = body;
-    if (!business_name || !biz_no || !animal_sale_no) {
-      return createResponse({ error: '상호명, 사업자 번호, 판매업 허가 번호는 필수 입력 사항입니다.' }, 400);
+    if (!business_name || !representative_name || !phone || !address || !biz_no || !animal_sale_no) {
+      return createResponse({ error: '모든 신청 항목(상호명, 대표자명, 연락처, 주소, 등록번호 등)은 필수 입력 사항입니다.' }, 400);
+    }
+    if (!file_base64) {
+      return createResponse({ error: '사업자등록증 등의 증빙 서류 파일은 필수 첨부 사항입니다.' }, 400);
     }
 
     try {

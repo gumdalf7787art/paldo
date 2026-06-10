@@ -1157,6 +1157,17 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!form.bizName.trim() || !form.repName.trim() || !form.phone.trim() || !form.address.trim() || !form.bizNo.trim() || !form.animalNo.trim()) {
+      alert('모든 신청 항목을 입력해 주세요.');
+      return;
+    }
+
+    if (!file) {
+      alert('사업자등록증 등의 증빙 서류 파일을 반드시 첨부해 주세요.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -1210,7 +1221,7 @@ const BusinessApplyModal = ({ userId, onClose, onSuccess }) => {
           <div><label style={labelStyle}>주소</label><input required style={inputStyle} value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록번호</label><input required style={inputStyle} value={form.bizNo} onChange={e => setForm({...form, bizNo: e.target.value})} /></div>
           <div><label style={labelStyle}>동물판매업번호</label><input required style={inputStyle} value={form.animalNo} onChange={e => setForm({...form, animalNo: e.target.value})} /></div>
-          <div><label style={labelStyle}>파일첨부 (선택)</label><input type="file" onChange={e => setFile(e.target.files[0])} /></div>
+          <div><label style={labelStyle}>사업자등록증 첨부 (필수)</label><input type="file" required onChange={e => setFile(e.target.files[0])} /></div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
             <button type="submit" disabled={uploading} style={{ ...miniBtnStyle, flex: 1, padding: '15px' }}>{uploading ? '신청 중...' : '확인'}</button>
             <button type="button" onClick={onClose} style={{ ...miniBtnStyle, backgroundColor: '#eee', color: '#666', flex: 1 }}>취소</button>

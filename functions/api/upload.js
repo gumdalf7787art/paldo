@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
     const key = `dogs/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
 
     // 바이너리 데이터 및 Content-Type 추출
-    let arrayBuffer;
+    let uploadBody;
     let contentType = 'image/jpeg';
 
     if (isString) {
@@ -92,49 +92,19 @@ export async function onRequestPost(context) {
         for (let i = 0; i < binary.length; i++) {
           bytes[i] = binary.charCodeAt(i);
         }
-        arrayBuffer = bytes.buffer;
+        uploadBody = bytes.buffer;
       } else {
         contentType = 'text/plain';
-        arrayBuffer = new TextEncoder().encode(file).buffer;
+        uploadBody = new TextEncoder().encode(file).buffer;
       }
     } else {
       contentType = file.type || 'image/jpeg';
-      if (typeof file.arrayBuffer === 'function') {
-        try {
-          arrayBuffer = await file.arrayBuffer();
-        } catch (e) {
-          arrayBuffer = null;
-        }
-      }
-      if (!arrayBuffer) {
-        if (typeof file.stream === 'function') {
-          try {
-            const reader = file.stream().getReader();
-            const chunks = [];
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              chunks.push(value);
-            }
-            const totalLength = chunks.reduce((acc, val) => acc + val.length, 0);
-            const result = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-              result.set(chunk, offset);
-              offset += chunk.length;
-            }
-            arrayBuffer = result.buffer;
-          } catch (streamErr) {
-            arrayBuffer = await new Response(file).arrayBuffer();
-          }
-        } else {
-          arrayBuffer = await new Response(file).arrayBuffer();
-        }
-      }
+      // File/Blob 객체인 경우 R2.put에 바로 넘겨 스트림 형태로 바이너리가 깨짐 없이 안전하게 업로드되도록 합니다.
+      uploadBody = file;
     }
 
     // R2 업로드
-    await env.R2.put(key, arrayBuffer, {
+    await env.R2.put(key, uploadBody, {
       httpMetadata: { contentType }
     });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import { calculateAge } from '../utils/age';
 
 // 영상 URL 렌더링 헬퍼 (IIFE 대신 독립 함수로 분리 - Rolldown 파서 버그 우회)
 function renderVideoEmbed(videoUrl) {
@@ -572,7 +573,7 @@ const DetailPage = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>생일 {" / "} 개월</span>
-                  <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} {" / "} {dog.age}</span>
+                  <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} {" / "} {calculateAge(dog.birthday, dog.age)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>성별 {" / "} 접종</span>

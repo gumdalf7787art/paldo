@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import { api } from '../lib/api';
+import { calculateAge } from '../utils/age';
 
 // 배열 요소를 무작위로 섞는 함수 (Fisher-Yates Shuffle)
 const shuffleArray = (array) => {
@@ -32,7 +33,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
       nickname: dog.nickname || '이름 없음',
       gender: dog.gender || '-',
       region: dog.region || '지역 미지정',
-      age: dog.age || '나이 미상',
+      age: calculateAge(dog.birthday, dog.age),
       price: dog.price,
       desc: dog.description || dog.desc || '팔도댓댓 추천 분양입니다.',
       date: new Date(dog.created_at).toLocaleDateString()
@@ -287,7 +288,7 @@ const HeroCarousel = () => {
                   nickname: dog.nickname || '이름 없음',
                   gender: dog.gender || '-',
                   region: dog.region || '지역 미지정',
-                  age: dog.age || '나이 미상',
+                  age: calculateAge(dog.birthday, dog.age),
                   price: dog.price
                 }}
               />
@@ -432,7 +433,7 @@ const AdoptionList = () => {
                 nickname: dog.nickname || '이름 없음',
                 gender: dog.gender || '-',
                 region: dog.region || '지역 미지정',
-                age: dog.age || '나이 미상',
+                age: calculateAge(dog.birthday, dog.age),
                 price: dog.price,
                 date: new Date(dog.created_at).toLocaleDateString()
               }} 

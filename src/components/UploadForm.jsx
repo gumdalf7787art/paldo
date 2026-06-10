@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from './Card'; // 미리보기용 컴포넌트 임포트
 import { api } from '../lib/api';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { calculateAge } from '../utils/age';
 
 const breedOptions = [
   "골든두들", "골든리트리버", "그레이트덴", "그레이트피레니즈", "그레이하운드", "꼬똥드툴레아",
@@ -42,13 +43,22 @@ const UploadForm = () => {
 
   useEffect(() => {
     if (editDog) {
+      const bday = editDog.birthday || '';
+      let calculatedAgeNum = '';
+      if (bday) {
+        const calculated = calculateAge(bday, '');
+        calculatedAgeNum = calculated.includes('개월') ? calculated.replace('개월', '') : (calculated.includes('일') ? '0' : calculated);
+      } else {
+        calculatedAgeNum = editDog.age ? editDog.age.replace('개월', '').replace('개월령', '') : '';
+      }
+
       setFormData({
         name: editDog.nickname || '',
         breed: editDog.breed || '말티푸',
         price: editDog.price === 0 ? '' : editDog.price,
         originalPrice: editDog.original_price || '',
         region: editDog.region || '전국',
-        age: editDog.age ? editDog.age.replace('개월', '') : '',
+        age: calculatedAgeNum,
         gender: editDog.gender || '수컷',
         birthday: editDog.birthday || '',
         vaccination: editDog.vaccine || '', // 기존의 vaccine 컬럼 맵핑
@@ -112,8 +122,8 @@ const UploadForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.breed || !formData.age) {
-      return alert('강아지 이름, 견종, 나이는 필수 입력 사항입니다.');
+    if (!formData.name || !formData.breed || !formData.birthday) {
+      return alert('강아지 이름, 견종, 생일은 필수 입력 사항입니다.');
     }
     setLoading(true);
 
@@ -157,7 +167,7 @@ const UploadForm = () => {
       const postData = {
         nickname: formData.name,
         breed: formData.breed,
-        age: formData.age ? `${formData.age}개월` : '',
+        age: (formData.age !== undefined && formData.age !== '') ? `${formData.age}개월` : '',
         gender: formData.gender,
         region: formData.region,
         price: formData.isFree ? 0 : (parseInt(formData.price) || 0),
@@ -285,8 +295,14 @@ const UploadForm = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <label style={labelStyle}>나이 (개월)</label>
-              <input type="number" placeholder="예: 2" style={inputStyle} value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
+              <label style={labelStyle}>나이 (개월 - 생일 선택 시 자동 계산)</label>
+              <input 
+                type="text" 
+                placeholder="생일을 선택하면 자동 계산됩니다" 
+                style={{ ...inputStyle, backgroundColor: '#f5f5f5' }} 
+                value={formData.age ? `${formData.age}개월령` : ''} 
+                readOnly 
+              />
             </div>
             <div>
               <label style={labelStyle}>성별</label>
@@ -305,8 +321,22 @@ const UploadForm = () => {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>생일 (선택)</label>
-              <input type="date" style={inputStyle} value={formData.birthday} onChange={e => setFormData({...formData, birthday: e.target.value})} />
+              <label style={labelStyle}>생일 (필수)</label>
+              <input 
+                type="date" 
+                style={inputStyle} 
+                value={formData.birthday} 
+                onChange={e => {
+                  const bday = e.target.value;
+                  const calculated = calculateAge(bday, '');
+                  const monthNum = calculated.includes('개월') ? calculated.replace('개월', '') : (calculated.includes('일') ? '0' : calculated);
+                  setFormData({
+                    ...formData,
+                    birthday: bday,
+                    age: monthNum
+                  });
+                }} 
+              />
             </div>
           </div>
 

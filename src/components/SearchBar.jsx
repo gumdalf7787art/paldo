@@ -15,18 +15,47 @@ const SearchBar = () => {
     navigate(`/breed/${breed}${regionParam}`);
   };
 
-  const popularBreedsList = [
+  const row1 = [
     { name: '말티즈', icon: '🐶' },
-    { name: '포메라니안', icon: '🐩' },
-    { name: '토이푸들', icon: '🐕' },
+    { name: '푸들', icon: '🐩' },
+    { name: '포메라니안', icon: '🐕' },
     { name: '비숑프리제', icon: '🐾' },
-    { name: '푸들', icon: '🐕‍🦺' },
     { name: '시바견', icon: '🦊' },
-    { name: '프랜치불독', icon: '🐷' },
-    { name: '웰쉬코기', icon: '🍞' },
-    { name: '리트리버', icon: '🐕' },
+    { name: '프렌치불독', icon: '🐷' },
+    { name: '웰시코기', icon: '🍞' },
+    { name: '골든리트리버', icon: '🐕' },
     { name: '보더콜리', icon: '🦓' }
   ];
+
+  const row2 = [
+    { name: '말티푸', icon: '🐶' },
+    { name: '푸숑', icon: '🐩' },
+    { name: '말숑', icon: '🐾' },
+    { name: '포메푸', icon: '🐕' },
+    { name: '폼피츠', icon: '🦊' },
+    { name: '코카푸', icon: '🍞' },
+    { name: '골든두들', icon: '🐕' },
+    { name: '래브라도두들', icon: '🐩' },
+    { name: '치푸', icon: '🐾' }
+  ];
+
+  const chipStyle = {
+    padding: '2px 0',
+    flex: '1',
+    minWidth: '75px',
+    borderRadius: '6px',
+    fontSize: '0.83rem',
+    gap: '4px',
+    border: '1px solid #cbd5e1',
+    backgroundColor: 'white',
+    height: '27px',
+    boxSizing: 'border-box',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    cursor: 'pointer'
+  };
 
   return (
     <section className="fade-in search-bar-section" style={{ padding: '5px 0' }}>
@@ -45,14 +74,14 @@ const SearchBar = () => {
         <div style={{
           display: 'flex', 
           flexDirection: 'row', 
-          flexWrap: 'wrap',
-          gap: '8px',
+          flexWrap: 'nowrap',
+          gap: '6px',
           alignItems: 'flex-end',
           width: '100%'
         }}>
           {/* 1. 품종 선택 */}
-          <div className="filter-item" style={{ flex: '1.2 1 140px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>품종</label>
+          <div className="filter-item" style={{ flex: '1.2 1 110px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>품종</label>
             <select 
               style={selectStyle} 
               value={selectedBreed}
@@ -64,8 +93,8 @@ const SearchBar = () => {
           </div>
 
           {/* 2. 분양지역 선택 */}
-          <div className="filter-item" style={{ flex: '1 1 110px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>지역</label>
+          <div className="filter-item" style={{ flex: '1 1 85px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>지역</label>
             <select 
               style={selectStyle}
               value={selectedRegion}
@@ -76,8 +105,8 @@ const SearchBar = () => {
           </div>
 
           {/* 3. 성별 선택 */}
-          <div className="filter-item" style={{ flex: '0.9 1 100px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>성별</label>
+          <div className="filter-item" style={{ flex: '0.9 1 78px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>성별</label>
             <select 
               style={selectStyle}
               value={selectedGender}
@@ -88,8 +117,8 @@ const SearchBar = () => {
           </div>
 
           {/* 4. 분양가격 */}
-          <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>분양가격</label>
+          <div className="filter-item" style={{ flex: '1.1 1 95px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>분양가격</label>
             <select 
               style={selectStyle}
               value={selectedPrice}
@@ -106,11 +135,11 @@ const SearchBar = () => {
               flexShrink: 0,
               backgroundColor: 'var(--primary)',
               color: 'var(--white)',
-              padding: '0 24px',
-              height: '34px',
-              borderRadius: '8px',
+              padding: '0 16px',
+              height: '27px',
+              borderRadius: '6px',
               fontWeight: '700',
-              fontSize: '0.85rem',
+              fontSize: '0.72rem',
               border: 'none',
               cursor: 'pointer',
               boxShadow: '0 4px 10px rgba(38, 166, 154, 0.15)',
@@ -130,91 +159,101 @@ const SearchBar = () => {
         {/* 구분선 */}
         <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
 
-        {/* 하단 인기 견종 칩 영역 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+        {/* 하단 인기 견종 칩 영역 (2줄 배치 및 병합) */}
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
           {/* 인기견종 레이블 */}
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '3px',
+            justifyContent: 'center',
+            gap: '4px',
             whiteSpace: 'nowrap',
-            fontSize: '0.72rem',
+            fontSize: '0.83rem',
             fontWeight: '800',
             color: '#475569',
             backgroundColor: '#e2e8f0',
-            padding: '2px 6px',
-            borderRadius: '6px',
+            padding: '0 12px',
+            borderRadius: '8px',
             flexShrink: 0
           }}>
-            🔥 인기견종
+            <span>🔥</span>
+            <span>인기견종</span>
           </div>
 
-          {/* 칩 목록 */}
-          <div className="breed-chips-container" style={{ 
+          {/* 칩 목록 (2줄로 나누어 배치) */}
+          <div className="breed-chips-rows-container" style={{ 
             display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between',
+            flexDirection: 'column',
             gap: '6px', 
-            overflowX: 'auto', 
-            padding: '0', 
-            margin: 0,
-            border: 'none',
             flexGrow: 1,
-            scrollbarWidth: 'none'
+            minWidth: 0
           }}>
-            {popularBreedsList.map((breed, i) => (
-              <div 
-                key={i} 
-                className="breed-chip"
-                onClick={() => navigate(`/breed/${breed.name}`)}
-                style={{
-                  padding: '2px 0',
-                  flex: '1',
-                  minWidth: '65px',
-                  borderRadius: '6px',
-                  fontSize: '0.72rem',
-                  gap: '4px',
-                  border: '1px solid #cbd5e1',
-                  backgroundColor: 'white',
-                  height: '23px',
-                  boxSizing: 'border-box',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center'
-                }}
-              >
-                <span style={{ fontSize: '0.8rem' }}>{breed.icon}</span>
-                <span>{breed.name}</span>
-              </div>
-            ))}
-
-            {/* 전체보기 칩 추가 */}
-            <div 
-              className="breed-chip"
-              onClick={() => navigate('/breed/전체')}
-              style={{
-                padding: '2px 0',
-                flex: '1',
-                minWidth: '65px',
-                borderRadius: '6px',
-                fontSize: '0.72rem',
-                gap: '4px',
-                border: '1px solid #cbd5e1',
-                backgroundColor: '#f8fafc',
-                color: 'var(--primary)',
-                fontWeight: '700',
-                height: '23px',
-                boxSizing: 'border-box',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center'
-              }}
-            >
-              <span style={{ fontSize: '0.8rem' }}>👀</span>
-              <span>전체보기</span>
+            {/* 1행 */}
+            <div className="breed-chips-row" style={{
+              display: 'flex',
+              gap: '6px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none'
+            }}>
+              {row1.map((breed, i) => (
+                <div 
+                  key={i} 
+                  className="breed-chip"
+                  onClick={() => navigate(`/breed/${breed.name}`)}
+                  style={chipStyle}
+                >
+                  <span style={{ fontSize: '0.92rem' }}>{breed.icon}</span>
+                  <span>{breed.name}</span>
+                </div>
+              ))}
             </div>
+
+            {/* 2행 */}
+            <div className="breed-chips-row" style={{
+              display: 'flex',
+              gap: '6px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none'
+            }}>
+              {row2.map((breed, i) => (
+                <div 
+                  key={i} 
+                  className="breed-chip"
+                  onClick={() => navigate(`/breed/${breed.name}`)}
+                  style={chipStyle}
+                >
+                  <span style={{ fontSize: '0.92rem' }}>{breed.icon}</span>
+                  <span>{breed.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 전체보기 칩 추가 */}
+          <div 
+            className="breed-chip"
+            onClick={() => navigate('/breed/전체')}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              whiteSpace: 'nowrap',
+              fontSize: '0.83rem',
+              fontWeight: '800',
+              color: 'var(--primary)',
+              backgroundColor: '#f8fafc',
+              border: '1px solid #cbd5e1',
+              padding: '0 12px',
+              borderRadius: '8px',
+              flexShrink: 0,
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '0.92rem' }}>👀</span>
+            <span>전체보기</span>
           </div>
         </div>
       </div>
@@ -224,18 +263,18 @@ const SearchBar = () => {
 
 const selectStyle = {
   width: '100%',
-  padding: '6px 20px 6px 8px',
-  borderRadius: '8px',
+  padding: '4px 16px 4px 6px',
+  borderRadius: '6px',
   border: '1px solid #cbd5e1',
   backgroundColor: 'var(--white)',
   color: 'var(--body-text)',
-  fontSize: '0.82rem',
+  fontSize: '0.72rem',
   outline: 'none',
   appearance: 'none',
-  backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M10.293%203.293L6%207.586%201.707%203.293A1%201%200%2000.293%204.707l5%205a1%201%200%20001.414%200l5-5a1%201%200%2010-1.414-1.414z%22%2F%3E%3C%2Fsvg%3E")',
+  backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M10.293%203.293L6%207.586%201.707%203.293A1%201%200%2000.293%204.707l5%205a1%201%200%20001.414%200l5-5a1%201%200%2010-1.414-1.414z%22%2F%3E%3C%2Fsvg%3E")',
   backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'right 8px center',
-  height: '34px',
+  backgroundPosition: 'right 6px center',
+  height: '27px',
   boxSizing: 'border-box'
 };
 

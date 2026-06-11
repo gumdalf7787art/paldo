@@ -987,3 +987,10 @@ html, body {
 .ad-carousel-btn.right {
   right: 5px;
 }
+
+/* Header Slogans Responsive */
+@media (max-width: 900px) {
+  .header-slogans-container {
+    display: none !important;
+  }
+}

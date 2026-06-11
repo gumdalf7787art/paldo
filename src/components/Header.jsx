@@ -111,38 +111,81 @@ const Header = () => {
         }}>
           <Link to="/"><Logo /></Link>
           
-          {/* 헤더 중앙 클린분양 슬로건 */}
-          <div style={{
+          {/* 헤더 중앙 리브랜딩 슬로건 (2개 카피 배치) */}
+          <div className="header-slogans-container" style={{
             position: 'absolute',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            gap: '3px'
+            gap: '20px',
+            pointerEvents: 'none'
           }}>
-            <span style={{ 
-              fontSize: '0.95rem', 
-              fontWeight: '700', 
-              color: 'var(--primary)', 
-              letterSpacing: '-0.3px',
-              lineHeight: '1.2'
+            {/* 왼쪽 카피 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: '3px'
             }}>
-              허위매물 없는 클린분양
-            </span>
-            <span style={{ 
-              fontSize: '0.82rem', 
-              fontWeight: '500', 
-              color: '#64748b', 
-              letterSpacing: '-0.3px',
-              lineHeight: '1.2'
+              <span style={{ 
+                fontSize: '0.92rem', 
+                fontWeight: '700', 
+                color: 'var(--primary)', 
+                letterSpacing: '-0.3px',
+                lineHeight: '1.2'
+              }}>
+                세상의 모든 강아지
+              </span>
+              <span style={{ 
+                fontSize: '0.8rem', 
+                fontWeight: '500', 
+                color: '#64748b', 
+                letterSpacing: '-0.3px',
+                lineHeight: '1.2'
+              }}>
+                여기 다 있다. 다잇독.
+              </span>
+            </div>
+
+            {/* 구분 세로선 */}
+            <div style={{
+              width: '1px',
+              height: '24px',
+              backgroundColor: '#e2e8f0'
+            }} />
+
+            {/* 오른쪽 카피 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: '3px'
             }}>
-              다잇독이 만들어갑니다.
-            </span>
+              <span style={{ 
+                fontSize: '0.92rem', 
+                fontWeight: '700', 
+                color: 'var(--primary)', 
+                letterSpacing: '-0.3px',
+                lineHeight: '1.2'
+              }}>
+                허위매물 없는 클린분양
+              </span>
+              <span style={{ 
+                fontSize: '0.8rem', 
+                fontWeight: '500', 
+                color: '#64748b', 
+                letterSpacing: '-0.3px',
+                lineHeight: '1.2'
+              }}>
+                다잇독이 만들어갑니다.
+              </span>
+            </div>
           </div>
 
           <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>

@@ -44,11 +44,11 @@ const SearchBar = () => {
     flex: '1',
     minWidth: '75px',
     borderRadius: '6px',
-    fontSize: '0.83rem',
+    fontSize: '0.78rem',
     gap: '4px',
     border: '1px solid #cbd5e1',
     backgroundColor: 'white',
-    height: '27px',
+    height: '24px',
     boxSizing: 'border-box',
     display: 'flex',
     justifyContent: 'center',
@@ -70,18 +70,93 @@ const SearchBar = () => {
         border: '1px solid #cbd5e1',
         boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
       }}>
-        {/* 상단 검색 필터 영역 */}
+        {/* 상단 인기 견종 칩 영역 (2줄 배치 및 병합) */}
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
+          {/* 인기견종 레이블 */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '2px',
+            whiteSpace: 'nowrap',
+            fontSize: '0.78rem',
+            fontWeight: '800',
+            color: '#475569',
+            backgroundColor: '#e2e8f0',
+            padding: '0 10px',
+            borderRadius: '6px',
+            flexShrink: 0
+          }}>
+            <span>🔥 인기견종</span>
+            <span>바로가기</span>
+          </div>
+
+          {/* 칩 목록 (2줄로 나누어 배치) */}
+          <div className="breed-chips-rows-container" style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            gap: '6px', 
+            flexGrow: 1,
+            minWidth: 0
+          }}>
+            {/* 1행 */}
+            <div className="breed-chips-row" style={{
+              display: 'flex',
+              gap: '6px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none'
+            }}>
+              {row1.map((breed, i) => (
+                <div 
+                  key={i} 
+                  className="breed-chip"
+                  onClick={() => navigate(`/breed/${breed.name}`)}
+                  style={chipStyle}
+                >
+                  <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                  <span>{breed.name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* 2행 */}
+            <div className="breed-chips-row" style={{
+              display: 'flex',
+              gap: '6px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none'
+            }}>
+              {row2.map((breed, i) => (
+                <div 
+                  key={i} 
+                  className="breed-chip"
+                  onClick={() => navigate(`/breed/${breed.name}`)}
+                  style={chipStyle}
+                >
+                  <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                  <span>{breed.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 구분선 */}
+        <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
+
+        {/* 하단 검색 필터 영역 */}
         <div style={{
           display: 'flex', 
           flexDirection: 'row', 
           flexWrap: 'nowrap',
-          gap: '6px',
-          alignItems: 'flex-end',
+          gap: '8px',
+          alignItems: 'center',
           width: '100%'
         }}>
           {/* 1. 품종 선택 */}
-          <div className="filter-item" style={{ flex: '1.2 1 110px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>품종</label>
+          <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
             <select 
               style={selectStyle} 
               value={selectedBreed}
@@ -93,8 +168,8 @@ const SearchBar = () => {
           </div>
 
           {/* 2. 분양지역 선택 */}
-          <div className="filter-item" style={{ flex: '1 1 85px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>지역</label>
+          <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
             <select 
               style={selectStyle}
               value={selectedRegion}
@@ -105,8 +180,8 @@ const SearchBar = () => {
           </div>
 
           {/* 3. 성별 선택 */}
-          <div className="filter-item" style={{ flex: '0.9 1 78px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>성별</label>
+          <div className="filter-item" style={{ flex: '0.9 1 95px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
             <select 
               style={selectStyle}
               value={selectedGender}
@@ -117,8 +192,8 @@ const SearchBar = () => {
           </div>
 
           {/* 4. 분양가격 */}
-          <div className="filter-item" style={{ flex: '1.1 1 95px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: '700', color: '#64748b', marginLeft: '2px' }}>분양가격</label>
+          <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
             <select 
               style={selectStyle}
               value={selectedPrice}
@@ -154,107 +229,6 @@ const SearchBar = () => {
           >
             검색하기
           </button>
-        </div>
-
-        {/* 구분선 */}
-        <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
-
-        {/* 하단 인기 견종 칩 영역 (2줄 배치 및 병합) */}
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
-          {/* 인기견종 레이블 */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            whiteSpace: 'nowrap',
-            fontSize: '0.83rem',
-            fontWeight: '800',
-            color: '#475569',
-            backgroundColor: '#e2e8f0',
-            padding: '0 12px',
-            borderRadius: '8px',
-            flexShrink: 0
-          }}>
-            <span>🔥</span>
-            <span>인기견종</span>
-          </div>
-
-          {/* 칩 목록 (2줄로 나누어 배치) */}
-          <div className="breed-chips-rows-container" style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '6px', 
-            flexGrow: 1,
-            minWidth: 0
-          }}>
-            {/* 1행 */}
-            <div className="breed-chips-row" style={{
-              display: 'flex',
-              gap: '6px',
-              overflowX: 'auto',
-              scrollbarWidth: 'none'
-            }}>
-              {row1.map((breed, i) => (
-                <div 
-                  key={i} 
-                  className="breed-chip"
-                  onClick={() => navigate(`/breed/${breed.name}`)}
-                  style={chipStyle}
-                >
-                  <span style={{ fontSize: '0.92rem' }}>{breed.icon}</span>
-                  <span>{breed.name}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* 2행 */}
-            <div className="breed-chips-row" style={{
-              display: 'flex',
-              gap: '6px',
-              overflowX: 'auto',
-              scrollbarWidth: 'none'
-            }}>
-              {row2.map((breed, i) => (
-                <div 
-                  key={i} 
-                  className="breed-chip"
-                  onClick={() => navigate(`/breed/${breed.name}`)}
-                  style={chipStyle}
-                >
-                  <span style={{ fontSize: '0.92rem' }}>{breed.icon}</span>
-                  <span>{breed.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 전체보기 칩 추가 */}
-          <div 
-            className="breed-chip"
-            onClick={() => navigate('/breed/전체')}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap',
-              fontSize: '0.83rem',
-              fontWeight: '800',
-              color: 'var(--primary)',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #cbd5e1',
-              padding: '0 12px',
-              borderRadius: '8px',
-              flexShrink: 0,
-              cursor: 'pointer'
-            }}
-          >
-            <span style={{ fontSize: '0.92rem' }}>👀</span>
-            <span>전체보기</span>
-          </div>
         </div>
       </div>
     </section>

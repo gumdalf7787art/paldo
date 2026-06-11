@@ -473,7 +473,7 @@ const DetailPage = () => {
 
   const maxCount = Math.max(...reviewStats.map(s => s.count), 1);
   const totalReviews = storeReviews.length;
-  const avgRating = totalReviews > 0 ? (storeReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1) : '5.0';
+  const avgRating = totalReviews > 0 ? (storeReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1) : '0.0';
 
 
 
@@ -662,10 +662,20 @@ const DetailPage = () => {
                     )}
                   </>
                 )}
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>고객평점</span>
-                  <span style={{ color: '#FFD54F' }}>{'★'.repeat(Math.round(parseFloat(avgRating)))} ({avgRating})</span>
-                </div>
+                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                   <span style={{ color: 'var(--muted-text)' }}>고객평점</span>
+                   <span style={{ color: '#FFD54F' }}>
+                     {totalReviews > 0 ? (
+                       <>
+                         {'★'.repeat(Math.round(parseFloat(avgRating)))}
+                         {'☆'.repeat(5 - Math.round(parseFloat(avgRating)))}
+                         {` (${avgRating})`}
+                       </>
+                     ) : (
+                       <span style={{ color: 'var(--muted-text)', fontSize: '0.85rem' }}>평가 없음</span>
+                     )}
+                   </span>
+                 </div>
               </div>
 
                 <div className="desktop-only" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>

@@ -22,7 +22,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
   try {
     // API를 통해 사용가능한 매물 로드
     const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
-    const dogs = allDogs || [];
+    const dogs = Array.isArray(allDogs) ? allDogs : [];
 
     // 관련 유형에 맞는 멌 매물 선별 (ad_type 필터 대신 주미로 선택)
     const selected = shuffleArray(dogs).slice(0, limit);
@@ -832,9 +832,15 @@ const AdoptionList = () => {
 
   useEffect(() => {
     const fetchDogs = async () => {
-      const { data } = await api.dogs.getList({ status: 'available', limit: 12 });
-      if (data) setDogs(data);
-      setLoading(false);
+      try {
+        const { data } = await api.dogs.getList({ status: 'available', limit: 12 });
+        if (Array.isArray(data)) setDogs(data);
+        else setDogs([]);
+      } catch (err) {
+        setDogs([]);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchDogs();
   }, []);
@@ -958,7 +964,7 @@ const PersonalRecommendWidget = () => {
 
         // 비로그인 또는 로그인 모두 api.dogs.getList로 쳐리
         const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
-        const available = allDogs || [];
+        const available = Array.isArray(allDogs) ? allDogs : [];
 
         if (available.length >= 3) {
           const shuffled = [...available].sort(() => 0.5 - Math.random());

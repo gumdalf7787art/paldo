@@ -38,7 +38,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
       region: dog.region || '지역 미지정',
       age: calculateAge(dog.birthday, dog.age),
       price: dog.price,
-      desc: dog.description || dog.desc || '팔도댓댓 추천 분양입니다.',
+      desc: dog.description || dog.desc || '다잇독 추천 분양입니다.',
       date: new Date(dog.created_at).toLocaleDateString()
     }));
   } catch (err) {
@@ -742,7 +742,7 @@ const PetShopBanner = () => {
             letterSpacing: '1px'
           }}
         >
-          팔도 펫숍 기획전
+          다잇독 펫숍 기획전
         </span>
         <h2 
           style={{
@@ -817,7 +817,7 @@ const AdSections = () => {
 
   return (
     <>
-      <AdSectionItem title="🛡️ 안심 분양 정보" sub="팔도댕댕이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
+      <AdSectionItem title="🛡️ 안심 분양 정보" sub="다잇독이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
       <PetInsuranceBanner />
       <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
       <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />

@@ -242,7 +242,7 @@ const AdminPage = () => {
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f7f6' }}>
       <nav style={sidebarStyle}>
         <div style={{ padding: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <h2 style={{ color: 'white', fontSize: '1.2rem', fontWeight: '800' }}>팔도 어드민 v1.0</h2>
+          <h2 style={{ color: 'white', fontSize: '1.2rem', fontWeight: '800' }}>다잇독 어드민 v1.0</h2>
         </div>
         <div style={{ marginTop: '20px' }}>
           {[

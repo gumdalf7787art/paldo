@@ -141,7 +141,7 @@ const Header = () => {
               letterSpacing: '-0.3px',
               lineHeight: '1.2'
             }}>
-              팔도댕댕이 만들어갑니다.
+              다잇독이 만들어갑니다.
             </span>
           </div>
 
@@ -169,7 +169,7 @@ const Header = () => {
                         {notifications.slice(0, 5).map(n => (
                           <div key={n.id} onClick={() => markAsRead(n.id, n.link_url)} style={{ ...notiItemStyle, backgroundColor: n.is_read ? 'white' : '#f0fdf4' }}>
                             <div style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '4px' }}>
-                              {n.type === 'chat' && '💬 팔톡 메시지'}
+                              {n.type === 'chat' && '💬 다잇톡 메시지'}
                               {n.type === 'bookmark' && '💝 새로운 찜'}
                               {n.type === 'coupon' && '🎁 쿠폰 도착'}
                               {n.type === 'system' && '📢 전체 공지'}
@@ -249,7 +249,7 @@ const Header = () => {
                         onClick={() => setShowUserDropdown(false)}
                         className="header-dropdown-item"
                       >
-                        💬 팔톡메시지
+                        💬 다잇톡메시지
                       </Link>
 
                       <div style={{ borderTop: '1px solid #e2e8f0', margin: '6px 0' }} />
@@ -276,7 +276,7 @@ const Header = () => {
       {toastMsg && (
         <div className="fade-in" style={toastStyle}>
           <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--primary-dark)', marginBottom: '5px' }}>
-            {toastMsg.type === 'chat' && '💬 팔톡'}
+            {toastMsg.type === 'chat' && '💬 다잇톡'}
             {toastMsg.type === 'bookmark' && '💝 찜'}
             {toastMsg.type === 'coupon' && '🎁 쿠폰'}
             {toastMsg.type === 'system' && '📢 공지'}

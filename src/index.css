@@ -315,42 +315,18 @@ ul {
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
-.logo-circle {
-  width: 65px;
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.logo-text {
-  font-size: 2.2rem;
-  margin: 0;
-  color: #4E342E;
-  letter-spacing: -2px;
-  font-weight: 800;
-  font-family: 'Outfit', sans-serif;
-  white-space: nowrap;
+.logo-image {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  transition: var(--transition);
 }
 
 @media (max-width: 600px) {
-  .logo-container {
-    gap: 8px;
-  }
-  .logo-circle {
-    width: 45px;
-    height: 45px;
-  }
-  .logo-text {
-    font-size: 1.5rem;
-    letter-spacing: -1px;
+  .logo-image {
+    height: 32px;
   }
 }
 

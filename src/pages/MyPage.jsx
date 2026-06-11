@@ -153,7 +153,7 @@ const MyPage = () => {
 
     if (profileData) {
       setProfile(profileData);
-      setNickname(profileData.nickname || '팔도회원');
+      setNickname(profileData.nickname || '다잇독회원');
       setPhone(profileData.phone || '');
       setAddress(profileData.address || '');
       setProfileImage(profileData.profile_image || null);
@@ -460,7 +460,7 @@ const MyPage = () => {
       { id: 'ads', label: '📢 광고' },
       { id: 'stats', label: '📊 통계' },
     ] : []),
-    { id: 'chats', label: '💬 팔톡' },
+    { id: 'chats', label: '💬 다잇톡' },
     { id: 'bookmarks', label: '💝 관심아이' },
     { id: 'notifications', label: '🔔 알림' },
   ];
@@ -530,7 +530,7 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}
-                <button onClick={() => setActiveTab('chats')} style={navBtnStyle('chats')}>💬 팔톡</button>
+                <button onClick={() => setActiveTab('chats')} style={navBtnStyle('chats')}>💬 다잇톡</button>
                 <button onClick={() => setActiveTab('bookmarks')} style={navBtnStyle('bookmarks')}>💝 관심아이</button>
                 <button onClick={() => setActiveTab('notifications')} style={navBtnStyle('notifications')}>🔔 알림내역</button>
               </div>
@@ -638,19 +638,19 @@ const MyPage = () => {
                       <>
                         <StatBox title="총 방문자 분석" value={totalViews} suffix="명" color="#F5A623" icon="👀" onClick={() => setActiveTab('stats')} />
                         <StatBox title="전체 게시물" value={myDogs.length} suffix="건" color="var(--primary)" icon="🐶" onClick={() => setActiveTab('posts')} />
-                        <StatBox title="진행중인 팔톡" value={chatRooms.length} suffix="건" color="#4A90E2" icon="💬" onClick={() => setActiveTab('chats')} />
+                        <StatBox title="진행중인 다잇톡" value={chatRooms.length} suffix="건" color="#4A90E2" icon="💬" onClick={() => setActiveTab('chats')} />
                       </>
                     ) : (
                       <>
                         <StatBox title="관심아이" value={bookmarks.length} suffix="마리" color="var(--primary)" icon="💝" onClick={() => setActiveTab('bookmarks')} />
-                        <StatBox title="진행중인 팔톡" value={chatRooms.length} suffix="건" color="#F5A623" icon="💬" onClick={() => setActiveTab('chats')} />
+                        <StatBox title="진행중인 다잇톡" value={chatRooms.length} suffix="건" color="#F5A623" icon="💬" onClick={() => setActiveTab('chats')} />
                       </>
                     )}
                   </div>
                   
                   {/* 최신 알림 및 요약 */}
                   <div style={{ padding: '20px', backgroundColor: '#fcfcfc', borderRadius: '15px', border: '1px solid #eee' }}>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '15px' }}>최근 대화 (팔톡)</h3>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '15px' }}>최근 대화 (다잇톡)</h3>
                     {chatRooms.slice(0, 3).map(room => (
                       <div 
                         key={room.id} 
@@ -965,7 +965,7 @@ const MyPage = () => {
                   {/* 좌측: 대화 목록 */}
                   <div className="chat-room-panel">
                     <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>팔톡 대화목록</h3>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>다잇톡 대화목록</h3>
                     </div>
                     <div style={{ flex: 1, overflowY: 'auto' }}>
                       {chatRooms.length === 0 ? (
@@ -1089,7 +1089,7 @@ const MyPage = () => {
                         <div key={n.id} style={{ ...chatRoomItemStyle, backgroundColor: n.is_read ? '#fafafa' : '#fff', borderLeft: n.is_read ? '1px solid #eee' : '5px solid var(--primary-dark)', paddingLeft: '25px', opacity: n.is_read ? 0.7 : 1 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '5px' }}>
-                              {n.type === 'chat' && '💬 팔톡 메시지'}
+                              {n.type === 'chat' && '💬 다잇톡 메시지'}
                               {n.type === 'bookmark' && '💝 새로운 찜'}
                               {n.type === 'coupon' && '🎁 쿠폰 도착'}
                               {n.type === 'system' && '📢 전체 공지'}

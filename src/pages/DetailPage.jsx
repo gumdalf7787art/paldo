@@ -501,7 +501,7 @@ const DetailPage = () => {
               textAlign: 'center',
               lineHeight: '1.5'
             }}>
-              문의하실 때는 <b style={{ color: 'var(--primary)' }}>'팔도댕댕에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
+              문의하실 때는 <b style={{ color: 'var(--primary)' }}>'다잇독에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
             </div>
             
             
@@ -527,7 +527,7 @@ const DetailPage = () => {
             <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
               <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
               <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
-                {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
               
               
@@ -670,7 +670,7 @@ const DetailPage = () => {
 
                 <div className="desktop-only" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <button onClick={handleStartChat} style={chatBtnStyle}>
-                     💬 팔톡으로 상담하기
+                     💬 다잇톡으로 상담하기
                   </button>
 
                   {sellerInfo && (
@@ -744,7 +744,7 @@ const DetailPage = () => {
                  📞 전화 문의
                </button>
                <button onClick={handleStartChat} style={chatBtnStyle}>
-                 💬 팔톡 상담
+                 💬 다잇톡 상담
                </button>
             </div>
 

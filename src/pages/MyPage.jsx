@@ -268,7 +268,7 @@ const MyPage = () => {
     const diff = endDate - new Date();
     const remainDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
     
-    const typeMap = { 'main': '메인배너', 'breed': '품종배너', 'safe': '안심분양', 'popular': '인기분양', 'special': '스페셜' };
+    const typeMap = { 'main': '메인 메인배너', 'breed': '품종별 메인배너', 'safe': '메인 안심분양', 'popular': '메인 인기분양', 'special': '메인 스페셜분양' };
     
     return {
       type: typeMap[activeAd.ad_type] || activeAd.ad_type,

@@ -210,7 +210,7 @@ const AdSetupPage = () => {
                   </p>
                   <button 
                     type="button"
-                    onClick={() => alert('광고 아이템 구매 및 상담은 우측 하단 채널톡 또는 고객센터(1588-0000)를 이용해 주세요.')}
+                    onClick={() => navigate('/ad-store')}
                     style={{ padding: '8px 20px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
                     onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}

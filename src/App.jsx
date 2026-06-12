@@ -14,6 +14,7 @@ import AdSetupPage from './pages/AdSetupPage'
 import StorePage from './pages/StorePage'
 import BreedPage from './pages/BreedPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import AdStorePage from './pages/AdStorePage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
@@ -105,6 +106,7 @@ function App() {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/upload" element={<UploadForm />} />
           <Route path="/ad-setup/:id" element={<AdSetupPage />} />
+          <Route path="/ad-store" element={<AdStorePage />} />
           <Route path="/store/:sellerId" element={<StorePage />} />
           <Route path="/breed/:breedName" element={<BreedPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />

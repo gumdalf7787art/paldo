@@ -111,14 +111,7 @@ export async function onRequestPatch(context) {
         // 쿠폰 자동 발급 로직 추가
         const couponCode = 'AD_' + Math.random().toString(36).substr(2, 9).toUpperCase();
         
-        // 임시로 쿠폰 생성
-        const { meta } = await env.DB.prepare(
-          `INSERT INTO coupons (name, discount_rate, code, auto_issue_type, ad_type) VALUES (?, ?, ?, 'manual', 'all') RETURNING id`
-        ).bind(`관리자 지급 광고 쿠폰`, 7, couponCode).run();
-        
-        // 생성된 쿠폰을 유저에게 지급 (이 부분은 임시로 처리, SQLite RETURNING이 안되면 ID 조회가 필요함)
-        // 위 RETURNING 구문이 지원되지 않는 D1의 경우 last_insert_rowid() 사용해야함. 수정하겠습니다.
-        
+        // 쿠폰 생성
         const insertCoupon = await env.DB.prepare(
             `INSERT INTO coupons (name, discount_rate, code, auto_issue_type, ad_type) VALUES (?, ?, ?, 'manual', 'all')`
         ).bind(`관리자 지급 광고 쿠폰`, 7, couponCode).run();

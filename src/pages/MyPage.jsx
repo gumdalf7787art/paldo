@@ -499,6 +499,7 @@ const MyPage = () => {
       { id: 'posts', label: '🐶 게시물' },
       { id: 'store', label: '🏪 스토어' },
       { id: 'ads', label: '📢 광고' },
+      { id: 'adStore', label: '🛒 광고 스토어', action: () => navigate('/ad-store') },
       { id: 'stats', label: '📊 통계' },
     ] : []),
     { id: 'chats', label: '💬 다잇톡' },
@@ -568,6 +569,7 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('posts')} style={navBtnStyle('posts')}>🐶 게시물관리</button>
                     <button onClick={() => setActiveTab('store')} style={navBtnStyle('store')}>🏪 내 스토어 관리</button>
                     <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 광고관리</button>
+                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 광고 스토어</button>
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}

@@ -49,6 +49,30 @@ const AdStorePage = () => {
       description: '메인페이지 스페셜분양 섹션에 독점 노출됩니다.',
       type: 'special',
       image: '/images/ads/ad_special.jpg'
+    },
+    {
+      id: 6,
+      name: '게시물 5개 추가 아이템',
+      price: 30000,
+      description: '결제일로부터 30일 동안 게시물 등록 한도가 5개 증가합니다.',
+      type: 'post_limit_5',
+      image: '/images/ads/post_add_5.png'
+    },
+    {
+      id: 7,
+      name: '게시물 10개 추가 아이템',
+      price: 50000,
+      description: '결제일로부터 30일 동안 게시물 등록 한도가 10개 증가합니다.',
+      type: 'post_limit_10',
+      image: '/images/ads/post_add_10.png'
+    },
+    {
+      id: 8,
+      name: '게시물 20개 추가 아이템',
+      price: 70000,
+      description: '결제일로부터 30일 동안 게시물 등록 한도가 20개 증가합니다.',
+      type: 'post_limit_20',
+      image: '/images/ads/post_add_20.png'
     }
   ];
 
@@ -92,8 +116,8 @@ const AdStorePage = () => {
                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.04)'; }}>
             
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-block', padding: '2px 8px', backgroundColor: '#fffbf0', color: '#e6a800', borderRadius: '15px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '8px', border: '1px solid #ffeeba' }}>
-                ✨ 노출 보장 기간: 7일
+              <div style={{ display: 'inline-block', padding: '2px 8px', backgroundColor: item.type.startsWith('post_limit') ? '#e8f4fd' : '#fffbf0', color: item.type.startsWith('post_limit') ? '#2980b9' : '#e6a800', borderRadius: '15px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '8px', border: `1px solid ${item.type.startsWith('post_limit') ? '#bde0fe' : '#ffeeba'}` }}>
+                {item.type.startsWith('post_limit') ? '✨ 30일간 한도 확장' : '✨ 노출 보장 기간: 7일'}
               </div>
               <h2 style={{ fontSize: '1.2rem', fontWeight: '900', marginBottom: '6px', lineHeight: '1.4' }}>
                 {renderAdName(item.name)}
@@ -112,11 +136,11 @@ const AdStorePage = () => {
               </div>
               <button 
                 onClick={() => handlePurchaseClick(item)}
-                style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.3)' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
+                style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: item.type.startsWith('post_limit') ? '0 4px 10px rgba(52, 152, 219, 0.3)' : '0 4px 10px rgba(255, 171, 0, 0.3)' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = item.type.startsWith('post_limit') ? '#2980b9' : 'var(--primary-dark)'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)'}
               >
-                광고 위치 및 결제 안내
+                {item.type.startsWith('post_limit') ? '구독(추가) 혜택 안내' : '광고 위치 및 결제 안내'}
               </button>
             </div>
           </div>
@@ -128,9 +152,11 @@ const AdStorePage = () => {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsModalOpen(false)}>
           <div className="fade-in" style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 50px rgba(0,0,0,0.3)', display: 'flex', gap: '30px' }} onClick={e => e.stopPropagation()}>
             
-            {/* 왼쪽: 광고 노출 위치 미리보기 */}
+            {/* 왼쪽: 아이템 미리보기 */}
             <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px', display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>📺 광고 노출 위치 미리보기</h3>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>
+                {selectedItem.type.startsWith('post_limit') ? '📦 정기구독 혜택 상세' : '📺 광고 노출 위치 미리보기'}
+              </h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
               <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>
                 <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />

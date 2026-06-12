@@ -91,7 +91,7 @@ export async function onRequestPatch(context) {
     if (status === 'active') {
       // 1. 필요한 정보 조회 (사업자 번호 등)
       const adInfo = await env.DB.prepare(`
-        SELECT a.budget, b.business_name, b.biz_no, p.email, p.nickname
+        SELECT a.budget, a.ad_type, b.business_name, b.biz_no, p.email, p.nickname
         FROM advertisements a
         JOIN profiles p ON a.user_id = p.id
         LEFT JOIN business_applications b ON p.id = b.user_id AND b.status = 'approved'
@@ -111,10 +111,21 @@ export async function onRequestPatch(context) {
         // 쿠폰 자동 발급 로직 추가
         const couponCode = 'AD_' + Math.random().toString(36).substr(2, 9).toUpperCase();
         
-        // 쿠폰 생성
+        // 쿠폰 생성 로직 (일반 광고 배너 vs 게시물 추가 아이템 구분)
+        let couponName = '관리자 지급 광고 쿠폰';
+        let discountRate = 7;
+        let couponType = 'all';
+
+        if (adInfo.ad_type && adInfo.ad_type.startsWith('post_limit_')) {
+          const limitAdd = parseInt(adInfo.ad_type.split('_')[2]);
+          couponName = `게시물 ${limitAdd}개 추가 아이템 (30일)`;
+          discountRate = limitAdd;
+          couponType = adInfo.ad_type;
+        }
+
         const insertCoupon = await env.DB.prepare(
-            `INSERT INTO coupons (name, discount_rate, code, auto_issue_type, ad_type) VALUES (?, ?, ?, 'manual', 'all')`
-        ).bind(`관리자 지급 광고 쿠폰`, 7, couponCode).run();
+            `INSERT INTO coupons (name, discount_rate, code, auto_issue_type, ad_type) VALUES (?, ?, ?, 'manual', ?)`
+        ).bind(couponName, discountRate, couponCode, couponType).run();
         
         // D1에서 lastRowId를 가져오려면 meta.last_row_id 를 확인해야함
         if (insertCoupon.success && insertCoupon.meta.last_row_id) {
@@ -123,9 +134,22 @@ export async function onRequestPatch(context) {
             // 유저에게 쿠폰 지급
             const adData = await env.DB.prepare(`SELECT user_id FROM advertisements WHERE id = ?`).bind(id).first();
             if (adData) {
-                 await env.DB.prepare(
-                    `INSERT INTO user_coupons (user_id, coupon_id) VALUES (?, ?)`
-                 ).bind(adData.user_id, couponId).run();
+                 let expiresAtStr = null;
+                 if (adInfo.ad_type && adInfo.ad_type.startsWith('post_limit_')) {
+                   const futureDate = new Date();
+                   futureDate.setDate(futureDate.getDate() + 30);
+                   expiresAtStr = futureDate.toISOString();
+                 }
+
+                 if (expiresAtStr) {
+                   await env.DB.prepare(
+                      `INSERT INTO user_coupons (user_id, coupon_id, expires_at) VALUES (?, ?, ?)`
+                   ).bind(adData.user_id, couponId, expiresAtStr).run();
+                 } else {
+                   await env.DB.prepare(
+                      `INSERT INTO user_coupons (user_id, coupon_id) VALUES (?, ?)`
+                   ).bind(adData.user_id, couponId).run();
+                 }
             }
         }
       }

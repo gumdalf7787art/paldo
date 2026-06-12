@@ -60,7 +60,7 @@ export async function onRequestGet(context) {
     try {
       const { results } = await env.DB.prepare(`
         SELECT uc.id as user_coupon_id, uc.is_used, uc.used_at, uc.expires_at,
-               c.id as coupon_id, c.name, c.coupon_type, c.description
+               c.id as coupon_id, c.name, c.ad_type, c.discount_rate
         FROM user_coupons uc
         JOIN coupons c ON uc.coupon_id = c.id
         WHERE uc.user_id = ? AND uc.is_used = 0

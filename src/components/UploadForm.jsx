@@ -112,21 +112,26 @@ const UploadForm = () => {
         const createdAt = new Date(dog.created_at);
         return createdAt >= firstDay;
       }).length;
-
-      // 쿠폰 시스템 추가 한도 계산 (D1 마이그레이션 기준, 일단 0으로 셋팅하되 기본값 20으로 한도 보존)
+      // 내 보유 쿠폰 조회 및 한도 확장 아이템(구독) 적용
       let additionalLimit = 0;
+      const { data: couponsData } = await api.coupons.getMyCoupons();
+      if (couponsData && !couponsData.error) {
+        setUserCoupons(couponsData);
+        // post_limit 타입이고 만료되지 않은 아이템들 합산
+        const activePostLimitCoupons = couponsData.filter(c => {
+          if (!c.ad_type || !c.ad_type.startsWith('post_limit_')) return false;
+          if (!c.expires_at) return true; // 유효기간 무제한인 경우
+          return new Date(c.expires_at) > new Date();
+        });
+        
+        additionalLimit = activePostLimitCoupons.reduce((sum, c) => sum + (c.discount_rate || 0), 0);
+      }
 
       setPostingStats({
         used: count || 0,
         limit: 20 + additionalLimit,
         loading: false
       });
-
-      // 내 보유 쿠폰 조회
-      const { data: couponsData } = await api.coupons.getMyCoupons();
-      if (couponsData && !couponsData.error) {
-        setUserCoupons(couponsData);
-      }
     } catch (err) {
       console.error('Failed to fetch posting stats:', err);
       setPostingStats(prev => ({ ...prev, loading: false }));

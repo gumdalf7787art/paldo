@@ -218,8 +218,8 @@ const UploadForm = () => {
   const handleImageResizeAndUpload = (e) => {
     const files = Array.from(e.target.files);
     
-    if (images.length + files.length > 6) {
-      return alert('사진은 최대 6장까지만 등록 가능합니다.');
+    if (images.length + files.length > 10) {
+      return alert('사진은 최대 10장까지 가능합니다.');
     }
     
     files.forEach(file => {
@@ -275,7 +275,7 @@ const UploadForm = () => {
         
         <div style={{ display: 'grid', gap: '20px' }}>
           <div>
-            <label style={labelStyle}>사진 등록 (사진은 최대 6장 가능)</label>
+            <label style={labelStyle}>사진 등록 (사진은 최대 10장 가능)</label>
             <input type="file" multiple onChange={handleImageResizeAndUpload} style={{ display: 'block', marginTop: '10px' }} />
             <div style={{ display: 'flex', gap: '10px', marginTop: '15px', flexWrap: 'wrap' }}>
               {images.map((img, i) => (
@@ -388,12 +388,12 @@ const UploadForm = () => {
 
           <div>
             <label style={labelStyle}>
-              유튜브/인스타 영상 링크 (선택)
+              유튜브 영상 링크 (선택)
               <span style={{ fontSize: '0.8rem', fontWeight: 'normal', marginLeft: '8px', color: '#888' }}>
-                영상에서 공유 클릭하시고 링크 복사해서 넣으시면 됩니다. (유튜브 바로 실행, 쇼츠-릴스는 링크)
+                유튜브 영상의 '공유'를 클릭하고 링크를 복사해서 넣어주세요. (쇼츠 영상도 가능합니다)
               </span>
             </label>
-            <input type="text" placeholder="URL을 입력해주세요" style={inputStyle} value={formData.videoLink} onChange={e => setFormData({...formData, videoLink: e.target.value})} />
+            <input type="text" placeholder="유튜브 URL을 입력해주세요" style={inputStyle} value={formData.videoLink} onChange={e => setFormData({...formData, videoLink: e.target.value})} />
           </div>
 
           <div>

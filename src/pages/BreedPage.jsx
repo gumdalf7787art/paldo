@@ -142,12 +142,12 @@ const BreedPage = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
                       <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#b45309', margin: 0 }}>🌟 프리미엄 스폰서</h3>
                       <span style={{ 
-                        fontSize: '0.7rem', 
-                        fontWeight: '800', 
-                        backgroundColor: '#fef3c7', 
-                        color: '#b45309', 
-                        padding: '3px 8px', 
-                        borderRadius: '6px', 
+                        fontSize: '0.65rem', 
+                        fontWeight: '600', 
+                        backgroundColor: '#fffbeb', 
+                        color: '#d97706', 
+                        padding: '2px 6px', 
+                        borderRadius: '4px', 
                         border: '1px solid #fde68a',
                         letterSpacing: '0.5px'
                       }}>

@@ -177,15 +177,15 @@ const HeroCarousel = ({ breedName }) => {
           position: 'absolute',
           top: '0',
           right: '0',
-          backgroundColor: '#f1f5f9',
-          color: '#64748b',
-          fontSize: '0.65rem',
-          fontWeight: '800',
-          padding: '3px 8px',
-          borderBottomLeftRadius: '10px',
+          backgroundColor: '#f8fafc',
+          color: '#94a3b8',
+          fontSize: '0.6rem',
+          fontWeight: '600',
+          padding: '2px 6px',
+          borderBottomLeftRadius: '8px',
           zIndex: 15,
-          borderLeft: '1px solid #e2e8f0',
-          borderBottom: '1px solid #e2e8f0',
+          borderLeft: '1px solid #f1f5f9',
+          borderBottom: '1px solid #f1f5f9',
           letterSpacing: '0.5px'
         }}>
           AD
@@ -316,12 +316,12 @@ const SectionTitle = ({ title, sub, isAd }) => (
     </div>
     {isAd && (
       <span style={{ 
-        fontSize: '0.7rem', 
-        fontWeight: '800', 
-        backgroundColor: '#f1f5f9', 
-        color: '#64748b', 
-        padding: '3px 8px', 
-        borderRadius: '6px', 
+        fontSize: '0.65rem', 
+        fontWeight: '600', 
+        backgroundColor: '#f8fafc', 
+        color: '#94a3b8', 
+        padding: '2px 6px', 
+        borderRadius: '4px', 
         border: '1px solid #e2e8f0',
         letterSpacing: '0.5px',
         flexShrink: 0

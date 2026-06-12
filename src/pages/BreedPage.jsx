@@ -144,11 +144,11 @@ const BreedPage = () => {
                       <span style={{ 
                         fontSize: '0.65rem', 
                         fontWeight: '500', 
-                        backgroundColor: 'transparent', 
-                        color: '#cbd5e1', 
+                        backgroundColor: '#fffbeb', 
+                        color: '#fbbf24', 
                         padding: '2px 6px', 
                         borderRadius: '4px', 
-                        border: '1px solid transparent',
+                        border: '1px solid #fef3c7',
                         letterSpacing: '0.5px'
                       }}>
                         AD

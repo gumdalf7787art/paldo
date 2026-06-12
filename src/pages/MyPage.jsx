@@ -261,7 +261,7 @@ const MyPage = () => {
   };
 
   const getAdInfo = (dogId) => {
-    const activeAd = myAds.find(ad => ad.dog_id === dogId && ad.ad_status === 'active');
+    const activeAd = myAds.find(ad => ad.id === dogId && ad.ad_status === 'active');
     if (!activeAd) return null;
     
     const endDate = new Date(activeAd.end_date);

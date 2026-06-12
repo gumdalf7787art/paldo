@@ -39,6 +39,7 @@ const UploadForm = () => {
   const [postingStats, setPostingStats] = useState({ used: 0, limit: 20, loading: true });
   const [userCoupons, setUserCoupons] = useState([]);
   const [selectedCouponId, setSelectedCouponId] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const editDog = location.state?.editDog;
@@ -93,6 +94,9 @@ const UploadForm = () => {
         setPostingStats(prev => ({ ...prev, loading: false }));
         return;
       }
+
+      const { data: userProfile } = await api.auth.getUser();
+      setCurrentUser(userProfile);
 
       // 내 분양 매물 목록을 가져와 이번 달 글 등록 수 계산
       const { data: listData, error: listError } = await api.dogs.getList({ seller_id: session.user.id });
@@ -455,7 +459,9 @@ const UploadForm = () => {
                   original_price: formData.originalPrice,
                   is_negotiable: formData.isNegotiable,
                   image: images[primaryImageIdx] || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop', // 임시 플레이스홀더 이미지
-                  isNew: true
+                  isNew: true,
+                  seller_business_name: currentUser?.business_name || null,
+                  seller_nickname: currentUser?.nickname || null
                 }} />
               </div>
             </div>

@@ -64,6 +64,7 @@ const AdSetupPage = () => {
 
   const adTypeDisplay = {
     'main': '메인배너 (웹사이트 최상단 노출)',
+    'breed': '품종별 배너 (견종 상세페이지 상단 노출)',
     'safe': '안심분양 (인증 마크와 함께 강조)',
     'popular': '인기분양 (우선 목록 노출)',
     'special': '스페셜분양 (하이라이트 효과 적용)'

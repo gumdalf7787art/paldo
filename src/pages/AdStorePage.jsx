@@ -28,27 +28,11 @@ const AdStorePage = () => {
     },
     {
       id: 3,
-      name: '메인페이지 안심분양',
+      name: '메인페이지 통합 섹션 광고',
       price: 30000,
-      description: '메인페이지 안심분양 전용 스페셜 섹션에 노출됩니다.',
-      type: 'safe',
+      description: '메인페이지의 안심/인기/스페셜 3개 섹션 중 무작위 위치에 섞여서 번갈아 노출됩니다. (위치 공정성 보장)',
+      type: 'section',
       image: '/images/ads/ad_safe.jpg'
-    },
-    {
-      id: 4,
-      name: '메인페이지 인기분양',
-      price: 30000,
-      description: '메인페이지 인기분양 섹션 상위 리스트에 노출됩니다.',
-      type: 'popular',
-      image: '/images/ads/ad_popular.jpg'
-    },
-    {
-      id: 5,
-      name: '메인페이지 스페셜분양',
-      price: 30000,
-      description: '메인페이지 스페셜분양 섹션에 독점 노출됩니다.',
-      type: 'special',
-      image: '/images/ads/ad_special.jpg'
     },
     {
       id: 6,

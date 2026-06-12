@@ -26,7 +26,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
     const { data: allDogs } = await api.dogs.getList(params);
     const dogs = Array.isArray(allDogs) ? allDogs : [];
 
-    // 관련 유형에 맞는 멌 매물 선별 (ad_type 필터 대신 주미로 선택)
+    // 관련 유형에 맞는 멌 매물 선별 (현재는 유기견 리스트를 섞어서 사용)
     const selected = shuffleArray(dogs).slice(0, limit);
 
     return selected.map(dog => ({
@@ -778,15 +778,19 @@ const AdSections = () => {
   useEffect(() => {
     const loadAllSections = async () => {
       try {
-        const [safe, popular, special] = await Promise.all([
-          Promise.race([fetchAdsAndFill('safe', 20, '안심'), timeoutPromise(2500)]),
-          Promise.race([fetchAdsAndFill('popular', 20, '인기'), timeoutPromise(2500)]),
-          Promise.race([fetchAdsAndFill('special', 20, '스페셜'), timeoutPromise(2500)])
+        // 섹션 통합 광고(section) 데이터 풀을 한 번에 60개 가져옵니다.
+        const allSectionAds = await Promise.race([
+          fetchAdsAndFill('section', 60, '추천'), 
+          timeoutPromise(2500)
         ]);
 
-        setSafeDogs(safe || []);
-        setPopularDogs(popular || []);
-        setSpecialDogs(special || []);
+        const ads = allSectionAds || [];
+        
+        // 가져온 전체 광고를 3등분하여 안심, 인기, 스페셜 구역에 무작위 배치합니다.
+        // 현재 fetchAdsAndFill 내부에서 shuffleArray가 동작하므로 이미 섞여 있습니다.
+        setSafeDogs(ads.slice(0, 20).map(d => ({...d, badgeText: '안심'})));
+        setPopularDogs(ads.slice(20, 40).map(d => ({...d, badgeText: '인기'})));
+        setSpecialDogs(ads.slice(40, 60).map(d => ({...d, badgeText: '스페셜'})));
       } catch (err) {
         console.error('Failed to load sections:', err);
         setSafeDogs([]);

@@ -80,24 +80,24 @@ const AdStorePage = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
         {items.map(item => (
-          <div key={item.id} className="glass-card" style={{ padding: '20px 15px', border: '1px solid #eef2f7', borderRadius: '15px', display: 'flex', flexDirection: 'column', transition: 'all 0.3s', backgroundColor: '#fff', boxShadow: '0 4px 15px rgba(0,0,0,0.04)' }}
+          <div key={item.id} className="glass-card" style={{ padding: '15px 15px', border: '1px solid #eef2f7', borderRadius: '15px', display: 'flex', flexDirection: 'column', transition: 'all 0.3s', backgroundColor: '#fff', boxShadow: '0 4px 15px rgba(0,0,0,0.04)' }}
                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.08)'; }}
                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.04)'; }}>
             
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-block', padding: '4px 10px', backgroundColor: '#fffbf0', color: '#e6a800', borderRadius: '15px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '15px', border: '1px solid #ffeeba' }}>
+              <div style={{ display: 'inline-block', padding: '2px 8px', backgroundColor: '#fffbf0', color: '#e6a800', borderRadius: '15px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '8px', border: '1px solid #ffeeba' }}>
                 ✨ 노출 보장 기간: 7일
               </div>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '900', marginBottom: '10px', lineHeight: '1.4' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: '900', marginBottom: '6px', lineHeight: '1.4' }}>
                 {renderAdName(item.name)}
               </h2>
-              <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.85rem', minHeight: '40px' }}>
+              <p style={{ color: '#666', lineHeight: '1.4', fontSize: '0.85rem', minHeight: '30px', margin: 0 }}>
                 {item.description}
               </p>
             </div>
 
-            <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '2px dashed #eee' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '15px' }}>
+            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '2px dashed #eee' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '10px' }}>
                 <span style={{ color: '#888', fontSize: '0.85rem', fontWeight: 'bold' }}>정상가</span>
                 <span style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--primary-dark)' }}>
                   {item.price.toLocaleString()} <span style={{ fontSize: '0.9rem', color: '#555' }}>원</span>
@@ -105,7 +105,7 @@ const AdStorePage = () => {
               </div>
               <button 
                 onClick={() => handlePurchaseClick(item)}
-                style={{ width: '100%', padding: '12px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.3)' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.3)' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
               >

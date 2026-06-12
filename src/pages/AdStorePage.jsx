@@ -13,35 +13,40 @@ const AdStorePage = () => {
       name: '메인페이지 메인배너',
       price: 50000,
       description: '메인페이지 최상단 슬라이드 배너에 노출됩니다.',
-      type: 'main'
+      type: 'main',
+      image: '/images/ads/ad_main.jpg'
     },
     {
       id: 2,
       name: '품종별페이지 메인배너',
       price: 50000,
       description: '견종별 리스트 페이지 상단 1순위로 노출됩니다.',
-      type: 'breed'
+      type: 'breed',
+      image: '/images/ads/ad_breed.jpg'
     },
     {
       id: 3,
       name: '메인페이지 안심분양',
       price: 30000,
       description: '메인페이지 안심분양 전용 스페셜 섹션에 노출됩니다.',
-      type: 'safe'
+      type: 'safe',
+      image: '/images/ads/ad_safe.jpg'
     },
     {
       id: 4,
       name: '메인페이지 인기분양',
       price: 30000,
       description: '메인페이지 인기분양 섹션 상위 리스트에 노출됩니다.',
-      type: 'popular'
+      type: 'popular',
+      image: '/images/ads/ad_popular.jpg'
     },
     {
       id: 5,
       name: '메인페이지 스페셜분양',
       price: 30000,
       description: '메인페이지 스페셜분양 섹션에 독점 노출됩니다.',
-      type: 'special'
+      type: 'special',
+      image: '/images/ads/ad_special.jpg'
     }
   ];
 
@@ -125,10 +130,11 @@ const AdStorePage = () => {
             <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px', display: 'flex', flexDirection: 'column' }}>
               <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>📺 광고 노출 위치 미리보기</h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
-              <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '2px dashed #cbd5e1' }}>
-                <div style={{ textAlign: 'center', color: '#64748b' }}>
+              <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>
+                <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                <div style={{ textAlign: 'center', color: '#64748b', display: 'none' }}>
                   <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>🖼️</span>
-                  <span><strong>{selectedItem.name}</strong><br/>영역 표시 예시 이미지</span>
+                  <span>이미지 준비중</span>
                 </div>
               </div>
             </div>

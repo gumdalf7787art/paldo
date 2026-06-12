@@ -597,7 +597,7 @@ const AdminPage = () => {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>신청일</th>
+                  <th style={thStyle}>신청일시</th>
                   <th style={thStyle}>광고 구역</th>
                   <th style={thStyle}>상점/신청자</th>
                   <th style={thStyle}>사업자정보</th>
@@ -609,10 +609,12 @@ const AdminPage = () => {
               <tbody>
                 {adRequests.map(req => (
                   <tr key={req.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={tdStyle}>{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td style={tdStyle}>{new Date(req.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                     <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--primary-dark)' }}>{req.title}</td>
                     <td style={tdStyle}>
-                      {req.business_name || req.nickname}<br/>
+                      {req.business_name || req.nickname}
+                      {req.representative_name && <span style={{ fontSize: '0.85rem', color: '#666', marginLeft: '4px' }}>({req.representative_name})</span>}
+                      <br/>
                       <span style={{ fontSize: '0.8rem', color: '#888' }}>{req.email}</span>
                     </td>
                     <td style={tdStyle}>{req.biz_no || '미등록'}</td>

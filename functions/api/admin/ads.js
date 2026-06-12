@@ -43,7 +43,7 @@ export async function onRequestGet(context) {
       SELECT 
         a.id, a.user_id, a.ad_type, a.title, a.status, a.budget as price, a.created_at,
         p.email, p.nickname, p.phone,
-        b.business_name, b.biz_no
+        b.business_name, b.biz_no, b.representative_name
       FROM advertisements a
       LEFT JOIN profiles p ON a.user_id = p.id
       LEFT JOIN business_applications b ON p.id = b.user_id AND b.status = 'approved'

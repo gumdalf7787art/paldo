@@ -60,8 +60,7 @@ const BreedPage = () => {
           
           // 클라이언트 사이드 추가 필터링 (성별, 가격)
           if (gender && gender !== '모두선택') {
-            const mappedGender = gender === '남아' ? '수컷' : (gender === '여아' ? '암컷' : gender);
-            filteredDogs = filteredDogs.filter(d => d.gender === mappedGender || d.gender === gender);
+            filteredDogs = filteredDogs.filter(d => d.gender === gender);
           }
           if (price && price !== '전체') {
             // 간단한 텍스트 기반 필터링 (필요시 상세 로직 구현)

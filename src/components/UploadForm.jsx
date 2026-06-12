@@ -28,7 +28,7 @@ const regionOptions = [
 const UploadForm = () => {
   const [formData, setFormData] = useState({
     name: '', breed: '말티푸', price: '', originalPrice: '', region: '전국', 
-    age: '', gender: '수컷', birthday: '', vaccination: '', description: '',
+    age: '', gender: '남아', birthday: '', vaccination: '', description: '',
     isFree: false, isNegotiable: false,
     agreePromotion: false, oneDogPerPost: null,
     videoLink: ''
@@ -62,7 +62,7 @@ const UploadForm = () => {
         originalPrice: editDog.original_price || '',
         region: editDog.region || '전국',
         age: calculatedAgeNum,
-        gender: editDog.gender || '수컷',
+        gender: editDog.gender || '남아',
         birthday: editDog.birthday || '',
         vaccination: editDog.vaccine || '', // 기존의 vaccine 컬럼 맵핑
         description: editDog.description || '',
@@ -328,8 +328,8 @@ const UploadForm = () => {
             <div>
               <label style={labelStyle}>성별</label>
               <select style={inputStyle} value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})}>
-                <option value="수컷">수컷 (왕자님)</option>
-                <option value="암컷">암컷 (공주님)</option>
+                <option value="남아">남아 (왕자님)</option>
+                <option value="여아">여아 (공주님)</option>
               </select>
             </div>
           </div>

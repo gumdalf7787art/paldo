@@ -2,17 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BREEDS, REGIONS, GENDERS, PRICES } from '../utils/constants';
 
-const SearchBar = () => {
+const SearchBar = ({ hideBreed, defaultBreed }) => {
   const navigate = useNavigate();
-  const [selectedBreed, setSelectedBreed] = useState('');
+  const [selectedBreed, setSelectedBreed] = useState(defaultBreed || '');
   const [selectedRegion, setSelectedRegion] = useState('전국');
   const [selectedGender, setSelectedGender] = useState('모두선택');
   const [selectedPrice, setSelectedPrice] = useState('전체');
 
   const handleSearch = () => {
-    const breed = selectedBreed || '전체';
-    const regionParam = selectedRegion && selectedRegion !== '전국' ? `?region=${selectedRegion}` : '';
-    navigate(`/breed/${breed}${regionParam}`);
+    const breed = hideBreed ? defaultBreed : (selectedBreed || '전체');
+    const params = new URLSearchParams();
+    if (selectedRegion && selectedRegion !== '전국') params.append('region', selectedRegion);
+    if (selectedGender && selectedGender !== '모두선택') params.append('gender', selectedGender);
+    if (selectedPrice && selectedPrice !== '전체') params.append('price', selectedPrice);
+    
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    navigate(`/breed/${breed}${queryString}`);
   };
 
   const row1 = [
@@ -70,80 +75,84 @@ const SearchBar = () => {
         border: '1px solid #cbd5e1',
         boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
       }}>
-        {/* 상단 인기 견종 칩 영역 (2줄 배치 및 병합) */}
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
-          {/* 인기견종 레이블 */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '2px',
-            whiteSpace: 'nowrap',
-            fontSize: '0.78rem',
-            fontWeight: '800',
-            color: '#475569',
-            backgroundColor: '#e2e8f0',
-            padding: '0 10px',
-            borderRadius: '6px',
-            flexShrink: 0
-          }}>
-            <span>🔥 인기견종</span>
-            <span>바로가기</span>
-          </div>
+        {/* 상단 인기 견종 칩 영역 (hideBreed가 아닐 때만 노출) */}
+        {!hideBreed && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
+              {/* 인기견종 레이블 */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+                whiteSpace: 'nowrap',
+                fontSize: '0.78rem',
+                fontWeight: '800',
+                color: '#475569',
+                backgroundColor: '#e2e8f0',
+                padding: '0 10px',
+                borderRadius: '6px',
+                flexShrink: 0
+              }}>
+                <span>🔥 인기견종</span>
+                <span>바로가기</span>
+              </div>
 
-          {/* 칩 목록 (2줄로 나누어 배치) */}
-          <div className="breed-chips-rows-container" style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '6px', 
-            flexGrow: 1,
-            minWidth: 0
-          }}>
-            {/* 1행 */}
-            <div className="breed-chips-row" style={{
-              display: 'flex',
-              gap: '6px',
-              overflowX: 'auto',
-              scrollbarWidth: 'none'
-            }}>
-              {row1.map((breed, i) => (
-                <div 
-                  key={i} 
-                  className="breed-chip"
-                  onClick={() => navigate(`/breed/${breed.name}`)}
-                  style={chipStyle}
-                >
-                  <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
-                  <span>{breed.name}</span>
+              {/* 칩 목록 (2줄로 나누어 배치) */}
+              <div className="breed-chips-rows-container" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                gap: '6px', 
+                flexGrow: 1,
+                minWidth: 0
+              }}>
+                {/* 1행 */}
+                <div className="breed-chips-row" style={{
+                  display: 'flex',
+                  gap: '6px',
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none'
+                }}>
+                  {row1.map((breed, i) => (
+                    <div 
+                      key={i} 
+                      className="breed-chip"
+                      onClick={() => navigate(`/breed/${breed.name}`)}
+                      style={chipStyle}
+                    >
+                      <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                      <span>{breed.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {/* 2행 */}
+                <div className="breed-chips-row" style={{
+                  display: 'flex',
+                  gap: '6px',
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none'
+                }}>
+                  {row2.map((breed, i) => (
+                    <div 
+                      key={i} 
+                      className="breed-chip"
+                      onClick={() => navigate(`/breed/${breed.name}`)}
+                      style={chipStyle}
+                    >
+                      <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                      <span>{breed.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* 2행 */}
-            <div className="breed-chips-row" style={{
-              display: 'flex',
-              gap: '6px',
-              overflowX: 'auto',
-              scrollbarWidth: 'none'
-            }}>
-              {row2.map((breed, i) => (
-                <div 
-                  key={i} 
-                  className="breed-chip"
-                  onClick={() => navigate(`/breed/${breed.name}`)}
-                  style={chipStyle}
-                >
-                  <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
-                  <span>{breed.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 구분선 */}
-        <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
+            {/* 구분선 */}
+            <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
+          </>
+        )}
 
         {/* 하단 검색 필터 영역 */}
         <div style={{
@@ -154,18 +163,20 @@ const SearchBar = () => {
           alignItems: 'center',
           width: '100%'
         }}>
-          {/* 1. 품종 선택 */}
-          <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
-            <select 
-              style={selectStyle} 
-              value={selectedBreed}
-              onChange={(e) => setSelectedBreed(e.target.value)}
-            >
-              <option value="">전체 품종</option>
-              {BREEDS.map(breed => <option key={breed} value={breed}>{breed}</option>)}
-            </select>
-          </div>
+          {/* 1. 품종 선택 (hideBreed가 아닐 때만 노출) */}
+          {!hideBreed && (
+            <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+              <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+              <select 
+                style={selectStyle} 
+                value={selectedBreed}
+                onChange={(e) => setSelectedBreed(e.target.value)}
+              >
+                <option value="">전체 품종</option>
+                {BREEDS.map(breed => <option key={breed} value={breed}>{breed}</option>)}
+              </select>
+            </div>
+          )}
 
           {/* 2. 분양지역 선택 */}
           <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>

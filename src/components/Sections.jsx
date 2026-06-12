@@ -18,10 +18,12 @@ const shuffleArray = (array) => {
 };
 
 // 광고 데이터 및 부족한 슬롯 송기기 공통 로직 (api.js 기반)
-const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
+const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
   try {
     // API를 통해 사용가능한 매물 로드
-    const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
+    const params = { status: 'available', limit: 20 };
+    if (breedName) params.breed = breedName;
+    const { data: allDogs } = await api.dogs.getList(params);
     const dogs = Array.isArray(allDogs) ? allDogs : [];
 
     // 관련 유형에 맞는 멌 매물 선별 (ad_type 필터 대신 주미로 선택)
@@ -47,22 +49,10 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge) => {
   }
 };
 
-const defaultHeroAds = [
-  { id: 'mock-1', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', badgeText: '추천', breed: '골든 리트리버', nickname: '인절미', gender: '남아', region: '서울 강남구', age: '2개월', price: 35 },
-  { id: 'mock-2', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', badgeText: '인기', breed: '포메라니안', nickname: '구름이', gender: '여아', region: '경기 수원시', age: '3개월', price: 45 },
-  { id: 'mock-3', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', badgeText: '스페셜', breed: '프렌치 불독', nickname: '초코', gender: '남아', region: '인천 연수구', age: '2.5개월', price: 60 },
-  { id: 'mock-4', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', badgeText: '추천', breed: '말티즈', nickname: '밀크', gender: '여아', region: '서울 송파구', age: '2개월', price: 30 },
-  { id: 'mock-5', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', badgeText: '신규', breed: '비숑 프리제', nickname: '눈송이', gender: '여아', region: '부산 해운대', age: '3개월', price: 50 },
-  { id: 'mock-6', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', badgeText: '인기', breed: '시바 이누', nickname: '보리', gender: '남아', region: '대구 수성구', age: '2.5개월', price: 55 },
-  { id: 'mock-7', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', badgeText: '추천', breed: '웰시 코기', nickname: '감자', gender: '남아', region: '대전 서구', age: '2개월', price: 40 },
-  { id: 'mock-8', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', badgeText: '스페셜', breed: '토이 푸들', nickname: '쿠키', gender: '여아', region: '광주 북구', age: '3개월', price: 35 },
-  { id: 'mock-9', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', badgeText: '신규', breed: '사모예드', nickname: '두부', gender: '남아', region: '울산 남구', age: '2개월', price: 75 },
-  { id: 'mock-10', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', badgeText: '추천', breed: '골든두들', nickname: '라떼', gender: '여아', region: '세종시', age: '3개월', price: 65 }
-];
 
 const timeoutPromise = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
-const HeroCarousel = () => {
+const HeroCarousel = ({ breedName }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ads, setAds] = useState([]);
   const [isTransitionActive, setIsTransitionActive] = useState(true);
@@ -72,17 +62,17 @@ const HeroCarousel = () => {
     const loadHeroAds = async () => {
       try {
         const data = await Promise.race([
-          fetchAdsAndFill('main', 10, '추천'),
+          fetchAdsAndFill('main', 10, '추천', breedName),
           timeoutPromise(2500)
         ]);
         if (data && data.length > 0) {
           setAds(data);
         } else {
-          setAds(defaultHeroAds);
+          setAds([]);
         }
       } catch (err) {
-        console.error('Failed to load main ads, using fallback:', err);
-        setAds(defaultHeroAds);
+        console.error('Failed to load main ads:', err);
+        setAds([]);
       }
     };
     loadHeroAds();
@@ -310,44 +300,6 @@ const SectionTitle = ({ title, sub }) => (
   </div>
 );
 
-const defaultSafeDogs = [
-  { id: 'safe-1', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '골든 리트리버', nickname: '인절미', gender: '남아', region: '서울', age: '2개월', price: 35 },
-  { id: 'safe-2', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '빵둥이', gender: '여아', region: '부산', age: '2개월', price: 40 },
-  { id: 'safe-3', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '비숑 프리제', nickname: '솜이', gender: '여아', region: '대구', age: '3개월', price: 50 },
-  { id: 'safe-4', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '말티즈', nickname: '두부', gender: '남아', region: '광주', age: '2.5개월', price: 30 },
-  { id: 'safe-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '시바 이누', nickname: '누리', gender: '여아', region: '대전', age: '3개월', price: 45 },
-  { id: 'safe-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '토이 푸들', nickname: '별이', gender: '여아', region: '인천', age: '2개월', price: 32 },
-  { id: 'safe-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '포메라니안', nickname: '코코', gender: '남아', region: '경기', age: '3개월', price: 48 },
-  { id: 'safe-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '요크셔 테리어', nickname: '초코', gender: '남아', region: '서울', age: '2.5개월', price: 28 },
-  { id: 'safe-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '진도견', nickname: '백구', gender: '남아', region: '전남', age: '3개월', price: 15 },
-  { id: 'safe-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '닥스훈트', nickname: '까막', gender: '여아', region: '경북', age: '2.5개월', price: 35 }
-];
-
-const defaultPopularDogs = [
-  { id: 'pop-1', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '포메라니안', nickname: '구름이', gender: '여아', region: '경기', age: '3개월', price: 45 },
-  { id: 'pop-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '토이 푸들', nickname: '초코', gender: '남아', region: '서울', age: '2개월', price: 28 },
-  { id: 'pop-3', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '시바 이누', nickname: '단풍이', gender: '남아', region: '인천', age: '2.5개월', price: 60 },
-  { id: 'pop-4', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '시츄', nickname: '사랑이', gender: '여아', region: '대전', age: '3개월', price: 25 },
-  { id: 'pop-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '몽이', gender: '여아', region: '광주', age: '2개월', price: 42 },
-  { id: 'pop-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '비숑 프리제', nickname: '솜사탕', gender: '여아', region: '부산', age: '3개월', price: 55 },
-  { id: 'pop-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '말티즈', nickname: '우유', gender: '남아', region: '대구', age: '2개월', price: 30 },
-  { id: 'pop-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '프렌치 불독', nickname: '만두', gender: '남아', region: '서울', age: '2.5개월', price: 65 },
-  { id: 'pop-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '치와와', nickname: '초미니', gender: '여아', region: '충남', age: '2개월', price: 38 },
-  { id: 'pop-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '골든 리트리버', nickname: '골디', gender: '남아', region: '경남', age: '3개월', price: 40 }
-];
-
-const defaultSpecialDogs = [
-  { id: 'spec-1', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80', breed: '프렌치 불독', nickname: '까망이', gender: '남아', region: '인천', age: '2.5개월', price: 60 },
-  { id: 'spec-2', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80', breed: '사모예드', nickname: '설탕이', gender: '여아', region: '강원', age: '3개월', price: 80 },
-  { id: 'spec-3', image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80', breed: '그레이하운드', nickname: '스피디', gender: '남아', region: '경기', age: '3.5개월', price: 70 },
-  { id: 'spec-4', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80', breed: '웰시 코기', nickname: '둥이', gender: '남아', region: '울산', age: '2개월', price: 42 },
-  { id: 'spec-5', image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80', breed: '보스턴 테리어', nickname: '시크', gender: '여아', region: '서울', age: '3개월', price: 50 },
-  { id: 'spec-6', image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80', breed: '말티푸', nickname: '루루', gender: '여아', region: '인천', age: '2개월', price: 48 },
-  { id: 'spec-7', image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80', breed: '보더 콜리', nickname: '천재', gender: '남아', region: '충북', age: '3개월', price: 55 },
-  { id: 'spec-8', image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80', breed: '스피츠', nickname: '뽀삐', gender: '여아', region: '경기', age: '2.5개월', price: 25 },
-  { id: 'spec-9', image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&q=80', breed: '차우차우', nickname: '사자', gender: '남아', region: '제주', age: '3개월', price: 90 },
-  { id: 'spec-10', image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80', breed: '이탈리안 그레이하운드', nickname: '달리', gender: '여아', region: '서울', age: '2.5개월', price: 65 }
-];
 
 const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -800,14 +752,14 @@ const AdSections = () => {
           Promise.race([fetchAdsAndFill('special', 20, '스페셜'), timeoutPromise(2500)])
         ]);
 
-        setSafeDogs(safe && safe.length > 0 ? safe : defaultSafeDogs);
-        setPopularDogs(popular && popular.length > 0 ? popular : defaultPopularDogs);
-        setSpecialDogs(special && special.length > 0 ? special : defaultSpecialDogs);
+        setSafeDogs(safe || []);
+        setPopularDogs(popular || []);
+        setSpecialDogs(special || []);
       } catch (err) {
-        console.error('Failed to load sections, using fallback:', err);
-        setSafeDogs(defaultSafeDogs);
-        setPopularDogs(defaultPopularDogs);
-        setSpecialDogs(defaultSpecialDogs);
+        console.error('Failed to load sections:', err);
+        setSafeDogs([]);
+        setPopularDogs([]);
+        setSpecialDogs([]);
       } finally {
         setLoading(false);
       }
@@ -921,32 +873,6 @@ const LoginWidget = () => {
   );
 };
 
-const DUMMY_RECOMMENDS = [
-  {
-    id: 'dummy-rec-1',
-    breed: '말티즈',
-    nickname: '두부',
-    region: '서울 강남구',
-    price: 350000,
-    image_url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'dummy-rec-2',
-    breed: '포메라니안',
-    nickname: '망고',
-    region: '경기 성남시',
-    price: 500000,
-    image_url: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=200'
-  },
-  {
-    id: 'dummy-rec-3',
-    breed: '토이푸들',
-    nickname: '보리',
-    region: '인천 남동구',
-    price: 0,
-    image_url: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=200'
-  }
-];
 
 const PersonalRecommendWidget = () => {
   const navigate = useNavigate();
@@ -970,11 +896,11 @@ const PersonalRecommendWidget = () => {
           const shuffled = [...available].sort(() => 0.5 - Math.random());
           setRecommendedDogs(shuffled.slice(0, 3));
         } else {
-          setRecommendedDogs(DUMMY_RECOMMENDS);
+          setRecommendedDogs([]);
         }
       } catch (err) {
         console.error('Failed to load recommendation:', err);
-        setRecommendedDogs(DUMMY_RECOMMENDS);
+        setRecommendedDogs([]);
       } finally {
         setLoading(false);
       }
@@ -1005,14 +931,7 @@ const PersonalRecommendWidget = () => {
         {recommendedDogs.map((dog) => (
           <div 
             key={dog.id} 
-            onClick={() => {
-              if (dog.id.toString().startsWith('dummy-rec')) {
-                // 더미 예시 칩 클릭 시 경고 안내창
-                alert('해당 강아지는 비로그인 또는 DB 매물 부족 시 노출되는 추천 예시입니다. 더 많은 강아지들을 상세 조회하시면 회원님의 취향을 정밀 추적해 맞춤형으로 추천해 드립니다!');
-              } else {
-                navigate('/detail', { state: { dog } });
-              }
-            }}
+            onClick={() => navigate('/detail', { state: { dog } })}
             style={itemCardStyle}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f8fafc';

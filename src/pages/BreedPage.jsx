@@ -105,12 +105,12 @@ const BreedPage = () => {
       </div>
 
       {/* 2. 메인 히어로 캐러셀 */}
-      <div style={{ marginBottom: '16px' }}>
+      <div style={{ marginBottom: '14px' }}>
         <HeroCarousel breedName={breedName} />
       </div>
 
       {/* 3. 상세 검색창 (품종 선택란 숨김) */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '16px' }}>
         <SearchBar hideBreed={true} defaultBreed={breedName} />
       </div>
 

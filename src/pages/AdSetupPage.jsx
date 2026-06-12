@@ -204,7 +204,20 @@ const AdSetupPage = () => {
                 ))}
               </select>
               {coupons.filter(c => c.ad_type === 'all' || c.ad_type === adType).length === 0 && (
-                <p style={{ color: '#ff4757', fontSize: '0.85rem', marginTop: '10px', fontWeight: 'bold' }}>현재 선택한 광고 구역에 사용 가능한 광고 아이템이 없습니다. 플랫폼 관리자 문의를 통해 획득해주세요.</p>
+                <div style={{ marginTop: '15px', backgroundColor: '#fff', padding: '15px', borderRadius: '10px', border: '1px dashed #ff4757', textAlign: 'center' }}>
+                  <p style={{ color: '#ff4757', fontSize: '0.9rem', marginBottom: '10px', fontWeight: 'bold' }}>
+                    현재 선택한 구역에 사용 가능한 광고 아이템이 없습니다.
+                  </p>
+                  <button 
+                    type="button"
+                    onClick={() => alert('광고 아이템 구매 및 상담은 우측 하단 채널톡 또는 고객센터(1588-0000)를 이용해 주세요.')}
+                    style={{ padding: '8px 20px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                    onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
+                    onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}
+                  >
+                    💳 광고 아이템 구매하러 가기
+                  </button>
+                </div>
               )}
             </div>
           </div>

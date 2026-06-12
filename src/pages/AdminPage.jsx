@@ -618,6 +618,7 @@ const AdminPage = () => {
                       {req.representative_name && <span style={{ fontSize: '0.85rem', color: '#666', marginLeft: '4px' }}>({req.representative_name})</span>}
                       <br/>
                       <span style={{ fontSize: '0.8rem', color: '#888' }}>{req.email}</span>
+                      {req.phone && <><br/><span style={{ fontSize: '0.8rem', color: '#888' }}>{req.phone}</span></>}
                     </td>
                     <td style={tdStyle}>{req.biz_no || '미등록'}</td>
                     <td style={{ ...tdStyle, fontWeight: 'bold' }}>{req.price?.toLocaleString()}원</td>
@@ -665,6 +666,7 @@ const AdminPage = () => {
                       {req.business_name || req.nickname}
                       <br/>
                       <span style={{ fontSize: '0.8rem', color: '#888' }}>{req.email}</span>
+                      {req.phone && <><br/><span style={{ fontSize: '0.8rem', color: '#888' }}>{req.phone}</span></>}
                     </td>
                     <td style={tdStyle}>
                       {req.status === 'pending' && <span style={{ ...badgeStyle, backgroundColor: '#f39c12' }}>대기중</span>}

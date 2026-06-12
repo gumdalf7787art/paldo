@@ -14,14 +14,18 @@ const BreedPage = () => {
   const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState({});
 
+  const searchParams = new URLSearchParams(location.search);
+  const currentRegion = searchParams.get('region') || '';
+  const currentGender = searchParams.get('gender') || '';
+  const currentPrice = searchParams.get('price') || '';
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       
-      const searchParams = new URLSearchParams(location.search);
-      const region = searchParams.get('region') || '';
-      const gender = searchParams.get('gender') || '';
-      const price = searchParams.get('price') || '';
+      const region = currentRegion;
+      const gender = currentGender;
+      const price = currentPrice;
 
       const queryParams = { status: 'available', breed: breedName };
       if (region) queryParams.region = region;
@@ -126,7 +130,14 @@ const BreedPage = () => {
         <div className="portal-main-col">
           <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b' }}>전체 {breedName} 분양 리스트</h2>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b', marginBottom: (currentRegion || currentGender || currentPrice) ? '4px' : '0' }}>전체 {breedName} 분양 리스트</h2>
+                {(currentRegion || currentGender || currentPrice) && (
+                  <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '500' }}>
+                    🔍 조건: {breedName} / {currentRegion || '전국'} / {currentGender || '모두선택'} / {currentPrice || '전체'}
+                  </div>
+                )}
+              </div>
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length + adDogs.length}</b>건</span>
             </div>
             

@@ -397,6 +397,28 @@ const UploadForm = () => {
             <textarea placeholder="아이의 성격, 접종 상태, 특징 등을 자유롭게 적어주세요!" style={{...inputStyle, height: '150px', resize: 'vertical'}} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
           </div>
 
+          {/* 광고/게시권 쿠폰 적용 */}
+          <div style={{ padding: '15px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba' }}>
+            <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '800', color: '#e6a800', marginBottom: '10px' }}>
+              📢 광고 설정 (선택)
+            </label>
+            <select 
+              style={inputStyle} 
+              value={selectedCouponId} 
+              onChange={e => setSelectedCouponId(e.target.value)}
+            >
+              <option value="">적용 안 함</option>
+              {userCoupons.map(coupon => (
+                <option key={coupon.user_coupon_id} value={coupon.user_coupon_id}>
+                  {coupon.name} ({coupon.description}) (쿠폰)
+                </option>
+              ))}
+            </select>
+            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px', marginBottom: 0 }}>
+              * 광고 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 광고가 등록됩니다.
+            </p>
+          </div>
+
           <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '12px', border: '1px solid #eee' }}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem' }}>
@@ -461,28 +483,6 @@ const UploadForm = () => {
               </p>
             </div>
           )}
-
-          {/* 광고/게시권 쿠폰 적용 */}
-          <div style={{ marginTop: '10px', padding: '15px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba' }}>
-            <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '800', color: '#e6a800', marginBottom: '10px' }}>
-              🎁 쿠폰 적용하기 (선택)
-            </label>
-            <select 
-              style={inputStyle} 
-              value={selectedCouponId} 
-              onChange={e => setSelectedCouponId(e.target.value)}
-            >
-              <option value="">적용 안 함</option>
-              {userCoupons.map(coupon => (
-                <option key={coupon.user_coupon_id} value={coupon.user_coupon_id}>
-                  {coupon.name} ({coupon.description})
-                </option>
-              ))}
-            </select>
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px', marginBottom: 0 }}>
-              * 광고 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 광고가 등록됩니다.
-            </p>
-          </div>
 
           <button 
             onClick={handleSubmit}

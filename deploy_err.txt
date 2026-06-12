@@ -1,0 +1,8 @@
+✨ Compiled Worker successfully
+Uploading... (11/11)
+✨ Success! Uploaded 0 files (11 already uploaded) (0.39 sec)
+
+✨ Uploading _redirects
+✨ Uploading Functions bundle
+🌎 Deploying...
+✨ Deployment complete! Take a peek over at https://ffc62deb.paldo-dog.pages.dev

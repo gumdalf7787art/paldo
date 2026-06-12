@@ -1,0 +1,14 @@
+PRAGMA defer_foreign_keys=TRUE;
+DROP TABLE IF EXISTS bookmarks;
+DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS user_coupons;
+DROP TABLE IF EXISTS coupons;
+DROP TABLE IF EXISTS advertisements;
+DROP TABLE IF EXISTS analytics_logs;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS chat_rooms;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS store_reviews;
+DROP TABLE IF EXISTS business_applications;
+DROP TABLE IF EXISTS dogs;
+DROP TABLE IF EXISTS profiles;

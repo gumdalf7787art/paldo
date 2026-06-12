@@ -14,8 +14,7 @@ const AdSetupPage = () => {
   const maxMainAds = 10; // 메인광고 최대 슬롯 수
 
   // 폼 상태
-  const [adType, setAdType] = useState('main'); // main, safe, popular, special
-  const [duration, setDuration] = useState('7'); // 7, 14, 30
+  const [adType, setAdType] = useState('main'); // main, breed, safe, popular, special
   const [selectedCoupon, setSelectedCoupon] = useState('');
   
   // 상태 제출
@@ -88,7 +87,6 @@ const AdSetupPage = () => {
         dog_id: parseInt(dogId),
         ad_type: adType,
         title: `${dog.nickname} 분양 광고 (${adTypeDisplay[adType]})`,
-        duration: parseInt(duration),
         used_coupon_id: parseInt(selectedCoupon)
       });
 
@@ -96,7 +94,7 @@ const AdSetupPage = () => {
 
       const endDate = data?.endDate ? new Date(data.endDate) : new Date();
 
-      alert(`광고 설정이 완료되었습니다!\n진행 기간: ${duration}일 (${endDate.toLocaleDateString()} 까지)\n내 게시물이 즉시 홍보됩니다.`);
+      alert(`광고 설정이 완료되었습니다!\n(${endDate.toLocaleDateString()} 까지)\n내 게시물이 즉시 홍보됩니다.`);
       navigate('/mypage');
       
     } catch (error) {
@@ -178,22 +176,6 @@ const AdSetupPage = () => {
             </div>
           </div>
 
-          {/* 광고 기간 */}
-          <div>
-            <label style={labelStyle}>진행 기간</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              {['7', '14', '30'].map(days => (
-                <button 
-                  key={days} type="button" 
-                  onClick={() => setDuration(days)}
-                  style={{ ...durationBtnStyle, borderColor: duration === days ? 'var(--primary)' : '#eee', backgroundColor: duration === days ? 'var(--primary)' : 'white', color: duration === days ? 'white' : '#666' }}
-                >
-                  {days}일
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* 결제 및 아이템 */}
           <div style={{ borderTop: '2px dashed #eee', paddingTop: '25px' }}>
             <label style={labelStyle}>사용할 광고 아이템 선택</label>
@@ -204,12 +186,14 @@ const AdSetupPage = () => {
                 style={{ width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #ffd700', outline: 'none', backgroundColor: 'white', color: '#333', fontSize: '0.95rem', fontWeight: 'bold' }}
               >
                 <option value="">🎁 사용할 광고 아이템을 선택해 주세요</option>
-                {coupons.map(c => (
-                  <option key={c.id} value={c.id}>{c.name || '무명 아이템'} ({c.discount_rate}% 할인)</option>
+                {coupons
+                  .filter(c => c.ad_type === 'all' || c.ad_type === adType)
+                  .map(c => (
+                    <option key={c.id} value={c.id}>{c.name || '무명 아이템'} ({c.discount_rate}일권)</option>
                 ))}
               </select>
-              {coupons.length === 0 && (
-                <p style={{ color: '#ff4757', fontSize: '0.85rem', marginTop: '10px', fontWeight: 'bold' }}>사용 가능한 광고 아이템이 없습니다. 플랫폼 관리자 문의를 통해 아이템을 획득해주세요.</p>
+              {coupons.filter(c => c.ad_type === 'all' || c.ad_type === adType).length === 0 && (
+                <p style={{ color: '#ff4757', fontSize: '0.85rem', marginTop: '10px', fontWeight: 'bold' }}>현재 선택한 광고 구역에 사용 가능한 광고 아이템이 없습니다. 플랫폼 관리자 문의를 통해 획득해주세요.</p>
               )}
             </div>
           </div>

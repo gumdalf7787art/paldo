@@ -261,14 +261,14 @@ export async function onRequestPost(context) {
 
   // 4. 쿠폰 신규 생성 (create_coupon)
   if (action === 'create_coupon') {
-    const { name, discount_rate, code, auto_issue_type, valid_until } = body;
+    const { name, discount_rate, code, auto_issue_type, valid_until, ad_type } = body;
     if (!name || discount_rate === undefined || !code) {
-      return createResponse({ error: '쿠폰 이름, 할인율, 코드는 필수입니다.' }, 400);
+      return createResponse({ error: '쿠폰 이름, 기간(일), 코드는 필수입니다.' }, 400);
     }
 
     try {
-      await env.DB.prepare('INSERT INTO coupons (name, discount_rate, code, auto_issue_type, valid_until) VALUES (?, ?, ?, ?, ?)')
-        .bind(name, discount_rate, code, auto_issue_type || 'none', valid_until || null)
+      await env.DB.prepare('INSERT INTO coupons (name, discount_rate, code, auto_issue_type, valid_until, ad_type) VALUES (?, ?, ?, ?, ?, ?)')
+        .bind(name, discount_rate, code, auto_issue_type || 'none', valid_until || null, ad_type || 'all')
         .run();
       return createResponse({ success: true, message: '쿠폰이 성공적으로 생성되었습니다.' });
     } catch (err) {

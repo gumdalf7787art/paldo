@@ -59,6 +59,7 @@ export async function onRequestGet(context) {
   const adType = url.searchParams.get('ad_type');
   const breed = url.searchParams.get('breed');
   const region = url.searchParams.get('region');
+  const userId = url.searchParams.get('user_id');
 
   // 1. 광고 수 카운트 조회 (예: 메인광고 슬롯 제한 체크용)
   if (action === 'count') {
@@ -109,6 +110,11 @@ export async function onRequestGet(context) {
       bindings.push(region);
     }
 
+    if (userId) {
+      sql += ' AND a.user_id = ?';
+      bindings.push(userId);
+    }
+
     sql += ' ORDER BY a.created_at DESC';
 
     const { results } = await env.DB.prepare(sql)
@@ -154,28 +160,40 @@ export async function onRequestPost(context) {
     body = {};
   }
 
-  const { dog_id, ad_type, title, duration, used_coupon_id } = body;
-  if (!dog_id || !ad_type || !title || !duration) {
-    return createResponse({ error: '필수 광고 설정 정보(dog_id, ad_type, title, duration)가 누락되었습니다.' }, 400);
+  const { dog_id, ad_type, title, used_coupon_id } = body;
+  if (!dog_id || !ad_type || !title || !used_coupon_id) {
+    return createResponse({ error: '필수 광고 설정 정보(dog_id, ad_type, title, used_coupon_id)가 누락되었습니다.' }, 400);
   }
 
   try {
-    // 1. 본인 소유의 사용 가능한 쿠폰 여부 확인
+    // 1. 본인 소유의 사용 가능한 쿠폰 여부 및 광고 구역 검증
+    let couponDuration = 0;
     if (used_coupon_id) {
-      const userCoupon = await env.DB.prepare('SELECT id FROM user_coupons WHERE id = ? AND user_id = ? AND is_used = 0')
+      const userCoupon = await env.DB.prepare(`
+        SELECT uc.id, c.discount_rate, c.ad_type 
+        FROM user_coupons uc 
+        INNER JOIN coupons c ON uc.coupon_id = c.id
+        WHERE uc.id = ? AND uc.user_id = ? AND uc.is_used = 0
+      `)
         .bind(used_coupon_id, authUser.id)
         .first();
       
       if (!userCoupon) {
-        return createResponse({ error: '유효하지 않거나 이미 사용된 쿠폰입니다.' }, 400);
+        return createResponse({ error: '유효하지 않거나 이미 사용된 광고 아이템입니다.' }, 400);
       }
+
+      if (userCoupon.ad_type !== 'all' && userCoupon.ad_type !== ad_type) {
+        return createResponse({ error: '해당 아이템은 이 광고 구역에서 사용할 수 없습니다.' }, 400);
+      }
+
+      couponDuration = userCoupon.discount_rate || 14; // discount_rate를 진행 일수로 사용
     }
 
     // 2. 광고 날짜 계산
-    const startDate = new Date().toISOString();
-    const endDateObj = new Date();
-    endDateObj.setDate(endDateObj.getDate() + parseInt(duration));
-    const endDate = endDateObj.toISOString();
+    const startDateStr = new Date().toISOString();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + couponDuration);
+    const endDateStr = endDate.toISOString();
 
     // 3. 광고 내역 저장 (D1 DML)
     await env.DB.prepare(
@@ -183,13 +201,13 @@ export async function onRequestPost(context) {
         user_id, dog_id, ad_type, title, status, duration, start_date, end_date, used_coupon_id
       ) VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?)`
     )
-      .bind(authUser.id, dog_id, ad_type, title, parseInt(duration), startDate, endDate, used_coupon_id || null)
+      .bind(authUser.id, dog_id, ad_type, title, couponDuration, startDateStr, endDateStr, used_coupon_id || null)
       .run();
 
     // 4. 쿠폰을 사용한 경우 사용 완료 처리
     if (used_coupon_id) {
       await env.DB.prepare('UPDATE user_coupons SET is_used = 1, used_at = ? WHERE id = ?')
-        .bind(startDate, used_coupon_id)
+        .bind(startDateStr, used_coupon_id)
         .run();
     }
 

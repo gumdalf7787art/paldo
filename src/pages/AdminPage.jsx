@@ -27,7 +27,8 @@ const AdminPage = () => {
     amount: 0, 
     benefit_type: 'ad_exemption', 
     auto_issue_type: 'none',
-    valid_until: '' 
+    valid_until: '',
+    ad_type: 'all'
   });
   const [issueData, setIssueData] = useState({ userId: '', couponId: '' });
   const [issueTargetType, setIssueTargetType] = useState('individual'); // 'individual', 'all_sellers'
@@ -146,14 +147,15 @@ const AdminPage = () => {
       name: newCoupon.name,
       discount_rate: parseInt(newCoupon.amount),
       auto_issue_type: newCoupon.auto_issue_type,
-      valid_until: newCoupon.valid_until || null
+      valid_until: newCoupon.valid_until || null,
+      ad_type: newCoupon.ad_type
     });
 
     if (error) {
       alert('생성 실패: ' + error);
     } else {
-      alert('쿠폰이 생성되었습니다.');
-      setNewCoupon({ code: '', name: '', amount: 0, benefit_type: 'ad_exemption', auto_issue_type: 'none', valid_until: '' });
+      alert('광고 아이템이 생성되었습니다.');
+      setNewCoupon({ code: '', name: '', amount: 0, benefit_type: 'ad_exemption', auto_issue_type: 'none', valid_until: '', ad_type: 'all' });
       fetchAdminData();
     }
   };
@@ -565,8 +567,19 @@ const AdminPage = () => {
                   <input required style={adminInput} value={newCoupon.code} onChange={e => setNewCoupon({...newCoupon, code: e.target.value})} placeholder="WELCOME2024" />
                 </div>
                 <div>
-                  <label style={smallLabel}>할인 금액/가치(원)</label>
+                  <label style={smallLabel}>광고 보장 기간 (일수)</label>
                   <input required type="number" style={adminInput} value={newCoupon.amount} onChange={e => setNewCoupon({...newCoupon, amount: e.target.value})} />
+                </div>
+                <div>
+                  <label style={smallLabel}>적용 가능 구역</label>
+                  <select style={adminInput} value={newCoupon.ad_type} onChange={e => setNewCoupon({...newCoupon, ad_type: e.target.value})}>
+                    <option value="all">전체 구역 가능</option>
+                    <option value="main">메인페이지 메인배너 전용</option>
+                    <option value="breed">품종별 페이지 메인배너 전용</option>
+                    <option value="safe">메인페이지 안심분양 전용</option>
+                    <option value="popular">메인페이지 인기분양 전용</option>
+                    <option value="special">메인페이지 스페셜분양 전용</option>
+                  </select>
                 </div>
                 <div>
                   <label style={smallLabel}>혜택 종류</label>

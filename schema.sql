@@ -142,8 +142,9 @@ CREATE TABLE IF NOT EXISTS coupons (
     name TEXT NOT NULL,
     discount_rate INTEGER DEFAULT 0,           -- 할인율 (%)
     code TEXT UNIQUE NOT NULL,
-    auto_issue_type TEXT DEFAULT 'none',       -- 자동발급 구분 ('welcome', 'none' 등)
-    valid_until TEXT,                          -- 유효 기간 설정
+    auto_issue_type TEXT DEFAULT 'none',       -- 자동 발급 여부 ('welcome', 'none' 등)
+    ad_type TEXT DEFAULT 'all',                -- 광고 적용 구역 ('main', 'breed', 'safe', 'popular', 'special', 'all')
+    valid_until TEXT,                          -- 유효 기간 만료일기간 설정
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

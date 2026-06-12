@@ -37,6 +37,8 @@ const UploadForm = () => {
   const [primaryImageIdx, setPrimaryImageIdx] = useState(0);
   const [loading, setLoading] = useState(false);
   const [postingStats, setPostingStats] = useState({ used: 0, limit: 20, loading: true });
+  const [userCoupons, setUserCoupons] = useState([]);
+  const [selectedCouponId, setSelectedCouponId] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const editDog = location.state?.editDog;
@@ -115,6 +117,12 @@ const UploadForm = () => {
         limit: 20 + additionalLimit,
         loading: false
       });
+
+      // 내 보유 쿠폰 조회
+      const { data: couponsData } = await api.coupons.getMyCoupons();
+      if (couponsData && !couponsData.error) {
+        setUserCoupons(couponsData);
+      }
     } catch (err) {
       console.error('Failed to fetch posting stats:', err);
       setPostingStats(prev => ({ ...prev, loading: false }));
@@ -177,7 +185,8 @@ const UploadForm = () => {
         is_negotiable: formData.isNegotiable ? 1 : 0,
         description: formData.description,
         video_url: formData.videoLink,
-        images: finalImages
+        images: finalImages,
+        used_coupon_id: selectedCouponId || null
       };
 
       if (editDog) {
@@ -452,6 +461,28 @@ const UploadForm = () => {
               </p>
             </div>
           )}
+
+          {/* 광고/게시권 쿠폰 적용 */}
+          <div style={{ marginTop: '10px', padding: '15px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba' }}>
+            <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '800', color: '#e6a800', marginBottom: '10px' }}>
+              🎁 쿠폰 적용하기 (선택)
+            </label>
+            <select 
+              style={inputStyle} 
+              value={selectedCouponId} 
+              onChange={e => setSelectedCouponId(e.target.value)}
+            >
+              <option value="">적용 안 함</option>
+              {userCoupons.map(coupon => (
+                <option key={coupon.user_coupon_id} value={coupon.user_coupon_id}>
+                  {coupon.name} ({coupon.description})
+                </option>
+              ))}
+            </select>
+            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px', marginBottom: 0 }}>
+              * 광고 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 광고가 등록됩니다.
+            </p>
+          </div>
 
           <button 
             onClick={handleSubmit}

@@ -627,6 +627,29 @@ export const api = {
     }
   },
 
+  // ─── 쿠폰 시스템 ──────────────────────────────────────────
+  coupons: {
+    async getMyCoupons() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/coupons?action=my`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async issueWelcomePack(targetUserId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/coupons`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'issue_welcome_pack', target_user_id: targetUserId })
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
+  },
+
   // ─── 북마크 (관심아이) ───────────────────────────────────
   bookmarks: {
     /** 특정 매물 북마크 여부 확인 */

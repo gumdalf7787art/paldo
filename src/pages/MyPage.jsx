@@ -192,15 +192,9 @@ const MyPage = () => {
     if (profileData && (profileData.role === 'seller' || profileData.role === 'admin')) {
       await fetchSellerData(session.user.id);
       
-      const { data: couponsData } = await api.admin.getCoupons();
-      if (couponsData) {
-        const myCoupons = couponsData.filter(uc => uc.user_id === session.user.id);
-        const formatted = myCoupons.map(uc => ({
-          ...uc,
-          coupon_name: uc.coupon_name || uc.coupons?.display_name || '광고 쿠폰',
-          benefit_type: uc.benefit_type || uc.coupons?.benefit_type || 'ad_exemption'
-        }));
-        setUserCoupons(formatted);
+      const { data: couponsData } = await api.coupons.getMyCoupons();
+      if (couponsData && !couponsData.error) {
+        setUserCoupons(couponsData);
       }
     }
 
@@ -894,23 +888,11 @@ const MyPage = () => {
                   <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>보유 쿠폰 목록</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
                     {userCoupons.length > 0 ? userCoupons.map(coupon => (
-                      <div key={coupon.id} style={{ padding: '20px', border: '1px solid #eee', borderRadius: '15px', backgroundColor: '#fffbf0', position: 'relative', overflow: 'hidden' }}>
+                      <div key={coupon.user_coupon_id} style={{ padding: '20px', border: '1px solid #eee', borderRadius: '15px', backgroundColor: '#fffbf0', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', right: '-10px', top: '-10px', width: '50px', height: '50px', backgroundColor: '#ffd700', borderRadius: '50%', opacity: 0.2 }}></div>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#e6a800' }}>🎁 {coupon.coupon_name}</h4>
+                        <h4 style={{ margin: '0 0 10px 0', color: '#e6a800' }}>🎁 {coupon.name}</h4>
                         <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>
-                          {(() => {
-                             const type = coupon.benefit_type;
-                             if (type === 'ad_exemption') return '일반 광고비 100% 면제';
-                             if (type === 'ad_main') return '메인 최상단 광고 1회 이용권';
-                             if (type === 'ad_safe_1m') return '안심분양 강조 광고 (1개월)';
-                             if (type === 'ad_popular_1m') return '인기분양 강조 광고 (1개월)';
-                             if (type === 'ad_special_1m') return '스페셜분양 강조 광고 (1개월)';
-                             if (type && type.startsWith('post_reg')) {
-                                const m = type.split('_')[2];
-                                return `게시물 등록 ${m} 쿠폰 (월 20개 가능)`;
-                             }
-                             return '플랫폼 서비스 이용 쿠폰';
-                          })()}
+                          {coupon.description}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: coupon.is_used ? '#aaa' : 'var(--primary)', fontWeight: 'bold' }}>{coupon.is_used ? '사용 완료' : '사용 가능'}</div>
                       </div>

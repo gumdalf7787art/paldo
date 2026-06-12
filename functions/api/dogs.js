@@ -294,7 +294,7 @@ export async function onRequestPost(context) {
   const { 
     breed, nickname, price, original_price, birthday, 
     is_negotiable, video_url, region, gender, age, vaccine, 
-    neutered, description, images 
+    neutered, description, images, used_coupon_id 
   } = body;
 
   if (!breed || !nickname) {
@@ -312,6 +312,21 @@ export async function onRequestPost(context) {
 
     const imagesStr = Array.isArray(images) ? JSON.stringify(images) : '[]';
 
+    // 쿠폰 검증
+    let coupon = null;
+    if (used_coupon_id) {
+      coupon = await env.DB.prepare(`
+        SELECT uc.id, c.coupon_type, c.name 
+        FROM user_coupons uc 
+        JOIN coupons c ON uc.coupon_id = c.id 
+        WHERE uc.id = ? AND uc.user_id = ? AND uc.is_used = 0
+      `).bind(used_coupon_id, authUser.id).first();
+
+      if (!coupon) {
+        return createResponse({ error: '유효하지 않거나 이미 사용된 쿠폰입니다.' }, 400);
+      }
+    }
+
     const result = await env.DB.prepare(
       `INSERT INTO dogs (
         breed, nickname, price, original_price, birthday, 
@@ -320,28 +335,46 @@ export async function onRequestPost(context) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
-        breed,
-        nickname,
-        price !== undefined ? Number(price) : 0,
+        breed, nickname, price !== undefined ? Number(price) : 0,
         original_price !== undefined && original_price !== null ? Number(original_price) : null,
-        birthday || null,
-        is_negotiable ? 1 : 0,
-        video_url || null,
-        region || '',
-        gender || '남아',
-        age || '',
-        vaccine || '',
-        neutered ? 1 : 0,
-        description || '',
-        imagesStr,
-        'available',
-        authUser.id
+        birthday || null, is_negotiable ? 1 : 0, video_url || null, region || '',
+        gender || '남아', age || '', vaccine || '', neutered ? 1 : 0,
+        description || '', imagesStr, 'available', authUser.id
       )
       .run();
 
     const newId = result.meta.last_row_id;
 
-    return createResponse({ success: true, id: newId, nickname });
+    // 쿠폰 사용 처리 및 광고 자동 등록
+    if (coupon) {
+      const now = new Date().toISOString();
+      const endDateObj = new Date();
+      endDateObj.setDate(endDateObj.getDate() + 7); // 기본 7일
+      const endDate = endDateObj.toISOString();
+
+      const stmts = [
+        env.DB.prepare('UPDATE user_coupons SET is_used = 1, used_at = ? WHERE id = ?').bind(now, used_coupon_id)
+      ];
+
+      // 광고 쿠폰인 경우 advertisements 테이블에 인서트
+      if (coupon.coupon_type.startsWith('ad_')) {
+        let adType = 'main'; // 기본값
+        if (coupon.coupon_type === 'ad_hero_main') adType = 'main_hero';
+        else if (coupon.coupon_type === 'ad_main_premium') adType = 'main_premium';
+        else if (coupon.coupon_type === 'ad_breed_premium') adType = 'breed_premium';
+
+        stmts.push(
+          env.DB.prepare(`
+            INSERT INTO advertisements (user_id, dog_id, ad_type, title, status, duration, start_date, end_date, used_coupon_id)
+            VALUES (?, ?, ?, ?, 'active', 7, ?, ?, ?)
+          `).bind(authUser.id, newId, adType, `${coupon.name} 자동 적용`, now, endDate, used_coupon_id)
+        );
+      }
+
+      await env.DB.batch(stmts);
+    }
+
+    return createResponse({ success: true, id: newId, nickname, used_coupon: coupon ? true : false });
   } catch (err) {
     return createResponse({ error: `매물 등록 실패: ${err.message}` }, 500);
   }

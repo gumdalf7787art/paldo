@@ -19,6 +19,8 @@ const AdminPage = () => {
   const [coupons, setCoupons] = useState([]);
   const [reports, setReports] = useState([]);
   const [adRequests, setAdRequests] = useState([]);
+  const [banners, setBanners] = useState({});
+  const [bannerUploadForm, setBannerUploadForm] = useState({ slot_key: '', image_url: '', link_url: '' });
   const navigate = useNavigate();
 
   // 쿠폰 생성용 상태
@@ -100,6 +102,10 @@ const AdminPage = () => {
       // 7. 광고 신청 내역
       const { data: adReqList } = await api.admin.getAdRequests();
       setAdRequests(adReqList || []);
+
+      // 8. 시스템 배너 목록
+      const { data: bannerData } = await api.banners.getList();
+      if (bannerData) setBanners(bannerData);
 
     } catch (error) {
       console.error('Data fetch error:', error);
@@ -276,6 +282,32 @@ const AdminPage = () => {
     }
   };
 
+  const handleBannerSubmit = async (e) => {
+    e.preventDefault();
+    if (!bannerUploadForm.slot_key || !bannerUploadForm.image_url) {
+      return alert('슬롯 키와 이미지 URL을 입력해 주세요.');
+    }
+    const { error } = await api.banners.adminCreate(bannerUploadForm);
+    if (error) {
+      alert('배너 등록 실패: ' + error);
+    } else {
+      alert('배너가 정상적으로 등록되었습니다.');
+      setBannerUploadForm({ slot_key: '', image_url: '', link_url: '' });
+      fetchAdminData();
+    }
+  };
+
+  const handleBannerDelete = async (id) => {
+    if (!window.confirm('정말 이 배너를 삭제하시겠습니까?')) return;
+    const { error } = await api.banners.adminDelete(id);
+    if (error) {
+      alert('배너 삭제 실패: ' + error);
+    } else {
+      alert('배너가 삭제되었습니다.');
+      fetchAdminData();
+    }
+  };
+
   if (!isAdmin || loading) return <div style={fullCenterStyle}>데이터를 동기화 중입니다...</div>;
 
   return (
@@ -293,6 +325,7 @@ const AdminPage = () => {
             { id: 'reports', icon: '🚨', label: '신고 관리' },
             { id: 'adRequests', icon: '🛒', label: '광고 구매 신청' },
             { id: 'adUsages', icon: '🎯', label: '광고 사용 내역' },
+            { id: 'banners', icon: '🖼️', label: '광고배너 관리' },
             { id: 'coupons', icon: '🎫', label: '쿠폰 시스템' }
           ].map(item => (
             <div 
@@ -849,6 +882,108 @@ const AdminPage = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            배너 관리 탭
+        ======================================================== */}
+        {activeTab === 'banners' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>🖼️ 광고배너 관리</h2>
+            </div>
+            
+            <div className="glass-card" style={{ padding: '25px', marginBottom: '30px' }}>
+              <h3 style={{ marginBottom: '15px' }}>새 배너 등록하기</h3>
+              <form onSubmit={handleBannerSubmit}>
+                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <label style={smallLabel}>적용할 위치 (슬롯)</label>
+                    <select required style={adminInput} value={bannerUploadForm.slot_key} onChange={e => setBannerUploadForm({...bannerUploadForm, slot_key: e.target.value})}>
+                      <option value="">슬롯을 선택하세요</option>
+                      <option value="main_sidebar">메인페이지 사이드 배너 (300x250)</option>
+                      <option value="main_bottom_a">메인페이지 하단 배너 A (1200x140)</option>
+                      <option value="main_bottom_b">메인페이지 하단 배너 B (1200x140)</option>
+                      <option value="breed_sidebar">품종별페이지 사이드 배너 (300x250)</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 2, minWidth: '300px' }}>
+                    <label style={smallLabel}>이미지 URL</label>
+                    <input 
+                      required 
+                      type="url" 
+                      style={adminInput} 
+                      placeholder="https://... (이미지 절대 주소)" 
+                      value={bannerUploadForm.image_url} 
+                      onChange={e => setBannerUploadForm({...bannerUploadForm, image_url: e.target.value})} 
+                    />
+                  </div>
+                  <div style={{ flex: 2, minWidth: '300px' }}>
+                    <label style={smallLabel}>클릭 시 이동할 링크 URL (선택)</label>
+                    <input 
+                      type="url" 
+                      style={adminInput} 
+                      placeholder="https://... (클릭 시 이동할 주소)" 
+                      value={bannerUploadForm.link_url} 
+                      onChange={e => setBannerUploadForm({...bannerUploadForm, link_url: e.target.value})} 
+                    />
+                  </div>
+                  <button type="submit" style={createBtnStyle}>
+                    배너 등록
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <h3 style={{ marginBottom: '15px' }}>등록된 배너 현황 (각 슬롯 최대 3개)</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              {[
+                { key: 'main_sidebar', name: '메인페이지 사이드 배너', size: '300x250' },
+                { key: 'main_bottom_a', name: '메인페이지 하단 배너 A', size: '1200x140' },
+                { key: 'main_bottom_b', name: '메인페이지 하단 배너 B', size: '1200x140' },
+                { key: 'breed_sidebar', name: '품종별페이지 사이드 배너', size: '300x250' }
+              ].map(slot => (
+                <div key={slot.key} className="glass-card" style={{ padding: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                    <h4 style={{ margin: 0 }}>{slot.name}</h4>
+                    <span style={badgeStyle}>
+                      {banners[slot.key]?.length || 0} / 3
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '15px' }}>권장: {slot.size}</div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {banners[slot.key] && banners[slot.key].length > 0 ? (
+                      banners[slot.key].map(banner => (
+                        <div key={banner.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', backgroundColor: 'white' }}>
+                          <div style={{ width: '80px', height: '40px', overflow: 'hidden', borderRadius: '4px', border: '1px solid #ddd', flexShrink: 0 }}>
+                            <img src={banner.image_url} alt="banner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, overflow: 'hidden' }}>
+                            <div style={{ fontSize: '0.75rem', color: '#888', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                              이미지: {banner.image_url}
+                            </div>
+                            {banner.link_url && (
+                              <div style={{ fontSize: '0.75rem', color: 'var(--primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                링크: {banner.link_url}
+                              </div>
+                            )}
+                          </div>
+                          <button onClick={() => handleBannerDelete(banner.id)} style={{ padding: '5px 10px', backgroundColor: '#ff4757', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                            삭제
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ padding: '20px', textAlign: 'center', color: '#999', fontSize: '0.85rem', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                        등록된 배너가 없습니다.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

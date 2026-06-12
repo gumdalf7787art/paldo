@@ -214,6 +214,39 @@ export const api = {
     }
   },
 
+  // 10. 시스템 배너 (Banners)
+  banners: {
+    async getList() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/banners`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async adminCreate(bannerData) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin/banners`, {
+          method: 'POST',
+          body: JSON.stringify(bannerData),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async adminDelete(id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin/banners?id=${id}`, {
+          method: 'DELETE',
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
+  },
+
   // 3. 상점 및 리뷰 (Store/Reviews)
   store: {
     async getProfile(sellerId) {

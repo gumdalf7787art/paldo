@@ -7,6 +7,85 @@ import petInsuranceBanner from '../assets/images/pet_insurance_banner.png';
 import petShopBanner from '../assets/images/pet_shop_banner.png';
 import { calculateAge } from '../utils/age';
 
+export const DynamicBanner = ({ banners, defaultImage, height = '140px', slotName }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!banners || banners.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [banners]);
+
+  if (!banners || banners.length === 0) {
+    // 이미지가 없을 경우 숨김처리
+    return null; 
+  }
+
+  const currentBanner = banners[currentIndex];
+  const bgImage = currentBanner.image_url;
+
+  return (
+    <div 
+      onClick={() => {
+        if (currentBanner.link_url) {
+          window.open(currentBanner.link_url, '_blank');
+        }
+      }}
+      style={{
+        width: '100%',
+        height,
+        borderRadius: '12px',
+        overflow: 'hidden',
+        position: 'relative',
+        marginBottom: '20px',
+        border: '1px solid #cbd5e1',
+        boxShadow: 'var(--shadow)',
+        cursor: currentBanner.link_url ? 'pointer' : 'default',
+        display: 'flex',
+        alignItems: 'center',
+        transition: 'all 0.3s ease'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
+        const bg = e.currentTarget.querySelector('.banner-bg');
+        if (bg) bg.style.transform = 'scale(1.03)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--shadow)';
+        const bg = e.currentTarget.querySelector('.banner-bg');
+        if (bg) bg.style.transform = 'scale(1)';
+      }}
+    >
+      <div 
+        className="banner-bg"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          transition: 'transform 0.6s ease',
+          zIndex: 1
+        }}
+      />
+      {banners.length > 1 && (
+        <div style={{ position: 'absolute', bottom: '10px', right: '10px', zIndex: 3, display: 'flex', gap: '5px' }}>
+          {banners.map((_, i) => (
+            <div key={i} style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: i === currentIndex ? 'white' : 'rgba(255,255,255,0.4)', transition: 'all 0.3s' }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // 배열 요소를 무작위로 섞는 함수 (Fisher-Yates Shuffle)
 const shuffleArray = (array) => {
   const newArray = [...array];
@@ -517,252 +596,6 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   );
 };
 
-const PetInsuranceBanner = () => {
-  return (
-    <div 
-      style={{
-        width: '100%',
-        height: '140px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        position: 'relative',
-        marginBottom: '20px',
-        border: '1px solid #cbd5e1',
-        boxShadow: 'var(--shadow)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        transition: 'all 0.3s ease'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
-        const bg = e.currentTarget.querySelector('.banner-bg');
-        if (bg) bg.style.transform = 'scale(1.03)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'var(--shadow)';
-        const bg = e.currentTarget.querySelector('.banner-bg');
-        if (bg) bg.style.transform = 'scale(1)';
-      }}
-    >
-      {/* 배경 이미지 */}
-      <div 
-        className="banner-bg"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${petInsuranceBanner})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          transition: 'transform 0.6s ease',
-          zIndex: 1
-        }}
-      />
-      {/* 어두운 그라데이션 오버레이 (텍스트 가독성 확보) */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0) 100%)',
-          zIndex: 2
-        }}
-      />
-      {/* 배너 텍스트 및 버튼 콘텐츠 */}
-      <div 
-        style={{
-          position: 'relative',
-          zIndex: 3,
-          padding: '0 40px',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          maxWidth: '70%'
-        }}
-      >
-        <span 
-          style={{
-            fontSize: '0.8rem',
-            fontWeight: '800',
-            backgroundColor: '#ff4757',
-            padding: '4px 10px',
-            borderRadius: '20px',
-            width: 'fit-content',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}
-        >
-          마이펫 케어
-        </span>
-        <h2 
-          style={{
-            fontSize: '1.9rem',
-            fontWeight: '900',
-            margin: 0,
-            lineHeight: '1.25',
-            letterSpacing: '-1px',
-            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
-            wordBreak: 'keep-all'
-          }}
-        >
-          우리 아이 건강을 지켜주는 평생 건강보험
-        </h2>
-      </div>
-      
-      {/* 오른쪽 끝 장식 버튼 */}
-      <div 
-        style={{
-          position: 'absolute',
-          right: '40px',
-          zIndex: 3,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          color: '#111',
-          padding: '10px 20px',
-          borderRadius: '30px',
-          fontSize: '0.8rem',
-          fontWeight: '800',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          transition: 'all 0.3s ease'
-        }}
-      >
-        <span>자세히 보기</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </div>
-    </div>
-  );
-};
-
-const PetShopBanner = () => {
-  return (
-    <div 
-      style={{
-        width: '100%',
-        height: '140px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        position: 'relative',
-        marginBottom: '20px',
-        border: '1px solid #cbd5e1',
-        boxShadow: 'var(--shadow)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        transition: 'all 0.3s ease'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
-        const bg = e.currentTarget.querySelector('.banner-bg');
-        if (bg) bg.style.transform = 'scale(1.03)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'var(--shadow)';
-        const bg = e.currentTarget.querySelector('.banner-bg');
-        if (bg) bg.style.transform = 'scale(1)';
-      }}
-    >
-      {/* 배경 이미지 */}
-      <div 
-        className="banner-bg"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${petShopBanner})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          transition: 'transform 0.6s ease',
-          zIndex: 1
-        }}
-      />
-      {/* 어두운 그라데이션 오버레이 (텍스트 가독성 확보) */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.25) 65%, rgba(0,0,0,0) 100%)',
-          zIndex: 2
-        }}
-      />
-      {/* 배너 텍스트 및 버튼 콘텐츠 */}
-      <div 
-        style={{
-          position: 'relative',
-          zIndex: 3,
-          padding: '0 40px',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          maxWidth: '70%'
-        }}
-      >
-        <span 
-          style={{
-            fontSize: '0.8rem',
-            fontWeight: '800',
-            backgroundColor: '#ffa502',
-            padding: '4px 10px',
-            borderRadius: '20px',
-            width: 'fit-content',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}
-        >
-          다잇독 펫숍 기획전
-        </span>
-        <h2 
-          style={{
-            fontSize: '1.9rem',
-            fontWeight: '900',
-            margin: 0,
-            lineHeight: '1.25',
-            letterSpacing: '-1px',
-            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
-            wordBreak: 'keep-all'
-          }}
-        >
-          우리 아이 취향저격 명품 용품숍, 최대 50% 단독 특가!
-        </h2>
-      </div>
-      
-      {/* 오른쪽 끝 장식 버튼 */}
-      <div 
-        style={{
-          position: 'absolute',
-          right: '40px',
-          zIndex: 3,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          color: '#111',
-          padding: '10px 20px',
-          borderRadius: '30px',
-          fontSize: '0.8rem',
-          fontWeight: '800',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          transition: 'all 0.3s ease'
-        }}
-      >
-        <span>구경하기</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </div>
     </div>

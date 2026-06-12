@@ -183,3 +183,12 @@ CREATE TABLE IF NOT EXISTS bookmarks (
     FOREIGN KEY(dog_id) REFERENCES dogs(id) ON DELETE CASCADE,
     UNIQUE(user_id, dog_id)                    -- 중복 관심등록 방지
 );
+
+-- 14. 시스템 광고 배너 테이블
+CREATE TABLE IF NOT EXISTS system_banners (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slot_key TEXT NOT NULL,         -- 'main_sidebar', 'main_bottom_a', 'main_bottom_b', 'breed_sidebar'
+    image_url TEXT NOT NULL,
+    link_url TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);

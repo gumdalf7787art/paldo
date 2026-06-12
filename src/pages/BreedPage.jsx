@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../lib/api';
 import Card from '../components/Card';
 import SearchBar from '../components/SearchBar';
-import { HeroCarousel, LoginWidget } from '../components/Sections';
+import { HeroCarousel, LoginWidget, DynamicBanner } from '../components/Sections';
 
 const BreedPage = () => {
   const { breedName } = useParams();
@@ -12,6 +12,7 @@ const BreedPage = () => {
   const [adDogs, setAdDogs] = useState([]);
   const [regularDogs, setRegularDogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [banners, setBanners] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,12 +29,20 @@ const BreedPage = () => {
       // Currently API might not support gender/price, but we pass region.
       
       try {
-        // 1. 유료 광고 데이터 가져오기 (REST API)
-        const { data: adData } = await api.ads.getList({
-          status: 'active',
-          breed: breedName,
-          region: region
-        });
+        // 1. 유료 광고 데이터 가져오기 및 배너 가져오기 병렬 실행
+        const [adResponse, bannerResponse] = await Promise.all([
+          api.ads.getList({
+            status: 'active',
+            breed: breedName,
+            region: region
+          }),
+          api.banners.getList()
+        ]);
+        
+        const adData = adResponse.data;
+        if (bannerResponse.data) {
+          setBanners(bannerResponse.data);
+        }
 
         const ads = (adData || []).map(ad => ({
           ...ad,
@@ -191,6 +200,14 @@ const BreedPage = () => {
 
         <div className="portal-side-col">
           <LoginWidget />
+          
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DynamicBanner 
+              banners={banners.breed_sidebar} 
+              slotName="breed_sidebar" 
+              height="250px" 
+            />
+          </div>
           
           <div style={{
             backgroundColor: '#FFF8F6',

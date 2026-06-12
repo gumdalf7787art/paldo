@@ -78,7 +78,7 @@ const AdStorePage = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
         {items.map(item => (
           <div key={item.id} className="glass-card" style={{ padding: '20px 15px', border: '1px solid #eef2f7', borderRadius: '15px', display: 'flex', flexDirection: 'column', transition: 'all 0.3s', backgroundColor: '#fff', boxShadow: '0 4px 15px rgba(0,0,0,0.04)' }}
                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.08)'; }}
@@ -109,7 +109,7 @@ const AdStorePage = () => {
                 onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
               >
-                결제 안내 보기
+                광고 위치 및 결제 안내
               </button>
             </div>
           </div>
@@ -119,60 +119,79 @@ const AdStorePage = () => {
       {/* 무통장 입금 안내 모달 */}
       {isModalOpen && selectedItem && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsModalOpen(false)}>
-          <div className="fade-in" style={{ backgroundColor: 'white', padding: '40px', borderRadius: '25px', width: '90%', maxWidth: '450px', boxShadow: '0 25px 50px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+          <div className="fade-in" style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 50px rgba(0,0,0,0.3)', display: 'flex', gap: '30px' }} onClick={e => e.stopPropagation()}>
             
-            <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🏦</div>
-              <h3 style={{ fontSize: '1.6rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '10px' }}>무통장 입금 안내</h3>
-              <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.95rem' }}>
-                현재 결제 시스템 연동 중으로 <strong>무통장 입금</strong>만 가능합니다.<br/>
-                아래 계좌로 입금 후 <strong>[확인 요청]</strong>을 눌러주시면<br/>관리자가 내역 확인 후 즉시 아이템을 지급해 드립니다.
-              </p>
+            {/* 왼쪽: 광고 노출 위치 미리보기 */}
+            <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px', display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>📺 광고 노출 위치 미리보기</h3>
+              <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
+              <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '2px dashed #cbd5e1' }}>
+                <div style={{ textAlign: 'center', color: '#64748b' }}>
+                  <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>🖼️</span>
+                  <span><strong>{selectedItem.name}</strong><br/>영역 표시 예시 이미지</span>
+                </div>
+              </div>
             </div>
 
-            <div style={{ backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '18px', marginBottom: '30px', border: '1px solid #eee' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <span style={{ color: '#666', fontSize: '0.95rem' }}>구매 상품</span>
-                <strong style={{ color: '#333', fontSize: '0.95rem' }}>{selectedItem.name}</strong>
+            {/* 오른쪽: 무통장 입금 안내 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  🏦 무통장 입금 안내
+                </h3>
+                <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.9rem', marginBottom: '20px' }}>
+                  아래 계좌로 입금 후 <strong>[신청하기]</strong>를 눌러주시면<br/>
+                  관리자가 내역 확인 후 즉시 아이템을 지급해 드립니다.
+                </p>
+
+                <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '15px', marginBottom: '20px', border: '1px solid #eee' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ color: '#666', fontSize: '0.9rem' }}>구매 상품</span>
+                    <strong style={{ color: '#333', fontSize: '0.9rem' }}>{selectedItem.name}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                    <span style={{ color: '#666', fontSize: '0.9rem' }}>결제 금액</span>
+                    <strong style={{ color: '#ff4757', fontSize: '1.2rem' }}>{selectedItem.price.toLocaleString()}원</strong>
+                  </div>
+                  <div style={{ height: '1px', backgroundColor: '#ddd', margin: '15px 0' }}></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ color: '#666', fontSize: '0.9rem' }}>입금 은행</span>
+                    <strong style={{ fontSize: '0.9rem' }}>국민은행</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ color: '#666', fontSize: '0.9rem' }}>계좌 번호</span>
+                    <strong style={{ fontSize: '1.05rem', letterSpacing: '1px', color: 'var(--primary-dark)' }}>0000-0000-0000</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span style={{ color: '#666', fontSize: '0.9rem' }}>예금주</span>
+                    <strong style={{ fontSize: '0.9rem' }}>블루프라임</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed #ddd' }}>
+                    <span style={{ color: '#e67e22', fontSize: '0.9rem', fontWeight: 'bold' }}>입금자명</span>
+                    <strong style={{ color: '#e67e22', fontSize: '0.9rem' }}>반드시 실명 입금</strong>
+                  </div>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <span style={{ color: '#666', fontSize: '0.95rem' }}>결제 금액</span>
-                <strong style={{ color: '#ff4757', fontSize: '1.2rem' }}>{selectedItem.price.toLocaleString()}원</strong>
-              </div>
-              <div style={{ height: '1px', backgroundColor: '#ddd', margin: '20px 0' }}></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ color: '#666', fontSize: '0.95rem' }}>입금 은행</span>
-                <strong style={{ fontSize: '0.95rem' }}>국민은행</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ color: '#666', fontSize: '0.95rem' }}>계좌 번호</span>
-                <strong style={{ fontSize: '1.05rem', letterSpacing: '1px', color: 'var(--primary-dark)' }}>0000-0000-0000</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#666', fontSize: '0.95rem' }}>예금주</span>
-                <strong style={{ fontSize: '0.95rem' }}>블루프라임</strong>
-              </div>
-            </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                style={{ flex: 1, padding: '16px', borderRadius: '14px', backgroundColor: '#f0f0f0', color: '#555', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                style={{ flex: 1, padding: '14px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#555', border: 'none', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#e0e0e0'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
               >
-                취소
+                닫기
               </button>
               <button 
                 onClick={() => {
-                  alert('✅ 입금 확인 요청이 전송되었습니다.\n관리자가 입금 내역을 확인하는 대로 신속하게 쿠폰을 지급해 드리겠습니다.');
+                  alert('✅ 광고 아이템 신청이 완료되었습니다.\n관리자가 입금 내역(실명)을 확인하는 대로 신속하게 지급해 드리겠습니다.');
                   setIsModalOpen(false);
                 }}
-                style={{ flex: 1.5, padding: '16px', borderRadius: '14px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 15px rgba(255, 171, 0, 0.3)' }}
+                style={{ flex: 2, padding: '14px', borderRadius: '12px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 15px rgba(255, 171, 0, 0.3)' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
               >
-                입금 완료 / 확인 요청
+                입금 완료 / 신청하기
               </button>
             </div>
           </div>

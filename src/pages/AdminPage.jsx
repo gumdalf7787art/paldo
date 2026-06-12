@@ -291,7 +291,8 @@ const AdminPage = () => {
             { id: 'users', icon: '👥', label: '회원 관리' },
             { id: 'dogs', icon: '🐶', label: '게시물 관리' },
             { id: 'reports', icon: '🚨', label: '신고 관리' },
-            { id: 'adRequests', icon: '🛒', label: '광고 신청 관리' },
+            { id: 'adRequests', icon: '🛒', label: '광고 구매 신청' },
+            { id: 'adUsages', icon: '🎯', label: '광고 사용 내역' },
             { id: 'coupons', icon: '🎫', label: '쿠폰 시스템' }
           ].map(item => (
             <div 
@@ -594,6 +595,7 @@ const AdminPage = () => {
 
         {activeTab === 'adRequests' && (
           <div className="fade-in glass-card" style={{ padding: '30px' }}>
+            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🛒 광고 아이템 구매 신청 내역</h3>
             <table style={tableStyle}>
               <thead>
                 <tr>
@@ -607,7 +609,7 @@ const AdminPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {adRequests.map(req => (
+                {adRequests.filter(req => req.price > 0).map(req => (
                   <tr key={req.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                     <td style={tdStyle}>{new Date(req.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                     <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--primary-dark)' }}>{req.title}</td>
@@ -634,8 +636,45 @@ const AdminPage = () => {
                     </td>
                   </tr>
                 ))}
-                {adRequests.length === 0 && (
+                {adRequests.filter(req => req.price > 0).length === 0 && (
                   <tr><td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>접수된 광고 구매 신청 내역이 없습니다.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === 'adUsages' && (
+          <div className="fade-in glass-card" style={{ padding: '30px' }}>
+            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🎯 광고 아이템 사용(적용) 내역</h3>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>사용일시</th>
+                  <th style={thStyle}>광고 구역</th>
+                  <th style={thStyle}>사용자</th>
+                  <th style={thStyle}>상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adRequests.filter(req => !req.price || req.price === 0).map(req => (
+                  <tr key={req.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdStyle}>{new Date(req.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                    <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--primary-dark)' }}>{req.title}</td>
+                    <td style={tdStyle}>
+                      {req.business_name || req.nickname}
+                      <br/>
+                      <span style={{ fontSize: '0.8rem', color: '#888' }}>{req.email}</span>
+                    </td>
+                    <td style={tdStyle}>
+                      {req.status === 'pending' && <span style={{ ...badgeStyle, backgroundColor: '#f39c12' }}>대기중</span>}
+                      {req.status === 'active' && <span style={{ ...badgeStyle, backgroundColor: '#2ecc71' }}>적용중/완료</span>}
+                      {req.status === 'rejected' && <span style={{ ...badgeStyle, backgroundColor: '#e74c3c' }}>취소/종료</span>}
+                    </td>
+                  </tr>
+                ))}
+                {adRequests.filter(req => !req.price || req.price === 0).length === 0 && (
+                  <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>광고 아이템 사용 내역이 없습니다.</td></tr>
                 )}
               </tbody>
             </table>

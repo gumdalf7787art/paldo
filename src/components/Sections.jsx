@@ -61,10 +61,7 @@ const HeroCarousel = ({ breedName }) => {
   useEffect(() => {
     const loadHeroAds = async () => {
       try {
-        const data = await Promise.race([
-          fetchAdsAndFill('main', 10, '추천', breedName),
-          timeoutPromise(2500)
-        ]);
+        const data = await fetchAdsAndFill('main', 10, '추천', breedName);
         if (data && data.length > 0) {
           setAds(data);
         } else {

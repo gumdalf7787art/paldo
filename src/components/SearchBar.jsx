@@ -65,7 +65,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
   return (
     <section className="fade-in search-bar-section" style={{ padding: '5px 0' }}>
       <div className="glass-card search-bar-container" style={{ 
-        padding: '10px 16px', 
+        padding: hideBreed ? '16px 24px' : '10px 16px', 
         display: 'flex', 
         flexDirection: 'column', 
         gap: '10px',
@@ -166,9 +166,9 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
           {/* 1. 품종 선택 (hideBreed가 아닐 때만 노출) */}
           {!hideBreed && (
             <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-              <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+              <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
               <select 
-                style={selectStyle} 
+                style={{ ...selectStyle, height: hideBreed ? '38px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }} 
                 value={selectedBreed}
                 onChange={(e) => setSelectedBreed(e.target.value)}
               >
@@ -179,10 +179,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
           )}
 
           {/* 2. 분양지역 선택 */}
-          <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
+          <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
             <select 
-              style={selectStyle}
+              style={{ ...selectStyle, height: hideBreed ? '38px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
             >
@@ -191,10 +191,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
           </div>
 
           {/* 3. 성별 선택 */}
-          <div className="filter-item" style={{ flex: '0.9 1 95px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
+          <div className="filter-item" style={{ flex: '0.9 1 95px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
             <select 
-              style={selectStyle}
+              style={{ ...selectStyle, height: hideBreed ? '38px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
               value={selectedGender}
               onChange={(e) => setSelectedGender(e.target.value)}
             >
@@ -203,10 +203,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
           </div>
 
           {/* 4. 분양가격 */}
-          <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
+          <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
             <select 
-              style={selectStyle}
+              style={{ ...selectStyle, height: hideBreed ? '38px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
               value={selectedPrice}
               onChange={(e) => setSelectedPrice(e.target.value)}
             >
@@ -221,11 +221,11 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
               flexShrink: 0,
               backgroundColor: 'var(--primary)',
               color: 'var(--white)',
-              padding: '0 16px',
-              height: '27px',
+              padding: hideBreed ? '0 24px' : '0 16px',
+              height: hideBreed ? '38px' : '27px',
               borderRadius: '6px',
               fontWeight: '700',
-              fontSize: '0.72rem',
+              fontSize: hideBreed ? '0.85rem' : '0.72rem',
               border: 'none',
               cursor: 'pointer',
               boxShadow: '0 4px 10px rgba(38, 166, 154, 0.15)',

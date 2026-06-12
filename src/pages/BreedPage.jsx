@@ -104,28 +104,13 @@ const BreedPage = () => {
         <p style={{ color: '#666', fontSize: '0.9rem' }}>모든 {breedName} 아이들을 한눈에 확인하세요.</p>
       </div>
 
-      {/* 2. 메인 히어로 캐러셀 (추가됨) */}
-      <div style={{ marginBottom: '40px' }}>
+      {/* 2. 메인 히어로 캐러셀 */}
+      <div style={{ marginBottom: '16px' }}>
         <HeroCarousel breedName={breedName} />
       </div>
 
-      {/* 3. 상단 프리미엄 하이라이트 (1줄) */}
-      {!loading && adDogs.length > 0 && (
-        <div style={{ marginBottom: '30px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: '800' }}>이달의 추천 {breedName}</h2>
-            <span style={{ fontSize: '0.75rem', padding: '2px 8px', backgroundColor: '#fff3e0', color: '#e65100', borderRadius: '4px', fontWeight: 'bold' }}>AD</span>
-          </div>
-          <div className="responsive-grid-4">
-            {adDogs.map(dog => (
-              <Card key={dog.id} type="large" data={dog} badgeText="추천" />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* 3. 상세 검색창 (품종 선택란 숨김) */}
-      <div style={{ marginBottom: '30px' }}>
+      <div style={{ marginBottom: '20px' }}>
         <SearchBar hideBreed={true} defaultBreed={breedName} />
       </div>
 

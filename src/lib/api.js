@@ -291,6 +291,18 @@ export const api = {
       }
     },
 
+    async markAsRead(id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/notifications?action=read`, {
+          method: 'POST',
+          body: JSON.stringify({ id })
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
     async markAllAsRead() {
       try {
         const { data } = await request(`${BASE_URL}/api/notifications?action=read_all`, {

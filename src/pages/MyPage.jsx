@@ -97,6 +97,12 @@ const MyPage = () => {
 
   useEffect(() => {
     fetchInitialData();
+    
+    const handleNotificationsUpdate = () => {
+      fetchMyNotifications();
+    };
+    window.addEventListener('notifications-updated', handleNotificationsUpdate);
+    return () => window.removeEventListener('notifications-updated', handleNotificationsUpdate);
   }, []);
 
   useEffect(() => {
@@ -247,6 +253,14 @@ const MyPage = () => {
   const fetchMyNotifications = async () => {
     const { data } = await api.notifications.getList();
     if (data) setMyNotifications(data);
+  };
+
+  const handleMarkAsRead = async (id, isRead) => {
+    if (isRead) return;
+    await api.notifications.markAsRead(id);
+    setMyNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    // 헤더 상태 동기화용
+    window.dispatchEvent(new Event('notifications-updated'));
   };
 
   const handleReadAllNotifications = async () => {
@@ -1068,7 +1082,7 @@ const MyPage = () => {
                       <div style={emptyStyle}>받은 알림이 없습니다.</div>
                     ) : (
                       myNotifications.map(n => (
-                        <div key={n.id} style={{ ...chatRoomItemStyle, backgroundColor: n.is_read ? '#fafafa' : '#fff', borderLeft: n.is_read ? '1px solid #eee' : '5px solid var(--primary-dark)', paddingLeft: '25px', opacity: n.is_read ? 0.7 : 1 }}>
+                        <div key={n.id} onClick={() => handleMarkAsRead(n.id, n.is_read)} style={{ ...chatRoomItemStyle, cursor: n.is_read ? 'default' : 'pointer', backgroundColor: n.is_read ? '#fafafa' : '#fff', borderLeft: n.is_read ? '1px solid #eee' : '5px solid var(--primary-dark)', paddingLeft: '25px', opacity: n.is_read ? 0.7 : 1 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '5px' }}>
                               {n.type === 'chat' && '💬 다잇톡 메시지'}

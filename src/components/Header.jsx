@@ -71,7 +71,13 @@ const Header = () => {
     fetchNotifications();
     const intervalId = setInterval(fetchNotifications, 15000);
 
-    return () => clearInterval(intervalId);
+    const handleUpdate = () => fetchNotifications();
+    window.addEventListener('notifications-updated', handleUpdate);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('notifications-updated', handleUpdate);
+    };
   }, [session?.user?.id]);
 
   const handleLogout = async () => {
@@ -86,10 +92,17 @@ const Header = () => {
   };
 
   const markAsRead = async (id, link_url) => {
-    // 로컬 즉시 반영
+    // 백엔드 상태 반영
+    await api.notifications.markAsRead(id);
+    
+    // 프론트엔드 상태 반영
     setNotifications((prev) => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
     setTotalUnreadCount(prev => Math.max(0, prev - 1));
     setShowDropdown(false);
+    
+    // 다른 컴포넌트(MyPage 등)에 알림 상태 변경을 알리기 위한 이벤트 발송
+    window.dispatchEvent(new Event('notifications-updated'));
+
     if (link_url) {
       if(link_url === '/mypage') navigate('/mypage', { state: { tab: 'notifications' }});
       else navigate(link_url);

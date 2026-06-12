@@ -101,6 +101,20 @@ export async function onRequestPost(context) {
     }
   }
 
+  // 단일 알림 읽음 처리 (read)
+  if (action === 'read') {
+    const { id } = body;
+    if (!id) return createResponse({ error: '알림 ID가 필요합니다.' }, 400);
+    try {
+      await env.DB.prepare('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?')
+        .bind(id, authUser.id)
+        .run();
+      return createResponse({ success: true });
+    } catch (err) {
+      return createResponse({ error: `단일 알림 읽음 처리 실패: ${err.message}` }, 500);
+    }
+  }
+
   // 2. 신규 알림 생성 (주로 시스템이 트리거하며, 로그인 인증 없이도 등록 가능해야 하는 경우도 있음)
   const { user_id, type, message } = body;
   if (!user_id || !message) {

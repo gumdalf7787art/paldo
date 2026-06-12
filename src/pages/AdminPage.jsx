@@ -18,6 +18,7 @@ const AdminPage = () => {
   const [dogs, setDogs] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [reports, setReports] = useState([]);
+  const [adRequests, setAdRequests] = useState([]);
   const navigate = useNavigate();
 
   // 쿠폰 생성용 상태
@@ -36,11 +37,7 @@ const AdminPage = () => {
   const [isIssuing, setIsIssuing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    checkAdmin();
-  }, []);
-
-  const checkAdmin = async () => {
+  async function checkAdmin() {
     const { data: sessionData, error: sessionErr } = await api.auth.getSession();
     if (sessionErr || !sessionData?.session) return navigate('/login');
 
@@ -55,9 +52,9 @@ const AdminPage = () => {
     // 진입 시 광고 만료 처리
     await api.admin.expireAds();
     fetchAdminData();
-  };
+  }
 
-  const fetchAdminData = async () => {
+  async function fetchAdminData() {
     setLoading(true);
 
     try {
@@ -100,12 +97,20 @@ const AdminPage = () => {
       const { data: reportList } = await api.admin.getReports();
       setReports(reportList || []);
 
+      // 7. 광고 신청 내역
+      const { data: adReqList } = await api.admin.getAdRequests();
+      setAdRequests(adReqList || []);
+
     } catch (error) {
       console.error('Data fetch error:', error);
     }
 
     setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    setTimeout(() => checkAdmin(), 0);
+  }, []);
 
   const handleApprove = async (app) => {
     if (!window.confirm(`${app.business_name} 승인하시겠습니까?`)) return;
@@ -172,7 +177,6 @@ const AdminPage = () => {
     if (!issueData.couponId) return alert('발급할 쿠폰을 선택해 주세요.');
 
     setIsIssuing(true);
-    const selectedCoupon = coupons.find(c => c.id == issueData.couponId);
 
     if (issueTargetType === 'all_sellers') {
       if (!window.confirm('모든 사업자 회원에게 쿠폰을 일괄 발급하시겠습니까?')) {
@@ -254,6 +258,24 @@ const AdminPage = () => {
     }
   };
 
+  const handleUpdateAdRequestStatus = async (id, status) => {
+    let confirmMsg = '상태를 변경하시겠습니까?';
+    if (status === 'active') confirmMsg = '승인 처리하시겠습니까?\n세금계산서가 자동 발행되며 광고 쿠폰이 발급됩니다.';
+    if (status === 'rejected') confirmMsg = '정말 취소(반려) 처리하시겠습니까?';
+
+    if (!window.confirm(confirmMsg)) return;
+
+    const { data, error } = await api.admin.updateAdRequestStatus(id, status);
+    if (error) {
+      alert('상태 업데이트 중 오류가 발생했습니다: ' + error);
+    } else {
+      let msg = data?.message || '처리되었습니다.';
+      if (data?.taxInvoiceIssued) msg += '\n🧾 세금계산서 발행 완료';
+      alert(msg);
+      fetchAdminData();
+    }
+  };
+
   if (!isAdmin || loading) return <div style={fullCenterStyle}>데이터를 동기화 중입니다...</div>;
 
   return (
@@ -269,6 +291,7 @@ const AdminPage = () => {
             { id: 'users', icon: '👥', label: '회원 관리' },
             { id: 'dogs', icon: '🐶', label: '게시물 관리' },
             { id: 'reports', icon: '🚨', label: '신고 관리' },
+            { id: 'adRequests', icon: '🛒', label: '광고 신청 관리' },
             { id: 'coupons', icon: '🎫', label: '쿠폰 시스템' }
           ].map(item => (
             <div 
@@ -286,12 +309,13 @@ const AdminPage = () => {
       <main style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
           <h1 style={{ fontSize: '1.8rem', fontWeight: '800' }}>
-            {activeTab === 'summary' && '실시간 활동 통계'}
-            {activeTab === 'business' && '입점 신청 관리'}
-            {activeTab === 'users' && '전체 회원 관리'}
-            {activeTab === 'dogs' && '분양 게시물 관리'}
-            {activeTab === 'reports' && '🚨 신고 내역 관리'}
-            {activeTab === 'coupons' && '쿠폰 시스템 관리'}
+            { activeTab === 'summary' && '실시간 활동 통계' }
+            { activeTab === 'business' && '입점 신청 관리' }
+            { activeTab === 'users' && '전체 회원 관리' }
+            { activeTab === 'dogs' && '분양 게시물 관리' }
+            { activeTab === 'reports' && '🚨 신고 내역 관리' }
+            { activeTab === 'adRequests' && '🛒 광고 신청 관리' }
+            { activeTab === 'coupons' && '쿠폰 시스템 관리' }
           </h1>
           <div style={{ backgroundColor: 'white', padding: '10px 20px', borderRadius: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', fontSize: '0.9rem' }}>
             마지막 업데이트: {new Date().toLocaleTimeString()}
@@ -568,6 +592,54 @@ const AdminPage = () => {
           </div>
         )}
 
+        {activeTab === 'adRequests' && (
+          <div className="fade-in glass-card" style={{ padding: '30px' }}>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>신청일</th>
+                  <th style={thStyle}>광고 구역</th>
+                  <th style={thStyle}>상점/신청자</th>
+                  <th style={thStyle}>사업자정보</th>
+                  <th style={thStyle}>결제금액</th>
+                  <th style={thStyle}>상태</th>
+                  <th style={thStyle}>관리 액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adRequests.map(req => (
+                  <tr key={req.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdStyle}>{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--primary-dark)' }}>{req.title}</td>
+                    <td style={tdStyle}>
+                      {req.business_name || req.nickname}<br/>
+                      <span style={{ fontSize: '0.8rem', color: '#888' }}>{req.email}</span>
+                    </td>
+                    <td style={tdStyle}>{req.biz_no || '미등록'}</td>
+                    <td style={{ ...tdStyle, fontWeight: 'bold' }}>{req.price?.toLocaleString()}원</td>
+                    <td style={tdStyle}>
+                      {req.status === 'pending' && <span style={{ ...badgeStyle, backgroundColor: '#f39c12' }}>입금대기</span>}
+                      {req.status === 'active' && <span style={{ ...badgeStyle, backgroundColor: '#2ecc71' }}>승인/발행완료</span>}
+                      {req.status === 'rejected' && <span style={{ ...badgeStyle, backgroundColor: '#e74c3c' }}>반려/취소</span>}
+                    </td>
+                    <td style={tdStyle}>
+                      {req.status === 'pending' && (
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button onClick={() => handleUpdateAdRequestStatus(req.id, 'active')} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary)' }}>확인(세금계산서)</button>
+                          <button onClick={() => handleUpdateAdRequestStatus(req.id, 'rejected')} style={{ ...tableBtnStyle, backgroundColor: '#eee', color: '#666' }}>취소</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {adRequests.length === 0 && (
+                  <tr><td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>접수된 광고 구매 신청 내역이 없습니다.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         {activeTab === 'coupons' && (
           <div className="fade-in">
             {/* 1. 쿠폰 템플릿 생성 섹션 */}
@@ -742,6 +814,7 @@ const tdStyle = { padding: '15px 20px', fontSize: '0.9rem', color: '#444' };
 const tableBtnStyle = { padding: '5px 12px', borderRadius: '5px', border: 'none', backgroundColor: 'var(--primary)', color: 'white', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' };
 const adminInput = { width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #eee', outline: 'none' };
 const smallLabel = { display: 'block', fontSize: '0.75rem', color: '#777', marginBottom: '5px' };
+const badgeStyle = { padding: '4px 8px', borderRadius: '12px', color: 'white', fontSize: '0.75rem', fontWeight: 'bold' };
 const createBtnStyle = { padding: '12px 30px', borderRadius: '8px', border: 'none', backgroundColor: '#2D3436', color: 'white', fontWeight: '800', cursor: 'pointer' };
 
 export default AdminPage;

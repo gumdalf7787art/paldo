@@ -11,10 +11,19 @@ const Header = () => {
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [toastMsg, setToastMsg] = useState(null);
+
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
+
+  async function fetchNotifications() {
+    const { data } = await api.notifications.getList();
+    if (data) {
+      setNotifications(data.slice(0, 20));
+      const unreadCount = data.filter(n => !n.is_read).length;
+      setTotalUnreadCount(unreadCount);
+    }
+  }
 
   useEffect(() => {
     const initSession = async () => {
@@ -55,23 +64,17 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  async function fetchNotifications() {
-    const { data } = await api.notifications.getList();
-    if (data) {
-      setNotifications(data.slice(0, 20));
-      const unreadCount = data.filter(n => !n.is_read).length;
-      setTotalUnreadCount(unreadCount);
-    }
-  }
+
 
   // 15초 폴링으로 알림 자동 갱신
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 15000);
+    const runFetch = () => fetchNotifications();
+    setTimeout(runFetch, 0);
+    const intervalId = setInterval(runFetch, 15000);
 
-    const handleUpdate = () => fetchNotifications();
+    const handleUpdate = () => runFetch();
     window.addEventListener('notifications-updated', handleUpdate);
 
     return () => {
@@ -329,17 +332,7 @@ const Header = () => {
         </div>
       </header>
 
-      {toastMsg && (
-        <div className="fade-in" style={toastStyle}>
-          <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--primary-dark)', marginBottom: '5px' }}>
-            {toastMsg.type === 'chat' && '💬 다잇톡'}
-            {toastMsg.type === 'bookmark' && '💝 찜'}
-            {toastMsg.type === 'coupon' && '🎁 쿠폰'}
-            {toastMsg.type === 'system' && '📢 공지'}
-          </div>
-          <div style={{ fontSize: '0.95rem', color: '#333' }}>{toastMsg.message}</div>
-        </div>
-      )}
+
     </>
   );
 };
@@ -350,6 +343,6 @@ const bellBtnStyle = { background: 'none', border: 'none', fontSize: '1.4rem', c
 const badgeStyle = { position: 'absolute', top: '0', right: '0', backgroundColor: '#ff4757', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', borderRadius: '50%', padding: '2px 5px', border: '2px solid white' };
 const dropdownStyle = { position: 'absolute', top: '50px', right: '-80px', width: '300px', backgroundColor: 'white', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: '1px solid #eee', overflow: 'hidden', zIndex: 1001 };
 const notiItemStyle = { padding: '15px', borderBottom: '1px solid #eee', cursor: 'pointer', transition: 'background-color 0.2s' };
-const toastStyle = { position: 'fixed', bottom: '30px', right: '30px', backgroundColor: 'white', borderRadius: '15px', padding: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', borderLeft: '5px solid var(--primary)', zIndex: 9999, minWidth: '250px' };
+
 
 export default Header;

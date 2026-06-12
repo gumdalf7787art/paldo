@@ -6,7 +6,7 @@ const AdSetupPage = () => {
   const { id: dogId } = useParams();
   const navigate = useNavigate();
   
-  const [session, setSession] = useState(null);
+
   const [dog, setDog] = useState(null);
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,6 @@ const AdSetupPage = () => {
       return;
     }
     const currentSession = sessionData.session;
-    setSession(currentSession);
 
     // 강아지 상세 정보 가져오기 (REST API)
     const { data: dogData } = await api.dogs.getDetail(dogId);
@@ -248,6 +247,6 @@ const AdSetupPage = () => {
 
 const labelStyle = { display: 'block', fontSize: '1rem', fontWeight: '800', color: '#333', marginBottom: '12px' };
 const radioBoxStyle = { display: 'block', padding: '15px 20px', borderRadius: '12px', border: '2px solid', cursor: 'pointer', transition: 'all 0.2s' };
-const durationBtnStyle = { flex: 1, padding: '15px', borderRadius: '12px', border: '2px solid', fontWeight: '800', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s' };
+
 
 export default AdSetupPage;

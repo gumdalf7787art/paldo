@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../lib/api';
 
 const AdStorePage = () => {
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 상품 정보
   const items = [
@@ -189,15 +191,31 @@ const AdStorePage = () => {
                 닫기
               </button>
               <button 
-                onClick={() => {
+                disabled={isSubmitting}
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  const { error } = await api.ads.requestAdPurchase({
+                    ad_type: selectedItem.type,
+                    title: selectedItem.name,
+                    price: selectedItem.price,
+                    duration: 7 // 기본 노출 기간 7일
+                  });
+                  
+                  setIsSubmitting(false);
+
+                  if (error) {
+                    alert('신청 중 오류가 발생했습니다: ' + error);
+                    return;
+                  }
+
                   alert('✅ 광고 아이템 신청이 완료되었습니다.\n관리자가 입금 내역(실명)을 확인하는 대로 신속하게 지급해 드리겠습니다.');
                   setIsModalOpen(false);
                 }}
-                style={{ flex: 2, padding: '14px', borderRadius: '12px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 15px rgba(255, 171, 0, 0.3)' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
+                style={{ flex: 2, padding: '14px', borderRadius: '12px', backgroundColor: isSubmitting ? '#ccc' : 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s', boxShadow: isSubmitting ? 'none' : '0 4px 15px rgba(255, 171, 0, 0.3)' }}
+                onMouseEnter={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary-dark)'; }}
+                onMouseLeave={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary)'; }}
               >
-                입금 완료 / 신청하기
+                {isSubmitting ? '신청 중...' : '입금 완료 / 신청하기'}
               </button>
             </div>
             

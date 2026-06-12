@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
-const Card = ({ type, data, badgeText }) => {
+const Card = ({ data, badgeText }) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -46,14 +46,7 @@ const Card = ({ type, data, badgeText }) => {
     return '';
   };
 
-  // 가격 포맷팅 유틸리티
-  const formattedPrice = (() => {
-    let p = data.price;
-    if (p === 0 || p === '0' || p === '무료분양' || p === '0만원') return '무료분양';
-    if (typeof p === 'number') return `${p}만원`;
-    if (typeof p === 'string' && !p.includes('만원') && p !== '무료분양') return `${p}만원`;
-    return p;
-  })();
+
 
   return (
     <div 

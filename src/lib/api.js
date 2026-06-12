@@ -25,7 +25,7 @@ async function request(url, options = {}) {
   let data;
   try {
     data = text ? JSON.parse(text) : {};
-  } catch (e) {
+  } catch {
     data = { message: text };
   }
 
@@ -98,7 +98,7 @@ export const api = {
     async logout() {
       try {
         await request(`${BASE_URL}/api/auth?action=logout`, { method: 'POST' });
-      } catch (e) {
+      } catch {
         // 네트워크 실패해도 로컬은 무조건 로그아웃 처리
       } finally {
         localStorage.removeItem('paldo_session_token');
@@ -446,6 +446,17 @@ export const api = {
       } catch (err) {
         return { data: null, error: err.message };
       }
+    },
+    async requestAdPurchase(payload) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/ads/request`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
     }
   },
 
@@ -636,6 +647,25 @@ export const api = {
       } catch (err) {
         return { data: null, error: err.message };
       }
+    },
+    async getAdRequests() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin/ads`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async updateAdRequestStatus(id, status) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin/ads`, {
+          method: 'PATCH',
+          body: JSON.stringify({ id, status }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
     }
   },
 
@@ -660,42 +690,6 @@ export const api = {
         return { data: null, error: err.message };
       }
     }
-  },
-
-  // ─── 북마크 (관심아이) ───────────────────────────────────
-  bookmarks: {
-    /** 특정 매물 북마크 여부 확인 */
-    async check(dogId) {
-      try {
-        const { data } = await request(`${BASE_URL}/api/bookmarks?action=check&dog_id=${dogId}`);
-        return { data, error: null };
-      } catch (err) {
-        return { data: null, error: err.message };
-      }
-    },
-
-    /** 북마크 목록 전체 조회 */
-    async getList() {
-      try {
-        const { data } = await request(`${BASE_URL}/api/bookmarks`);
-        return { data, error: null };
-      } catch (err) {
-        return { data: null, error: err.message };
-      }
-    },
-
-    /** 북마크 토글 (추가 or 제거) */
-    async toggle(dogId) {
-      try {
-        const { data } = await request(`${BASE_URL}/api/bookmarks?action=toggle`, {
-          method: 'POST',
-          body: JSON.stringify({ dog_id: dogId }),
-        });
-        return { data, error: null };
-      } catch (err) {
-        return { data: null, error: err.message };
-      }
-    },
   },
 
   // 10. 파일 업로드 (R2)
@@ -725,7 +719,7 @@ export const api = {
       let data;
       try {
         data = text ? JSON.parse(text) : {};
-      } catch (e) {
+      } catch {
         data = { message: text };
       }
 

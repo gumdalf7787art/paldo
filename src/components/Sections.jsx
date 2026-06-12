@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import { api } from '../lib/api';
@@ -820,7 +820,8 @@ const AdoptionList = () => {
         const { data } = await api.dogs.getList({ status: 'available', limit: 12 });
         if (Array.isArray(data)) setDogs(data);
         else setDogs([]);
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setDogs([]);
       } finally {
         setLoading(false);

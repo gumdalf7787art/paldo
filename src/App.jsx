@@ -23,7 +23,7 @@ const AnalyticsTracker = () => {
   useEffect(() => {
     const trackView = async () => {
       try {
-        const { data: user } = await api.auth.getUser();
+        await api.auth.getUser();
         
         // 상세 페이지 ID 추출 (State 또는 Query Parameter)
         const searchParams = new URLSearchParams(location.search);

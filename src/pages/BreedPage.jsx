@@ -131,12 +131,10 @@ const BreedPage = () => {
           <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b', marginBottom: (currentRegion || currentGender || currentPrice) ? '4px' : '0' }}>전체 {breedName} 분양 리스트</h2>
-                {(currentRegion || currentGender || currentPrice) && (
-                  <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '500' }}>
-                    🔍 조건: {breedName} / {currentRegion || '전국'} / {currentGender || '모두선택'} / {currentPrice || '전체'}
-                  </div>
-                )}
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>전체 {breedName} 분양 리스트</h2>
+                <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '500' }}>
+                  🔍 조건: {breedName === '전체' ? '품종전체' : breedName} / {currentRegion || '전국'} / {(!currentGender || currentGender === '모두선택') ? '남여전체' : currentGender} / {(!currentPrice || currentPrice === '전체') ? '가격전체' : currentPrice}
+                </div>
               </div>
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length + adDogs.length}</b>건</span>
             </div>

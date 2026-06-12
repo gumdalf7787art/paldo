@@ -137,6 +137,9 @@ const UploadForm = () => {
     if (!formData.name || !formData.breed || !formData.birthday) {
       return alert('강아지 이름, 견종, 생일은 필수 입력 사항입니다.');
     }
+    if (!formData.isFree && !formData.price) {
+      return alert('최종 할인가격은 필수 입력 사항입니다. (할인이 없는 경우 최초가격과 동일하게 입력해주세요)');
+    }
     setLoading(true);
 
     try {
@@ -380,7 +383,7 @@ const UploadForm = () => {
                 <input type="number" placeholder="예: 100" style={inputStyle} value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: e.target.value})} />
               </div>
               <div>
-                <label style={labelStyle}>할인가격 (만원)</label>
+                <label style={labelStyle}>최종 할인가격(만원) _ 필수입력</label>
                 <input type="number" placeholder="예: 80" style={inputStyle} value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
               </div>
             </div>

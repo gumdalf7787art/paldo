@@ -63,7 +63,7 @@ const AdSetupPage = () => {
   const adTypeDisplay = {
     'main': '메인페이지 메인배너 (메인페이지 최상단 노출)',
     'breed': '품종별페이지 메인배너 (품종별페이지 메인배너 및 상위노출)',
-    'section': '메인페이지 통합 섹션 광고 (안심/인기/스페셜 랜덤 배치)'
+    'section': '메인페이지 안심/인기/스페셜 광고 (안심/인기/스페셜 랜덤 배치)'
   };
 
   const formatAdLabel = (label) => {

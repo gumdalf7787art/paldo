@@ -33,6 +33,8 @@ const AdminPage = () => {
   const [issueData, setIssueData] = useState({ userId: '', couponId: '' });
   const [issueTargetType, setIssueTargetType] = useState('individual'); // 'individual', 'all_sellers'
   const [userSearch, setUserSearch] = useState('');
+  const [isIssuing, setIsIssuing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     checkAdmin();
@@ -142,6 +144,9 @@ const AdminPage = () => {
 
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
+    if (isCreating) return;
+    setIsCreating(true);
+
     const { error } = await api.admin.createCoupon({
       code: newCoupon.code,
       name: newCoupon.name,
@@ -151,6 +156,7 @@ const AdminPage = () => {
       ad_type: newCoupon.ad_type
     });
 
+    setIsCreating(false);
     if (error) {
       alert('생성 실패: ' + error);
     } else {
@@ -162,14 +168,20 @@ const AdminPage = () => {
 
   const handleIssueCoupon = async (e) => {
     e.preventDefault();
+    if (isIssuing) return;
     if (!issueData.couponId) return alert('발급할 쿠폰을 선택해 주세요.');
 
+    setIsIssuing(true);
     const selectedCoupon = coupons.find(c => c.id == issueData.couponId);
 
     if (issueTargetType === 'all_sellers') {
-      if (!window.confirm('모든 사업자 회원에게 쿠폰을 일괄 발급하시겠습니까?')) return;
+      if (!window.confirm('모든 사업자 회원에게 쿠폰을 일괄 발급하시겠습니까?')) {
+        setIsIssuing(false);
+        return;
+      }
       
       const { error } = await api.admin.issueCouponToAll(parseInt(issueData.couponId));
+      setIsIssuing(false);
       if (error) {
         return alert('일괄 발급 실패: ' + error);
       }
@@ -178,9 +190,13 @@ const AdminPage = () => {
       fetchAdminData();
     } else {
       // 개별 유저 발급
-      if (!issueData.userId) return alert('대상 유저를 선택해 주세요.');
+      if (!issueData.userId) {
+        setIsIssuing(false);
+        return alert('대상 유저를 선택해 주세요.');
+      }
 
       const { error } = await api.admin.issueCouponToUser(parseInt(issueData.couponId), issueData.userId);
+      setIsIssuing(false);
       if (error) {
         alert('발급 실패: ' + error);
       } else {
@@ -616,7 +632,9 @@ const AdminPage = () => {
                   </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <button type="submit" style={{ ...createBtnStyle, width: '100%', height: '45px' }}>쿠폰 템플릿 등록</button>
+                  <button type="submit" disabled={isCreating} style={{ ...createBtnStyle, width: '100%', height: '45px', backgroundColor: isCreating ? '#999' : '#2D3436', cursor: isCreating ? 'not-allowed' : 'pointer' }}>
+                    {isCreating ? '등록 중...' : '쿠폰 템플릿 등록'}
+                  </button>
                 </div>
               </form>
             </div>
@@ -679,7 +697,9 @@ const AdminPage = () => {
                     </select>
                   </div>
 
-                  <button type="submit" style={{ ...createBtnStyle, backgroundColor: 'var(--primary-dark)', height: '45px', padding: '0 30px' }}>쿠폰 발급하기</button>
+                  <button type="submit" disabled={isIssuing} style={{ ...createBtnStyle, backgroundColor: isIssuing ? '#999' : 'var(--primary-dark)', height: '45px', padding: '0 30px', cursor: isIssuing ? 'not-allowed' : 'pointer' }}>
+                    {isIssuing ? '발급 중...' : '쿠폰 발급하기'}
+                  </button>
                 </div>
               </form>
             </div>

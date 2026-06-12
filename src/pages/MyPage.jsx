@@ -899,7 +899,7 @@ const MyPage = () => {
                     ))}
                   </div>
 
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>보유 쿠폰 목록</h3>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>보유 광고 아이템 현황</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
                     {userCoupons.length > 0 ? userCoupons.map(coupon => (
                       <div key={coupon.user_coupon_id} style={{ padding: '20px', border: '1px solid #eee', borderRadius: '15px', backgroundColor: '#fffbf0', position: 'relative', overflow: 'hidden' }}>
@@ -911,7 +911,7 @@ const MyPage = () => {
                         <div style={{ fontSize: '0.75rem', color: coupon.is_used ? '#aaa' : 'var(--primary)', fontWeight: 'bold' }}>{coupon.is_used ? '사용 완료' : '사용 가능'}</div>
                       </div>
                     )) : (
-                      <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center' }}>보유 중인 광고 쿠폰이 없습니다.</div>
+                      <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center' }}>보유한 광고 아이템이 없습니다.</div>
                     )}
                   </div>
                 </div>

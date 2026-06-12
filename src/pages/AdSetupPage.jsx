@@ -72,7 +72,7 @@ const AdSetupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedCoupon) {
-      alert('광고를 진행하시려면 사용하실 쿠폰을 먼저 선택해 주세요.');
+      alert('광고를 진행하시려면 사용할 광고 아이템을 먼저 선택해 주세요.');
       return;
     }
     if (adType === 'main' && activeMainAds >= maxMainAds) {
@@ -193,22 +193,22 @@ const AdSetupPage = () => {
             </div>
           </div>
 
-          {/* 결제 및 쿠폰 */}
+          {/* 결제 및 아이템 */}
           <div style={{ borderTop: '2px dashed #eee', paddingTop: '25px' }}>
-            <label style={labelStyle}>결제 방법 (현재 쿠폰으로만 운영됩니다)</label>
+            <label style={labelStyle}>사용할 광고 아이템 선택</label>
             <div style={{ backgroundColor: '#fffbf0', padding: '20px', borderRadius: '15px', border: '1px solid #ffeeba' }}>
               <select 
                 value={selectedCoupon} 
                 onChange={(e) => setSelectedCoupon(e.target.value)}
                 style={{ width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #ffd700', outline: 'none', backgroundColor: 'white', color: '#333', fontSize: '0.95rem', fontWeight: 'bold' }}
               >
-                <option value="">🎁 사용할 쿠폰을 선택해 주세요</option>
+                <option value="">🎁 사용할 광고 아이템을 선택해 주세요</option>
                 {coupons.map(c => (
-                  <option key={c.id} value={c.id}>{c.name || '무명 쿠폰'} ({c.discount_rate}% 할인)</option>
+                  <option key={c.id} value={c.id}>{c.name || '무명 아이템'} ({c.discount_rate}% 할인)</option>
                 ))}
               </select>
               {coupons.length === 0 && (
-                <p style={{ color: '#ff4757', fontSize: '0.85rem', marginTop: '10px', fontWeight: 'bold' }}>사용 가능한 쿠폰이 없습니다. 플랫폼 관리자 문의를 통해 쿠폰을 획득해주세요.</p>
+                <p style={{ color: '#ff4757', fontSize: '0.85rem', marginTop: '10px', fontWeight: 'bold' }}>사용 가능한 광고 아이템이 없습니다. 플랫폼 관리자 문의를 통해 아이템을 획득해주세요.</p>
               )}
             </div>
           </div>

@@ -93,7 +93,7 @@ export async function onRequestGet(context) {
   if (action === 'coupons') {
     try {
       const { results: coupons } = await env.DB.prepare(`
-        SELECT uc.id, uc.user_id, uc.coupon_id, uc.is_used, uc.used_at, uc.created_at,
+        SELECT uc.id, uc.user_id, uc.coupon_id, uc.is_used, uc.used_at, uc.created_at, uc.expires_at,
                c.name, c.discount_rate, c.code, c.ad_type
         FROM user_coupons uc
         INNER JOIN coupons c ON uc.coupon_id = c.id

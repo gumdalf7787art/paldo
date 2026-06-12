@@ -63,10 +63,19 @@ const AdSetupPage = () => {
 
   const adTypeDisplay = {
     'main': '메인페이지 메인배너 (메인페이지 최상단 노출)',
-    'breed': '품종별 페이지 메인배너 (품종별 페이지 메인배너 및 상위노출)',
+    'breed': '품종별페이지 메인배너 (품종별페이지 메인배너 및 상위노출)',
     'safe': '메인페이지 안심분양 (메인페이지 안심분양 노출)',
     'popular': '메인페이지 인기분양 (메인페이지 인기분양 노출)',
     'special': '메인페이지 스페셜분양 (메인페이지 스페셜분양 노출)'
+  };
+
+  const formatAdLabel = (label) => {
+    if (label.startsWith('메인페이지')) {
+      return <><span style={{ color: '#4A90E2' }}>메인페이지</span> {label.substring(5)}</>;
+    } else if (label.startsWith('품종별페이지')) {
+      return <><span style={{ color: '#7ED321' }}>품종별페이지</span> {label.substring(6)}</>;
+    }
+    return label;
   };
 
   const handleSubmit = async (e) => {
@@ -161,7 +170,7 @@ const AdSetupPage = () => {
                           {adType === val && <div style={{ width: '10px', height: '10px', backgroundColor: 'var(--primary)', borderRadius: '50%' }}></div>}
                         </div>
                         <span style={{ fontWeight: adType === val ? '800' : '500', color: adType === val ? 'var(--primary-dark)' : '#333' }}>
-                          {label}
+                          {formatAdLabel(label)}
                         </span>
                       </div>
                       {val === 'main' && (
@@ -189,7 +198,9 @@ const AdSetupPage = () => {
                 {coupons
                   .filter(c => c.ad_type === 'all' || c.ad_type === adType)
                   .map(c => (
-                    <option key={c.id} value={c.id}>{c.name || '무명 아이템'} ({c.discount_rate}일권)</option>
+                    <option key={c.id} value={c.id}>
+                      {c.name || '무명 아이템'} (기한: {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '무제한'})
+                    </option>
                 ))}
               </select>
               {coupons.filter(c => c.ad_type === 'all' || c.ad_type === adType).length === 0 && (

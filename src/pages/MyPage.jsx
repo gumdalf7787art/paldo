@@ -261,7 +261,7 @@ const MyPage = () => {
   };
 
   const getAdInfo = (dogId) => {
-    const activeAd = myAds.find(ad => ad.id === dogId && ad.ad_status === 'active');
+    const activeAd = myAds.find(ad => ad.dog_id === dogId && ad.ad_status === 'active');
     if (!activeAd) return null;
     
     const endDate = new Date(activeAd.end_date);
@@ -274,6 +274,18 @@ const MyPage = () => {
       type: typeMap[activeAd.ad_type] || activeAd.ad_type,
       remainDays: remainDays > 0 ? remainDays : 0
     };
+  };
+
+  const renderAdName = (name) => {
+    if (!name) return name;
+    if (name.includes('메인페이지')) {
+      const suffix = name.replace('메인페이지', '').trim();
+      return <><span style={{ color: '#4A90E2' }}>메인페이지</span> <span style={{ color: '#333' }}>{suffix}</span></>;
+    } else if (name.includes('품종별페이지')) {
+      const suffix = name.replace('품종별페이지', '').trim();
+      return <><span style={{ color: '#7ED321' }}>품종별페이지</span> <span style={{ color: '#333' }}>{suffix}</span></>;
+    }
+    return <span style={{ color: '#333' }}>{name}</span>;
   };
 
   const handleMarkAsRead = async (id, isRead) => {
@@ -950,9 +962,12 @@ const MyPage = () => {
                     {userCoupons.length > 0 ? userCoupons.map(coupon => (
                       <div key={coupon.user_coupon_id} style={{ padding: '20px', border: '1px solid #eee', borderRadius: '15px', backgroundColor: '#fffbf0', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', right: '-10px', top: '-10px', width: '50px', height: '50px', backgroundColor: '#ffd700', borderRadius: '50%', opacity: 0.2 }}></div>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#e6a800' }}>🎁 {coupon.name}</h4>
+                        <h4 style={{ margin: '0 0 10px 0', color: '#e6a800' }}>🎁 {renderAdName(coupon.name)}</h4>
+                        <div style={{ fontSize: '0.8rem', color: '#e67e22', marginBottom: '8px', fontWeight: 'bold' }}>
+                          사용 가능 기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '제한 없음 (무제한)'}
+                        </div>
                         <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>
-                          {coupon.description}
+                          {coupon.ad_type !== 'all' && coupon.ad_type ? `광고 적용 시 ${coupon.discount_rate}일간 진행됩니다.` : coupon.description}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: coupon.is_used ? '#aaa' : 'var(--primary)', fontWeight: 'bold' }}>{coupon.is_used ? '사용 완료' : '사용 가능'}</div>
                       </div>

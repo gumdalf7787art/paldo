@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import { api } from '../lib/api';
-import sidebarAd from '../assets/images/sidebar_ad.png';
-import petInsuranceBanner from '../assets/images/pet_insurance_banner.png';
-import petShopBanner from '../assets/images/pet_shop_banner.png';
 import { calculateAge } from '../utils/age';
 
-export const DynamicBanner = ({ banners, defaultImage, height = '140px', slotName }) => {
+export const DynamicBanner = ({ banners, height = '140px' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -596,28 +593,30 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   );
 };
 
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </div>
-    </div>
-  );
-};
 
 const AdSections = () => {
   const [safeDogs, setSafeDogs] = useState([]);
   const [popularDogs, setPopularDogs] = useState([]);
   const [specialDogs, setSpecialDogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [systemBanners, setSystemBanners] = useState({});
 
   useEffect(() => {
     const loadAllSections = async () => {
       try {
         // 섹션 통합 광고(section) 데이터 풀을 한 번에 60개 가져옵니다.
-        const allSectionAds = await Promise.race([
-          fetchAdsAndFill('section', 60, '추천'), 
-          timeoutPromise(2500)
+        const [allSectionAds, bannerDataResponse] = await Promise.all([
+          Promise.race([
+            fetchAdsAndFill('section', 60, '추천'), 
+            timeoutPromise(2500)
+          ]),
+          api.banners.getList()
         ]);
 
         const ads = allSectionAds || [];
+        if (bannerDataResponse.data) {
+          setSystemBanners(bannerDataResponse.data);
+        }
         
         // 가져온 전체 광고를 3등분하여 안심, 인기, 스페셜 구역에 무작위 배치합니다.
         // 현재 fetchAdsAndFill 내부에서 shuffleArray가 동작하므로 이미 섞여 있습니다.
@@ -639,10 +638,20 @@ const AdSections = () => {
   return (
     <>
       <AdSectionItem title="🛡️ 안심 분양 정보" sub="다잇독이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
-      <PetInsuranceBanner />
+      
+      <DynamicBanner 
+        banners={systemBanners.main_bottom_a} 
+        slotName="main_bottom_a" 
+      />
+
       <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
+      
+      <DynamicBanner 
+        banners={systemBanners.main_bottom_b} 
+        slotName="main_bottom_b" 
+      />
+
       <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />
-      <PetShopBanner />
     </>
   );
 };
@@ -702,43 +711,25 @@ const AdoptionList = () => {
 
 
 const LoginWidget = () => {
+  const [banners, setBanners] = useState({});
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      const { data } = await api.banners.getList();
+      if (data) {
+        setBanners(data);
+      }
+    };
+    fetchBanners();
+  }, []);
+
   return (
-    <div 
-      className="naver-profile-widget" 
-      style={{ 
-        padding: '0', 
-        overflow: 'hidden', 
-        cursor: 'pointer',
-        display: 'block',
-        height: '240px',
-        position: 'relative'
-      }}
-      onClick={() => window.open('https://github.com/gumdalf7787art/paldo', '_blank')}
-    >
-      <img 
-        src={sidebarAd} 
-        alt="광고 배너" 
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover',
-          display: 'block'
-        }} 
+    <div style={{ marginBottom: '10px' }}>
+      <DynamicBanner 
+        banners={banners.main_sidebar} 
+        slotName="main_sidebar" 
+        height="240px" 
       />
-      <span style={{
-        position: 'absolute',
-        bottom: '8px',
-        right: '8px',
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        color: 'white',
-        fontSize: '0.62rem',
-        padding: '2px 6px',
-        borderRadius: '4px',
-        fontWeight: 'bold',
-        letterSpacing: '0.5px'
-      }}>
-        AD
-      </span>
     </div>
   );
 };

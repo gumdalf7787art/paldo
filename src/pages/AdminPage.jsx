@@ -449,13 +449,21 @@ const AdminPage = () => {
                   <th style={thStyle}>등록일</th>
                   <th style={thStyle}>판매자 ID</th>
                   <th style={thStyle}>상태</th>
+                  <th style={{ ...thStyle, textAlign: 'center' }}>바로가기</th>
                   <th style={{ ...thStyle, textAlign: 'center' }}>관리</th>
                 </tr>
               </thead>
               <tbody>
                 {dogs.map(dog => (
                   <tr key={dog.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={tdStyle}><img src={dog.image_url} alt="dog" style={{ width: '50px', height: '50px', borderRadius: '5px', objectFit: 'cover' }}/></td>
+                    <td style={tdStyle}>
+                      <img 
+                        src={dog.images ? (typeof dog.images === 'string' && dog.images.startsWith('[') ? JSON.parse(dog.images)[0] : (Array.isArray(dog.images) ? dog.images[0] : dog.images)) : 'https://via.placeholder.com/50'} 
+                        alt="dog" 
+                        style={{ width: '50px', height: '50px', borderRadius: '5px', objectFit: 'cover', backgroundColor: '#f0f0f0' }}
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/50'; }}
+                      />
+                    </td>
                     <td style={tdStyle}>
                       <strong>{dog.breed}</strong><br/>
                       <span style={{ fontSize: '0.8rem', color: '#888' }}>{dog.nickname}</span>
@@ -467,6 +475,14 @@ const AdminPage = () => {
                       <span style={{ padding: '4px 8px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                         {dog.status === 'available' ? '분양중' : '분양완료'}
                       </span>
+                    </td>
+                    <td style={{ ...tdStyle, textAlign: 'center' }}>
+                      <button 
+                        onClick={() => navigate(`/detail/${dog.id}`)} 
+                        style={{ ...tableBtnStyle, backgroundColor: '#3498db', fontSize: '0.8rem', padding: '5px 10px' }}
+                      >
+                        게시물 보기
+                      </button>
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
                       <button 

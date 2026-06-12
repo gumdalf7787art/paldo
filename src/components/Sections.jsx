@@ -172,6 +172,24 @@ const HeroCarousel = ({ breedName }) => {
           position: 'relative'
         }}
       >
+        {/* 상단 우측 AD 뱃지 (박스 전체가 광고임을 명시) */}
+        <div style={{
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          backgroundColor: '#f1f5f9',
+          color: '#64748b',
+          fontSize: '0.65rem',
+          fontWeight: '800',
+          padding: '3px 8px',
+          borderBottomLeftRadius: '10px',
+          zIndex: 15,
+          borderLeft: '1px solid #e2e8f0',
+          borderBottom: '1px solid #e2e8f0',
+          letterSpacing: '0.5px'
+        }}>
+          AD
+        </div>
         {/* 좌측 화살표 버튼 */}
         <button 
           onClick={handlePrev}
@@ -290,10 +308,27 @@ const HeroCarousel = ({ breedName }) => {
   );
 };
 
-const SectionTitle = ({ title, sub }) => (
-  <div className="section-title-wrap" style={{ marginBottom: '15px' }}>
-    <h2 style={{ fontSize: '1.4rem' }}>{title}</h2>
-    <span style={{ fontSize: '0.85rem' }}>{sub}</span>
+const SectionTitle = ({ title, sub, isAd }) => (
+  <div className="section-title-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '15px' }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+      <h2 style={{ fontSize: '1.4rem', margin: 0 }}>{title}</h2>
+      <span style={{ fontSize: '0.85rem' }}>{sub}</span>
+    </div>
+    {isAd && (
+      <span style={{ 
+        fontSize: '0.7rem', 
+        fontWeight: '800', 
+        backgroundColor: '#f1f5f9', 
+        color: '#64748b', 
+        padding: '3px 8px', 
+        borderRadius: '6px', 
+        border: '1px solid #e2e8f0',
+        letterSpacing: '0.5px',
+        flexShrink: 0
+      }}>
+        AD
+      </span>
+    )}
   </div>
 );
 
@@ -393,7 +428,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
       marginBottom: '10px',
       position: 'relative'
     }}>
-      <SectionTitle title={title} sub={sub} />
+      <SectionTitle title={title} sub={sub} isAd={true} />
       
       {loading && dogs.length === 0 ? (
         <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>

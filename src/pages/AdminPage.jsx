@@ -21,6 +21,8 @@ const AdminPage = () => {
   const [adRequests, setAdRequests] = useState([]);
   const [banners, setBanners] = useState({});
   const [bannerUploadForm, setBannerUploadForm] = useState({ slot_key: '', image_url: '', link_url: '' });
+  const [bannerUploadFile, setBannerUploadFile] = useState(null);
+  const [isBannerUploading, setIsBannerUploading] = useState(false);
   const navigate = useNavigate();
 
   // 쿠폰 생성용 상태
@@ -284,16 +286,38 @@ const AdminPage = () => {
 
   const handleBannerSubmit = async (e) => {
     e.preventDefault();
-    if (!bannerUploadForm.slot_key || !bannerUploadForm.image_url) {
-      return alert('슬롯 키와 이미지 URL을 입력해 주세요.');
+    if (!bannerUploadForm.slot_key) {
+      return alert('슬롯을 선택해 주세요.');
     }
-    const { error } = await api.banners.adminCreate(bannerUploadForm);
-    if (error) {
-      alert('배너 등록 실패: ' + error);
-    } else {
+    if (!bannerUploadFile && !bannerUploadForm.image_url) {
+      return alert('배너 이미지를 첨부하거나 이미지 URL을 입력해 주세요.');
+    }
+
+    setIsBannerUploading(true);
+    let finalImageUrl = bannerUploadForm.image_url;
+
+    try {
+      if (bannerUploadFile) {
+        const { data: uploadData, error: uploadError } = await api.uploadFile(bannerUploadFile);
+        if (uploadError) throw new Error(uploadError);
+        finalImageUrl = uploadData.url;
+      }
+
+      const { error } = await api.banners.adminCreate({ ...bannerUploadForm, image_url: finalImageUrl });
+      if (error) throw new Error(error);
+
       alert('배너가 정상적으로 등록되었습니다.');
       setBannerUploadForm({ slot_key: '', image_url: '', link_url: '' });
+      setBannerUploadFile(null);
+      // 파일 input 초기화
+      const fileInput = document.getElementById('banner-file-input');
+      if (fileInput) fileInput.value = '';
+      
       fetchAdminData();
+    } catch (err) {
+      alert('배너 등록 실패: ' + err.message);
+    } finally {
+      setIsBannerUploading(false);
     }
   };
 
@@ -910,15 +934,24 @@ const AdminPage = () => {
                     </select>
                   </div>
                   <div style={{ flex: 2, minWidth: '300px' }}>
-                    <label style={smallLabel}>이미지 URL</label>
-                    <input 
-                      required 
-                      type="url" 
-                      style={adminInput} 
-                      placeholder="https://... (이미지 절대 주소)" 
-                      value={bannerUploadForm.image_url} 
-                      onChange={e => setBannerUploadForm({...bannerUploadForm, image_url: e.target.value})} 
-                    />
+                    <label style={smallLabel}>배너 이미지 첨부 (또는 URL 입력)</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <input 
+                        id="banner-file-input"
+                        type="file" 
+                        accept="image/*"
+                        style={adminInput}
+                        onChange={e => setBannerUploadFile(e.target.files[0])}
+                      />
+                      <input 
+                        type="url" 
+                        style={adminInput} 
+                        placeholder="직접 URL 입력 시 (예: https://...)" 
+                        value={bannerUploadForm.image_url} 
+                        onChange={e => setBannerUploadForm({...bannerUploadForm, image_url: e.target.value})} 
+                        disabled={!!bannerUploadFile}
+                      />
+                    </div>
                   </div>
                   <div style={{ flex: 2, minWidth: '300px' }}>
                     <label style={smallLabel}>클릭 시 이동할 링크 URL (선택)</label>
@@ -930,8 +963,8 @@ const AdminPage = () => {
                       onChange={e => setBannerUploadForm({...bannerUploadForm, link_url: e.target.value})} 
                     />
                   </div>
-                  <button type="submit" style={createBtnStyle}>
-                    배너 등록
+                  <button type="submit" disabled={isBannerUploading} style={{ ...createBtnStyle, backgroundColor: isBannerUploading ? '#999' : 'var(--primary-dark)', cursor: isBannerUploading ? 'not-allowed' : 'pointer' }}>
+                    {isBannerUploading ? '업로드 중...' : '배너 등록'}
                   </button>
                 </div>
               </form>

@@ -159,15 +159,7 @@ const BreedPage = () => {
                         <Card 
                           key={dog.id} 
                           type="medium" 
-                          data={{
-                            ...dog,
-                            breed: dog.breed || breedName,
-                            nickname: dog.nickname || '이름 없음',
-                            gender: dog.gender || '-',
-                            region: dog.region || '지역 미지정',
-                            age: calculateAge(dog.birthday, dog.age),
-                            price: dog.price
-                          }} 
+                          data={dog} 
                         />
                       ))}
                     </div>
@@ -185,15 +177,7 @@ const BreedPage = () => {
                         <Card 
                           key={dog.id} 
                           type="medium" 
-                          data={{
-                            ...dog,
-                            breed: dog.breed || breedName,
-                            nickname: dog.nickname || '이름 없음',
-                            gender: dog.gender || '-',
-                            region: dog.region || '지역 미지정',
-                            age: calculateAge(dog.birthday, dog.age),
-                            price: dog.price
-                          }} 
+                          data={dog} 
                         />
                       ))}
                     </div>

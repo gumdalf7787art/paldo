@@ -67,16 +67,13 @@ const BreedPage = () => {
           }
 
           const adDogIds = new Set(ads.map(ad => ad.id));
-          const sortedDogs = filteredDogs.sort((a, b) => {
-            const aIsAd = adDogIds.has(a.id);
-            const bIsAd = adDogIds.has(b.id);
-            if (aIsAd && !bIsAd) return -1;
-            if (!aIsAd && bIsAd) return 1;
-            return 0;
-          }).map(dog => ({
-            ...dog,
-            image: dog.image_url
-          }));
+          const sortedDogs = filteredDogs
+            .filter(dog => !adDogIds.has(dog.id))
+            .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+            .map(dog => ({
+              ...dog,
+              image: dog.image_url
+            }));
           setRegularDogs(sortedDogs);
         }
       } catch (err) {
@@ -117,44 +114,100 @@ const BreedPage = () => {
       {/* 4. 2컬럼 레이아웃 (메인 리스트 / 우측 사이드바) */}
       <div className="main-portal-layout">
         
-        {/* 좌측: 통합 그리드 리스트 */}
         <div className="portal-main-col">
           <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b' }}>전체 {breedName} 분양 리스트</h2>
-              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length}</b>건</span>
+              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length + adDogs.length}</b>건</span>
             </div>
             
             {loading ? (
               <div style={{ padding: '60px 0', textAlign: 'center', color: '#999' }}>데이터를 불러오는 중입니다...</div>
-            ) : regularDogs.length === 0 ? (
+            ) : regularDogs.length === 0 && adDogs.length === 0 ? (
               <div style={{ padding: '80px 0', textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🐶</div>
                 <p style={{ color: '#64748b', fontWeight: '600' }}>현재 조건에 맞는 {breedName} 분양 매물이 없습니다.</p>
               </div>
             ) : (
-              <div className="adoption-grid">
-                {regularDogs.map(dog => {
-                  const isPremium = adDogs.some(ad => ad.id === dog.id);
-                  return (
-                    <Card 
-                      key={dog.id} 
-                      type="small" 
-                      data={dog} 
-                      badgeText={isPremium ? "추천" : undefined}
-                    />
-                  );
-                })}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                
+                {/* 1. 프리미엄 스폰서 블록 */}
+                {adDogs.length > 0 && (
+                  <div style={{ 
+                    backgroundColor: '#fffbeb', 
+                    borderRadius: '12px',
+                    padding: '20px',
+                    border: '1px solid #fcd34d'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#b45309', margin: 0 }}>🌟 프리미엄 스폰서</h3>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        fontWeight: '800', 
+                        backgroundColor: '#fef3c7', 
+                        color: '#b45309', 
+                        padding: '3px 8px', 
+                        borderRadius: '6px', 
+                        border: '1px solid #fde68a',
+                        letterSpacing: '0.5px'
+                      }}>
+                        AD
+                      </span>
+                    </div>
+                    <div className="adoption-grid">
+                      {adDogs.map(dog => (
+                        <Card 
+                          key={dog.id} 
+                          type="medium" 
+                          data={{
+                            ...dog,
+                            breed: dog.breed || breedName,
+                            nickname: dog.nickname || '이름 없음',
+                            gender: dog.gender || '-',
+                            region: dog.region || '지역 미지정',
+                            age: calculateAge(dog.birthday, dog.age),
+                            price: dog.price
+                          }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. 일반 분양 리스트 */}
+                {regularDogs.length > 0 && (
+                  <div>
+                    {adDogs.length > 0 && (
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#334155', marginBottom: '16px', paddingLeft: '4px' }}>일반 분양 리스트</h3>
+                    )}
+                    <div className="adoption-grid">
+                      {regularDogs.map(dog => (
+                        <Card 
+                          key={dog.id} 
+                          type="medium" 
+                          data={{
+                            ...dog,
+                            breed: dog.breed || breedName,
+                            nickname: dog.nickname || '이름 없음',
+                            gender: dog.gender || '-',
+                            region: dog.region || '지역 미지정',
+                            age: calculateAge(dog.birthday, dog.age),
+                            price: dog.price
+                          }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
           </section>
         </div>
 
-        {/* 우측: 사이드바 */}
         <div className="portal-side-col">
           <LoginWidget />
           
-          {/* 입양 안내 위젯 */}
           <div style={{
             backgroundColor: '#FFF8F6',
             border: '1px solid #FFECE5',

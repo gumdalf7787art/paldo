@@ -203,7 +203,7 @@ export async function onRequestPost(context) {
 
       // 알림 생성
       await env.DB.prepare(
-        'INSERT INTO notifications (user_id, type, message, link_url) VALUES (?, "system", "🎉 축하합니다! 판매자 자격 신청이 승인되었고, 웰컴 광고 쿠폰이 지급되었습니다.", "/mypage")'
+        'INSERT INTO notifications (user_id, type, message) VALUES (?, "system", "🎉 축하합니다! 판매자 자격 신청이 승인되었고, 웰컴 광고 쿠폰이 지급되었습니다.")'
       )
         .bind(user_id)
         .run();
@@ -296,8 +296,8 @@ export async function onRequestPost(context) {
 
       // 알림 생성
       await env.DB.prepare(
-        `INSERT INTO notifications (user_id, type, message, link_url) 
-         SELECT id, 'system', ?, '/mypage' FROM profiles`
+        `INSERT INTO notifications (user_id, type, message) 
+         SELECT id, 'system', ? FROM profiles`
       )
         .bind(`🎁 관리자가 모든 회원에게 '${coupon.name}' 쿠폰을 선물했습니다!`)
         .run();
@@ -324,7 +324,7 @@ export async function onRequestPost(context) {
         .run();
 
       await env.DB.prepare(
-        'INSERT INTO notifications (user_id, type, message, link_url) VALUES (?, "system", ?, "/mypage")'
+        'INSERT INTO notifications (user_id, type, message) VALUES (?, "system", ?)'
       )
         .bind(user_id, `🎁 관리자가 '${coupon.name}' 쿠폰을 선물했습니다! 마이페이지에서 확인해 보세요.`)
         .run();
@@ -344,8 +344,8 @@ export async function onRequestPost(context) {
 
     try {
       await env.DB.prepare(
-        `INSERT INTO notifications (user_id, type, message, link_url) 
-         SELECT id, 'system', ?, '/' FROM profiles`
+        `INSERT INTO notifications (user_id, type, message) 
+         SELECT id, 'system', ? FROM profiles`
       )
         .bind(message)
         .run();

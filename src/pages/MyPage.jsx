@@ -83,6 +83,7 @@ const MyPage = () => {
   const [bookmarks, setBookmarks] = useState([]);
   const [chatRooms, setChatRooms] = useState([]);
   const [myDogs, setMyDogs] = useState([]); 
+  const [myAds, setMyAds] = useState([]);
   const [dogStats, setDogStats] = useState({});
   const [chartData, setChartData] = useState([]);
   const [userCoupons, setUserCoupons] = useState([]);
@@ -212,6 +213,10 @@ const MyPage = () => {
     const { data: dogsData } = await api.dogs.getList({ seller_id: userId });
     setMyDogs(dogsData || []);
 
+    // 1.5. 진행 중인 내 광고 가져오기
+    const { data: adsData } = await api.ads.getList({ user_id: userId, status: 'active' });
+    setMyAds(adsData || []);
+
     // 2. 게시물별 통계 가져오기
     const statsMap = {};
     if (dogsData) {
@@ -253,6 +258,22 @@ const MyPage = () => {
   const fetchMyNotifications = async () => {
     const { data } = await api.notifications.getList();
     if (data) setMyNotifications(data);
+  };
+
+  const getAdInfo = (dogId) => {
+    const activeAd = myAds.find(ad => ad.id === dogId && ad.ad_status === 'active');
+    if (!activeAd) return null;
+    
+    const endDate = new Date(activeAd.end_date);
+    const diff = endDate - new Date();
+    const remainDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    
+    const typeMap = { 'main': '메인배너', 'safe': '안심분양', 'popular': '인기분양', 'special': '스페셜' };
+    
+    return {
+      type: typeMap[activeAd.ad_type] || activeAd.ad_type,
+      remainDays: remainDays > 0 ? remainDays : 0
+    };
   };
 
   const handleMarkAsRead = async (id, isRead) => {
@@ -860,12 +881,15 @@ const MyPage = () => {
                           <th style={thStyle}>사진</th>
                           <th style={thStyle}>견종/이름</th>
                           <th style={thStyle}>상태</th>
+                          <th style={thStyle}>진행중인 광고</th>
                           <th style={{ ...thStyle, textAlign: 'center' }}>광고 설정</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {myDogs.map(dog => (
-                          <tr key={dog.id} style={{ borderBottom: '1px solid #eee' }}>
+                        {myDogs.map(dog => {
+                          const adInfo = getAdInfo(dog.id);
+                          return (
+                            <tr key={dog.id} style={{ borderBottom: '1px solid #eee' }}>
                             <td style={tdStyle}><img src={dog.image_url} alt="dog" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }}/></td>
                             <td style={tdStyle}>
                               <strong>{dog.breed}</strong><br/>
@@ -874,11 +898,22 @@ const MyPage = () => {
                             <td style={tdStyle}>
                               <span style={{ padding: '4px 8px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>분양중</span>
                             </td>
+                            <td style={tdStyle}>
+                              {adInfo ? (
+                                <div>
+                                  <div style={{ fontWeight: 'bold', color: 'var(--primary-dark)', fontSize: '0.85rem' }}>{adInfo.type}</div>
+                                  <div style={{ fontSize: '0.75rem', color: '#ff4757', marginTop: '3px' }}>{adInfo.remainDays}일 남음</div>
+                                </div>
+                              ) : (
+                                <span style={{ color: '#aaa', fontSize: '0.8rem' }}>진행중인 광고 없음</span>
+                              )}
+                            </td>
                             <td style={{ ...tdStyle, textAlign: 'center' }}>
                               <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', padding: '10px 15px' }}>📢 광고 설정하기</button>
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                     {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
@@ -887,16 +922,27 @@ const MyPage = () => {
                   {/* 모바일 카드 리스트 (광고) */}
                   <div className="post-card-list" style={{ marginBottom: '30px' }}>
                     {myDogs.length === 0 && <div style={emptyStyle}>등록된 분양글이 없습니다.</div>}
-                    {myDogs.map(dog => (
-                      <div key={dog.id} className="post-mobile-card">
-                        <img src={dog.image_url} alt="dog" style={{ width: '72px', height: '72px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
-                          <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '10px' }}>{dog.nickname} · {dog.region}</div>
-                          <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
+                    {myDogs.map(dog => {
+                      const adInfo = getAdInfo(dog.id);
+                      return (
+                        <div key={dog.id} className="post-mobile-card">
+                          <img src={dog.image_url} alt="dog" style={{ width: '72px', height: '72px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
+                            <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '10px' }}>{dog.nickname} · {dog.region}</div>
+                            
+                            {adInfo && (
+                              <div style={{ backgroundColor: '#fffbf0', padding: '8px 12px', borderRadius: '8px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--primary-dark)' }}>{adInfo.type} 진행중</span>
+                                <span style={{ fontSize: '0.75rem', color: '#ff4757', fontWeight: 'bold' }}>{adInfo.remainDays}일 남음</span>
+                              </div>
+                            )}
+
+                            <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>보유 광고 아이템 현황</h3>

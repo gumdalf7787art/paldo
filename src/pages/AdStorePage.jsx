@@ -194,6 +194,8 @@ const AdStorePage = () => {
                 입금 완료 / 신청하기
               </button>
             </div>
+            
+            </div>
           </div>
         </div>
       )}

@@ -41,6 +41,12 @@ const SignupPage = () => {
   const [isCertified, setIsCertified] = useState(false);
   const [certifiedInfo, setCertifiedInfo] = useState(null);
 
+  useEffect(() => {
+    if (window.IMP) {
+      window.IMP.init('imp14397622'); // 테스트 본인인증 작동을 보장하기 위해 데모 계정 코드로 강제 하드코딩
+    }
+  }, []);
+
   const handleCertification = () => {
     if (!window.IMP) {
       alert('포트원 라이브러리가 로드되지 않았습니다.');

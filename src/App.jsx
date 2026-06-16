@@ -16,6 +16,8 @@ import BreedPage from './pages/BreedPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import AdStorePage from './pages/AdStorePage'
 import RefundPolicyPage from './pages/RefundPolicyPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
@@ -112,6 +114,8 @@ function App() {
           <Route path="/breed/:breedName" element={<BreedPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/refund" element={<RefundPolicyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Routes>
         <footer style={{ 
           padding: '60px 0', 
@@ -131,8 +135,8 @@ function App() {
                 <p style={{ fontSize: '12px' }}>© 2024 Daitdog. All rights reserved.</p>
               </div>
               <div style={{ display: 'flex', gap: '25px', fontSize: '14px', flexWrap: 'wrap' }}>
-                <span style={{ cursor: 'pointer' }}>개인정보처리방침</span>
-                <span style={{ cursor: 'pointer' }}>이용약관</span>
+                <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>
+                <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>이용약관</Link>
                 <Link to="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
                 <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1538703544" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>사업자정보확인</a>
               </div>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom'
 import { api } from './lib/api'
 import Header from './components/Header'
 import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from './components/Sections'
@@ -15,6 +15,7 @@ import StorePage from './pages/StorePage'
 import BreedPage from './pages/BreedPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import AdStorePage from './pages/AdStorePage'
+import RefundPolicyPage from './pages/RefundPolicyPage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
@@ -110,6 +111,7 @@ function App() {
           <Route path="/store/:sellerId" element={<StorePage />} />
           <Route path="/breed/:breedName" element={<BreedPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/refund" element={<RefundPolicyPage />} />
         </Routes>
         <footer style={{ 
           padding: '60px 0', 
@@ -118,19 +120,21 @@ function App() {
           marginTop: '100px'
         }}>
           <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '30px' }}>
               <div>
                 <h2 style={{ color: 'white', marginBottom: '10px' }}>다잇독</h2>
-                <div style={{ fontSize: '13px', lineHeight: '1.6', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
-                  블루프라임 &nbsp;&nbsp; 대표 : 김덕규 &nbsp;&nbsp; 사업자등록번호 : 153-87-03544<br />
-                  이메일 : goodduck2@naver.com
+                <div style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
+                  (주)블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544<br />
+                  주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
+                  고객센터 : 02-1234-5678 (임시) &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
                 </div>
                 <p style={{ fontSize: '12px' }}>© 2024 Daitdog. All rights reserved.</p>
               </div>
-              <div style={{ display: 'flex', gap: '30px', fontSize: '14px' }}>
-                <span>개인정보처리방침</span>
-                <span>이용약관</span>
-                <span>사업자정보확인</span>
+              <div style={{ display: 'flex', gap: '25px', fontSize: '14px', flexWrap: 'wrap' }}>
+                <span style={{ cursor: 'pointer' }}>개인정보처리방침</span>
+                <span style={{ cursor: 'pointer' }}>이용약관</span>
+                <Link to="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
+                <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1538703544" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>사업자정보확인</a>
               </div>
             </div>
           </div>

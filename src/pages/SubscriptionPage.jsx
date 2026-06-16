@@ -17,9 +17,9 @@ const SubscriptionPage = () => {
     };
     loadUser();
 
-    // 포트원 SDK 초기화 (데모 상점 코드 하드코딩)
+    // 포트원 SDK 초기화 (다잇독 가맹점 코드)
     if (window.IMP) {
-      window.IMP.init('imp14397622');
+      window.IMP.init('imp37213066');
     }
   }, []);
 
@@ -71,12 +71,12 @@ const SubscriptionPage = () => {
 
     // 포트원 빌링키 발급 요청 (IMP.request_pay에 customer_uid 전달)
     window.IMP.request_pay({
-      pg: 'html5_inicis', // 이니시스 일반결제로 우회 (심사용 캡처를 위해 에러 회피)
+      pg: 'html5_inicis.INIBillTst', // 이니시스 정기결제(빌링) 데모
       pay_method: 'card',
       merchant_uid: merchantUid,
       name: `다잇독 월 정기구독 (${plan.name})`,
-      amount: 100, // 일반결제 테스트를 위해 최소금액 100원 설정
-      // customer_uid: customerUid, // ❗빌링 계약이 없어서 나는 에러를 막기 위해 임시 주석 처리. 실제 빌링 계약 완료 후 주석 해제.
+      amount: 0, // 정기결제 빌링키 발급용
+      customer_uid: customerUid, // ❗빌링키 발급을 위한 필수 파라미터
       buyer_email: currentUser.email || '',
       buyer_name: currentUser.nickname || currentUser.email || '',
       buyer_tel: currentUser.phone || '01012341234',

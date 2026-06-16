@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
@@ -7,6 +7,25 @@ const AdStorePage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [payMethod, setPayMethod] = useState('card'); // 'card' or 'vbank'
+
+  useEffect(() => {
+    // 현재 사용자 정보 불러오기
+    const loadUser = async () => {
+      const { data } = await api.auth.getUser();
+      if (data) {
+        setCurrentUser(data);
+      }
+    };
+    loadUser();
+
+    // 포트원 SDK 초기화
+    if (window.IMP) {
+      const impCode = import.meta.env.VITE_PORTONE_IMP_CODE || 'imp37213066';
+      window.IMP.init(impCode);
+    }
+  }, []);
 
   // 상품 정보
   const items = [
@@ -151,16 +170,52 @@ const AdStorePage = () => {
               </div>
             </div>
 
-            {/* 오른쪽: 무통장 입금 안내 */}
+            {/* 오른쪽: 결제 및 신청 안내 */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  🏦 무통장 입금 안내
+                  💳 결제 수단 선택
                 </h3>
                 <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.9rem', marginBottom: '20px' }}>
-                  아래 계좌로 입금 후 <strong>[신청하기]</strong>를 눌러주시면<br/>
-                  관리자가 내역 확인 후 즉시 아이템을 지급해 드립니다.
+                  편리하고 안전한 결제 방식을 선택하여 광고를 신청하세요.<br/>
+                  가상계좌 입금의 경우, 입금이 완료되면 광고가 즉시 시작됩니다.
                 </p>
+
+                {/* 결제 수단 선택 라디오/버튼 그룹 */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                  <button
+                    onClick={() => setPayMethod('card')}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
+                      border: payMethod === 'card' ? '2px solid var(--primary)' : '1px solid #ddd',
+                      backgroundColor: payMethod === 'card' ? '#fffbf0' : '#fff',
+                      fontWeight: 'bold',
+                      color: payMethod === 'card' ? 'var(--primary-dark)' : '#555',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    💳 신용카드 / 간편결제
+                  </button>
+                  <button
+                    onClick={() => setPayMethod('vbank')}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
+                      border: payMethod === 'vbank' ? '2px solid var(--primary)' : '1px solid #ddd',
+                      backgroundColor: payMethod === 'vbank' ? '#fffbf0' : '#fff',
+                      fontWeight: 'bold',
+                      color: payMethod === 'vbank' ? 'var(--primary-dark)' : '#555',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    🏦 가상계좌 (무통장)
+                  </button>
+                </div>
 
                 <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '15px', marginBottom: '20px', border: '1px solid #eee' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -172,63 +227,109 @@ const AdStorePage = () => {
                     <strong style={{ color: '#ff4757', fontSize: '1.2rem' }}>{selectedItem.price.toLocaleString()}원</strong>
                   </div>
                   <div style={{ height: '1px', backgroundColor: '#ddd', margin: '15px 0' }}></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ color: '#666', fontSize: '0.9rem' }}>입금 은행</span>
-                    <strong style={{ fontSize: '0.9rem' }}>국민은행</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ color: '#666', fontSize: '0.9rem' }}>계좌 번호</span>
-                    <strong style={{ fontSize: '1.05rem', letterSpacing: '1px', color: 'var(--primary-dark)' }}>0000-0000-0000</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ color: '#666', fontSize: '0.9rem' }}>예금주</span>
-                    <strong style={{ fontSize: '0.9rem' }}>블루프라임</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed #ddd' }}>
-                    <span style={{ color: '#e67e22', fontSize: '0.9rem', fontWeight: 'bold' }}>입금자명</span>
-                    <strong style={{ color: '#e67e22', fontSize: '0.9rem' }}>반드시 실명 입금</strong>
+                  <div style={{ fontSize: '0.85rem', color: '#e67e22', lineHeight: '1.4' }}>
+                    {payMethod === 'card' ? (
+                      <span>* 하나카드, 비씨카드, 신한카드 등 모든 카드사 결제가 가능합니다.</span>
+                    ) : (
+                      <span>* 결제창에서 은행 선택 시 발급되는 계좌로 입금 기한 내 송금해 주세요.</span>
+                    )}
                   </div>
                 </div>
               </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                style={{ flex: 1, padding: '14px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#555', border: 'none', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#e0e0e0'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-              >
-                닫기
-              </button>
-              <button 
-                disabled={isSubmitting}
-                onClick={async () => {
-                  setIsSubmitting(true);
-                  const { error } = await api.ads.requestAdPurchase({
-                    ad_type: selectedItem.type,
-                    title: selectedItem.name,
-                    price: selectedItem.price,
-                    duration: 7 // 기본 노출 기간 7일
-                  });
-                  
-                  setIsSubmitting(false);
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  style={{ flex: 1, padding: '14px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#555', border: 'none', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+                >
+                  닫기
+                </button>
+                <button 
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    if (!currentUser) {
+                      alert('로그인이 필요한 서비스입니다.');
+                      navigate('/login');
+                      return;
+                    }
 
-                  if (error) {
-                    alert('신청 중 오류가 발생했습니다: ' + error);
-                    return;
-                  }
+                    setIsSubmitting(true);
 
-                  alert('✅ 광고 아이템 신청이 완료되었습니다.\n관리자가 입금 내역(실명)을 확인하는 대로 신속하게 지급해 드리겠습니다.');
-                  setIsModalOpen(false);
-                }}
-                style={{ flex: 2, padding: '14px', borderRadius: '12px', backgroundColor: isSubmitting ? '#ccc' : 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s', boxShadow: isSubmitting ? 'none' : '0 4px 15px rgba(255, 171, 0, 0.3)' }}
-                onMouseEnter={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary-dark)'; }}
-                onMouseLeave={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary)'; }}
-              >
-                {isSubmitting ? '신청 중...' : '입금 완료 / 신청하기'}
-              </button>
-            </div>
-            
+                    // 1. 다잇독 백엔드에 임시 광고 신청 생성
+                    const { data: requestData, error: requestError } = await api.ads.requestAdPurchase({
+                      ad_type: selectedItem.type,
+                      title: selectedItem.name,
+                      price: selectedItem.price,
+                      duration: 7 // 기본 노출 기간 7일
+                    });
+
+                    if (requestError || !requestData || !requestData.adId) {
+                      alert('광고 신청 도중 오류가 발생했습니다: ' + (requestError || '알 수 없는 오류'));
+                      setIsSubmitting(false);
+                      return;
+                    }
+
+                    const adId = requestData.adId;
+                    const merchantUid = `merchant_ad_${adId}_${Date.now()}`;
+
+                    // 2. 포트원 결제창 호출
+                    if (!window.IMP) {
+                      alert('포트원 라이브러리가 로드되지 않았습니다.');
+                      setIsSubmitting(false);
+                      return;
+                    }
+
+                    const paymentData = {
+                      pg: 'html5_inicis',
+                      pay_method: payMethod,
+                      merchant_uid: merchantUid,
+                      name: selectedItem.name,
+                      amount: selectedItem.price,
+                      buyer_email: currentUser.email || '',
+                      buyer_name: currentUser.nickname || currentUser.email || '',
+                      buyer_tel: currentUser.phone || '',
+                      m_redirect_url: window.location.origin + '/mypage'
+                    };
+
+                    window.IMP.request_pay(paymentData, async (rsp) => {
+                      if (rsp.success) {
+                        // 3. 백엔드 결제 검증 호출
+                        const { data: verifyData, error: verifyError } = await api.payment.verify(
+                          rsp.imp_uid,
+                          rsp.merchant_uid,
+                          rsp.paid_amount || selectedItem.price,
+                          adId
+                        );
+
+                        setIsSubmitting(false);
+
+                        if (verifyError) {
+                          alert('결제 검증 실패: ' + verifyError);
+                          return;
+                        }
+
+                        if (payMethod === 'vbank') {
+                          alert(`✅ 가상계좌 발급 완료!\n\n은행: ${rsp.vbank_name}\n계좌번호: ${rsp.vbank_num}\n예금주: ${rsp.vbank_holder}\n기한: ${rsp.vbank_date}\n\n입금이 완료되면 자동으로 광고가 노출됩니다.`);
+                        } else {
+                          alert('✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.');
+                        }
+                        setIsModalOpen(false);
+                        navigate('/mypage');
+                      } else {
+                        setIsSubmitting(false);
+                        alert('결제에 실패하였습니다: ' + rsp.error_msg);
+                      }
+                    });
+                  }}
+                  style={{ flex: 2, padding: '14px', borderRadius: '12px', backgroundColor: isSubmitting ? '#ccc' : 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s', boxShadow: isSubmitting ? 'none' : '0 4px 15px rgba(255, 171, 0, 0.3)' }}
+                  onMouseEnter={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary-dark)'; }}
+                  onMouseLeave={(e) => { if(!isSubmitting) e.target.style.backgroundColor = 'var(--primary)'; }}
+                >
+                  {isSubmitting ? '결제 요청중...' : '결제하기'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -52,14 +52,16 @@ export async function onRequestPost(context) {
   }
 
   try {
-    // Insert into advertisements table as 'pending'
-    await env.DB.prepare(
-      `INSERT INTO advertisements (user_id, ad_type, title, status, budget, duration) VALUES (?, ?, ?, 'pending', ?, ?)`
+    // Insert into advertisements table as 'pending' and return the created ID
+    const { results } = await env.DB.prepare(
+      `INSERT INTO advertisements (user_id, ad_type, title, status, budget, duration) VALUES (?, ?, ?, 'pending', ?, ?) RETURNING id`
     )
     .bind(authUser.id, ad_type, title, price, duration || 7)
-    .run();
+    .all();
 
-    return new Response(JSON.stringify({ success: true, message: '광고 구매 신청이 완료되었습니다.' }), {
+    const adId = results[0].id;
+
+    return new Response(JSON.stringify({ success: true, adId, message: '광고 구매 신청이 임시 완료되었습니다. 결제를 진행해주세요.' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });

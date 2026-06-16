@@ -764,5 +764,34 @@ export const api = {
     } catch (err) {
       return { data: null, error: err.message };
     }
+  },
+
+  // 11. 포트원 결제 및 본인인증 (Payment / Certification)
+  payment: {
+    async verify(imp_uid, merchant_uid, amount, adId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/verify`, {
+          method: 'POST',
+          body: JSON.stringify({ imp_uid, merchant_uid, amount, ad_id: adId }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
+  },
+
+  certification: {
+    async verify(imp_uid) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/certification/verify`, {
+          method: 'POST',
+          body: JSON.stringify({ imp_uid }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
   }
 };

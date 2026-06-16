@@ -130,9 +130,9 @@ function App() {
                 <div style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
                   (주)블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544<br />
                   주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
-                  고객센터 : 02-1234-5678 (임시) &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
+                  고객센터 : goodduck2@naver.com
                 </div>
-                <p style={{ fontSize: '12px' }}>© 2024 Daitdog. All rights reserved.</p>
+                <p style={{ fontSize: '12px' }}>© 2026 Daitdog. All rights reserved.</p>
               </div>
               <div style={{ display: 'flex', gap: '25px', fontSize: '14px', flexWrap: 'wrap' }}>
                 <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>

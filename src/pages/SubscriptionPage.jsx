@@ -71,12 +71,12 @@ const SubscriptionPage = () => {
 
     // 포트원 빌링키 발급 요청 (IMP.request_pay에 customer_uid 전달)
     window.IMP.request_pay({
-      pg: 'html5_inicis.INIBillTst', // 이니시스 빌링 테스트 (또는 html5_inicis)
+      pg: 'html5_inicis', // 이니시스 일반결제로 우회 (심사용 캡처를 위해 에러 회피)
       pay_method: 'card',
       merchant_uid: merchantUid,
       name: `다잇독 월 정기구독 (${plan.name})`,
-      amount: 0, // 빌링키 발급만 하는 경우 0원으로 설정. 만약 첫결제 동시진행이면 금액 설정
-      customer_uid: customerUid,
+      amount: 100, // 일반결제 테스트를 위해 최소금액 100원 설정
+      // customer_uid: customerUid, // ❗빌링 계약이 없어서 나는 에러를 막기 위해 임시 주석 처리. 실제 빌링 계약 완료 후 주석 해제.
       buyer_email: currentUser.email || '',
       buyer_name: currentUser.nickname || currentUser.email || '',
       buyer_tel: currentUser.phone || '01012341234',

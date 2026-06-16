@@ -19,7 +19,7 @@ const SubscriptionPage = () => {
 
     // 포트원 SDK 초기화 (다잇독 가맹점 코드)
     if (window.IMP) {
-      window.IMP.init('imp37213066');
+      window.IMP.init('imp62573664');
     }
   }, []);
 

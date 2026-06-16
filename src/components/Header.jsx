@@ -311,6 +311,17 @@ const Header = () => {
                         💬 다잇톡메시지
                       </Link>
 
+                      {role !== 'user' && (
+                        <Link 
+                          to="/subscription" 
+                          onClick={() => setShowUserDropdown(false)}
+                          className="header-dropdown-item"
+                          style={{ color: '#9b59b6', fontWeight: 'bold' }}
+                        >
+                          💎 파트너스 구독
+                        </Link>
+                      )}
+
                       <div style={{ borderTop: '1px solid #e2e8f0', margin: '6px 0' }} />
 
                       <button 

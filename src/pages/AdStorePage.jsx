@@ -282,7 +282,7 @@ const AdStorePage = () => {
                     }
 
                     const paymentData = {
-                      pg: 'html5_inicis',
+                      pg: 'kcp', // 테스트 결제창이 즉시 정상 작동하도록 kcp로 임시 변경 (하나카드 선택/캡처용)
                       pay_method: payMethod,
                       merchant_uid: merchantUid,
                       name: selectedItem.name,

@@ -793,5 +793,20 @@ export const api = {
         return { data: null, error: err.message };
       }
     }
+  },
+
+  // 12. 정기결제(빌키) 연동
+  subscription: {
+    async register(customer_uid, plan_name, merchant_uid, amount) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/subscription/register`, {
+          method: 'POST',
+          body: JSON.stringify({ customer_uid, plan_name, merchant_uid, amount }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
   }
 };

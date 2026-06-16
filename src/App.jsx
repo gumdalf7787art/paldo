@@ -18,6 +18,7 @@ import AdStorePage from './pages/AdStorePage'
 import RefundPolicyPage from './pages/RefundPolicyPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
+import SubscriptionPage from './pages/SubscriptionPage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
@@ -116,6 +117,7 @@ function App() {
           <Route path="/refund" element={<RefundPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
         </Routes>
         <footer style={{ 
           padding: '60px 0', 

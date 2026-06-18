@@ -503,6 +503,7 @@ const MyPage = () => {
       return alert('완료 처리 실패: ' + updateError);
     }
 
+    const { error: deleteError } = await api.dogs.delete(dogId);
     if (!deleteError) {
       alert(`분양 완료 처리되었습니다! (누적 완료 달성: ${newCount}건)`);
       setProfile({ ...profile, completed_adoption_count: newCount });
@@ -1125,6 +1126,8 @@ const MyPage = () => {
                     </div>
                   </div>
                 </div>
+              )}
+
               {activeTab === 'payments' && isSeller && (
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '10px' }}>결제 내역 관리</h2>

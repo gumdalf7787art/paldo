@@ -129,7 +129,11 @@ const MyPage = () => {
       navigate('/mypage', { replace: true, state: newState });
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
-      setPaymentResultMsg({ type: 'success', text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] 으로 기한 내 입금해주세요.` });
+      const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+      setPaymentResultMsg({ 
+        type: 'success', 
+        text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.` 
+      });
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
@@ -1170,7 +1174,13 @@ const MyPage = () => {
                                 })}</div>
                                 <div style={{ marginTop: '8px' }}>
                                   <span style={{ display: 'inline-block', padding: '2px 6px', backgroundColor: '#edf2f7', color: '#4a5568', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                                    {payment.pay_method === 'vbank' ? '무통장입금' : payment.pay_method === 'card' ? '신용카드' : payment.pay_method === 'trans' ? '계좌이체' : (payment.pay_method || '신용카드')}
+                                    {payment.pay_method === 'vbank' ? '무통장입금' : 
+                                     payment.pay_method === 'kakaopay' ? '카카오페이' : 
+                                     payment.pay_method === 'naverpay' ? '네이버페이' : 
+                                     payment.pay_method === 'tosspay' ? '토스페이' : 
+                                     payment.pay_method === 'payco' ? '페이코' : 
+                                     payment.pay_method === 'card' ? '신용카드' : 
+                                     payment.pay_method === 'trans' ? '계좌이체' : (payment.pay_method || '신용카드')}
                                   </span>
                                 </div>
                               </td>

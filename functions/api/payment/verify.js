@@ -127,7 +127,21 @@ export async function onRequestPost(context) {
       const payment = payData.response;
       portone_amount = payment.amount;
       portone_status = payment.status; // 'ready' (가상계좌 대기), 'paid' (결제완료), 'failed' (결제실패), 'cancelled' (취소됨)
-      portone_pay_method = payment.pay_method;
+      
+      let resolvedPayMethod = payment.pay_method;
+      const provider = payment.pg_provider ? payment.pg_provider.toLowerCase() : '';
+      const cardName = payment.card_name ? payment.card_name.toLowerCase() : '';
+      
+      if (provider.includes('kakaopay') || resolvedPayMethod === 'kakaopay' || cardName.includes('카카오') || cardName.includes('kakao')) {
+        resolvedPayMethod = 'kakaopay';
+      } else if (provider.includes('naverpay') || resolvedPayMethod === 'naverpay' || cardName.includes('네이버') || cardName.includes('naver') || resolvedPayMethod === 'point') {
+        resolvedPayMethod = 'naverpay';
+      } else if (provider.includes('tosspay') || resolvedPayMethod === 'tosspay' || cardName.includes('토스') || cardName.includes('toss')) {
+        resolvedPayMethod = 'tosspay';
+      } else if (provider.includes('payco') || resolvedPayMethod === 'payco' || cardName.includes('페이코')) {
+        resolvedPayMethod = 'payco';
+      }
+      portone_pay_method = resolvedPayMethod;
 
       if (portone_status === 'ready' && payment.vbank_num) {
         vbank_num = payment.vbank_num;

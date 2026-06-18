@@ -348,13 +348,27 @@ const AdStorePage = () => {
 
                     window.IMP.request_pay(paymentData, async (rsp) => {
                       if (rsp.success) {
+                        let resolvedPayMethod = rsp.pay_method;
+                        const provider = rsp.pg_provider ? rsp.pg_provider.toLowerCase() : '';
+                        const cardName = rsp.card_name ? rsp.card_name.toLowerCase() : '';
+                        
+                        if (provider.includes('kakaopay') || resolvedPayMethod === 'kakaopay' || cardName.includes('카카오') || cardName.includes('kakao')) {
+                          resolvedPayMethod = 'kakaopay';
+                        } else if (provider.includes('naverpay') || resolvedPayMethod === 'naverpay' || cardName.includes('네이버') || cardName.includes('naver') || resolvedPayMethod === 'point') {
+                          resolvedPayMethod = 'naverpay';
+                        } else if (provider.includes('tosspay') || resolvedPayMethod === 'tosspay' || cardName.includes('토스') || cardName.includes('toss')) {
+                          resolvedPayMethod = 'tosspay';
+                        } else if (provider.includes('payco') || resolvedPayMethod === 'payco' || cardName.includes('페이코')) {
+                          resolvedPayMethod = 'payco';
+                        }
+
                         // 3. 백엔드 결제 검증 호출
                         const { data: verifyData, error: verifyError } = await api.payment.verify(
                           rsp.imp_uid,
                           rsp.merchant_uid,
                           rsp.paid_amount || selectedItem.price,
                           adId,
-                          rsp.pay_method
+                          resolvedPayMethod
                         );
 
                         setIsSubmitting(false);
@@ -366,7 +380,10 @@ const AdStorePage = () => {
                         }
 
                         if (verifyData && verifyData.status === 'ready' && verifyData.vbank) {
-                          const v = verifyData.vbank;
+                          const v = {
+                            ...verifyData.vbank,
+                            amount: selectedItem.price
+                          };
                           setIsModalOpen(false);
                           navigate('/mypage', { state: { paymentReady: true, vbank: v } });
                         } else {

@@ -94,7 +94,28 @@ const PrivacyPage = () => {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제4조 (회원의 권리와 행사방법)</h2>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제4조 (개인정보 처리의 위탁)</h2>
+          <p style={{ margin: '0 0 10px 0' }}>
+            회사는 원활한 결제 및 본인인증 서비스 제공을 위하여 다음과 같이 개인정보 처리 업무를 외부 전문업체에 위탁하여 운영하고 있습니다.
+          </p>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left', marginTop: '10px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #eee' }}>
+                <th style={{ padding: '10px', border: '1px solid #eee' }}>수탁업체 (위탁을 받는 자)</th>
+                <th style={{ padding: '10px', border: '1px solid #eee' }}>위탁 업무 내용</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ padding: '10px', border: '1px solid #eee', fontWeight: 'bold' }}>포트원 (주식회사 포트원)</td>
+                <td style={{ padding: '10px', border: '1px solid #eee' }}>신용카드, 간편결제(카카오페이/네이버페이/토스페이 등), 가상계좌 등을 통한 전자결제 서비스 대행 및 본인인증 대행</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제5조 (회원의 권리와 행사방법)</h2>
           <ul style={{ paddingLeft: '20px', margin: 0 }}>
             <li>회원은 언제든지 마이페이지 설정을 통해 자신의 개인정보를 조회, 수정할 수 있습니다.</li>
             <li>회원은 언제든 플랫폼을 통해 '회원탈퇴'를 신청하여 회사에게 수집 중단을 요구할 권리가 있으며, 회사는 지체 없이 계정을 삭제하고 파기합니다.</li>

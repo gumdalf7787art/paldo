@@ -107,6 +107,23 @@ const MyPage = () => {
   }, []);
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const impUid = searchParams.get('imp_uid');
+    const merchantUid = searchParams.get('merchant_uid');
+    const impSuccess = searchParams.get('imp_success');
+
+    if (impUid && merchantUid) {
+      if (impSuccess === 'false') {
+        const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
+        alert(`❌ 결제 실패: ${errorMsg}`);
+      } else {
+        alert('✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.');
+      }
+      navigate('/mypage', { replace: true });
+    }
+  }, [location.search, navigate]);
+
+  useEffect(() => {
     if (location.state?.tab === 'notifications') {
       setActiveTab('notifications');
       // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지

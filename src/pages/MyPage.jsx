@@ -133,7 +133,7 @@ const MyPage = () => {
     if (paymentResultMsg) {
       const timer = setTimeout(() => {
         setPaymentResultMsg(null);
-      }, 4000); // 4초 후 자동 닫힘
+      }, 7000); // 7초 후 자동 닫힘
       return () => clearTimeout(timer);
     }
   }, [paymentResultMsg]);
@@ -545,21 +545,32 @@ const MyPage = () => {
       {/* 결제 결과 커스텀 토스트 알림 */}
       {paymentResultMsg && (
         <div style={{
-          position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+          position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
           backgroundColor: paymentResultMsg.type === 'success' ? '#e6fffa' : '#fff5f5',
-          borderLeft: `5px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
-          padding: '16px 24px', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-          display: 'flex', alignItems: 'center', gap: '12px', minWidth: '300px', maxWidth: '90vw',
+          borderLeft: `8px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
+          padding: '24px 32px', borderRadius: '12px', boxShadow: '0 15px 35px rgba(0,0,0,0.25)',
+          display: 'flex', alignItems: 'center', gap: '20px', minWidth: '400px', maxWidth: '95vw',
           animation: 'fadeInDown 0.4s ease-out forwards'
         }}>
-          <div style={{ fontSize: '24px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
+          <div style={{ fontSize: '32px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 'bold', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
+            <div style={{ fontWeight: '900', fontSize: '1.2rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
               {paymentResultMsg.type === 'success' ? '결제 성공' : '결제 실패'}
             </div>
-            <div style={{ color: '#4a5568', fontSize: '0.9rem', marginTop: '2px', wordBreak: 'keep-all' }}>{paymentResultMsg.text}</div>
+            <div style={{ color: '#4a5568', fontSize: '1.05rem', marginTop: '6px', wordBreak: 'keep-all', lineHeight: '1.4' }}>{paymentResultMsg.text}</div>
           </div>
-          <button onClick={() => setPaymentResultMsg(null)} style={{ background: 'none', border: 'none', fontSize: '24px', color: '#a0aec0', cursor: 'pointer', padding: '0 0 0 10px' }}>&times;</button>
+          <button 
+            onClick={() => setPaymentResultMsg(null)} 
+            style={{ 
+              background: '#edf2f7', border: '1px solid #cbd5e0', fontSize: '0.9rem', fontWeight: 'bold',
+              color: '#4a5568', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', marginLeft: '10px',
+              transition: 'all 0.2s', flexShrink: 0
+            }}
+            onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
+            onMouseLeave={(e) => e.target.style.background = '#edf2f7'}
+          >
+            닫기
+          </button>
         </div>
       )}
 

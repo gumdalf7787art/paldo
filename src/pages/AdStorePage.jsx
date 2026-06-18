@@ -9,6 +9,7 @@ const AdStorePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [payMethod, setPayMethod] = useState('card'); // 'card' or 'vbank'
+  const [senderName, setSenderName] = useState('');
 
   useEffect(() => {
     // 현재 사용자 정보 불러오기
@@ -243,9 +244,24 @@ const AdStorePage = () => {
                       transition: 'all 0.2s'
                     }}
                   >
-                    🏦 가상계좌 (무통장)
                   </button>
                 </div>
+
+                {payMethod === 'vbank' && (
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>
+                      입금자명 (실명) <span style={{ color: '#ff4757' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={senderName}
+                      onChange={(e) => setSenderName(e.target.value)}
+                      placeholder={currentUser?.business_name || currentUser?.nickname || '입금하시는 분 성함을 입력하세요'}
+                      style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.95rem' }}
+                    />
+                    <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '6px' }}>* 실제 입금하실 분의 실명을 정확히 입력해 주세요.</p>
+                  </div>
+                )}
 
                 <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '15px', marginBottom: '20px', border: '1px solid #eee' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -287,6 +303,12 @@ const AdStorePage = () => {
 
                     setIsSubmitting(true);
 
+                    if (payMethod === 'vbank' && !senderName.trim()) {
+                      alert('입금자명(실명)을 정확히 입력해 주세요.');
+                      setIsSubmitting(false);
+                      return;
+                    }
+
                     // 1. 다잇독 백엔드에 임시 광고 신청 생성
                     const { data: requestData, error: requestError } = await api.ads.requestAdPurchase({
                       ad_type: selectedItem.type,
@@ -318,7 +340,7 @@ const AdStorePage = () => {
                       name: selectedItem.name,
                       amount: selectedItem.price,
                       buyer_email: currentUser.email || '',
-                      buyer_name: currentUser.nickname || currentUser.email || '',
+                      buyer_name: (payMethod === 'vbank' ? senderName.trim() : (currentUser.nickname || currentUser.email || '')),
                       buyer_tel: currentUser.phone || '',
                       m_redirect_url: window.location.origin + '/mypage'
                     };

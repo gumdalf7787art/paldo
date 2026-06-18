@@ -330,7 +330,8 @@ const AdStorePage = () => {
                           rsp.imp_uid,
                           rsp.merchant_uid,
                           rsp.paid_amount || selectedItem.price,
-                          adId
+                          adId,
+                          rsp.pay_method
                         );
 
                         setIsSubmitting(false);

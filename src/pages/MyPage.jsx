@@ -105,6 +105,7 @@ const MyPage = () => {
     window.addEventListener('notifications-updated', handleNotificationsUpdate);
     return () => window.removeEventListener('notifications-updated', handleNotificationsUpdate);
   }, []);
+  const [paymentResultMsg, setPaymentResultMsg] = useState(null);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -115,13 +116,27 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
-        alert(`❌ 결제 실패: ${errorMsg}`);
+        setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` });
       } else {
-        alert('✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.');
+        setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
       }
       navigate('/mypage', { replace: true });
+    } else if (location.state?.paymentSuccess) {
+      setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
+      const newState = { ...location.state };
+      delete newState.paymentSuccess;
+      navigate('/mypage', { replace: true, state: newState });
     }
-  }, [location.search, navigate]);
+  }, [location.search, location.state, navigate]);
+
+  useEffect(() => {
+    if (paymentResultMsg) {
+      const timer = setTimeout(() => {
+        setPaymentResultMsg(null);
+      }, 4000); // 4초 후 자동 닫힘
+      return () => clearTimeout(timer);
+    }
+  }, [paymentResultMsg]);
 
   useEffect(() => {
     if (location.state?.tab === 'notifications') {
@@ -526,7 +541,28 @@ const MyPage = () => {
   ];
 
   return (
-    <div className="container" style={{ padding: '60px 0' }}>
+    <div className="container" style={{ padding: '60px 0', position: 'relative' }}>
+      {/* 결제 결과 커스텀 토스트 알림 */}
+      {paymentResultMsg && (
+        <div style={{
+          position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+          backgroundColor: paymentResultMsg.type === 'success' ? '#e6fffa' : '#fff5f5',
+          borderLeft: `5px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
+          padding: '16px 24px', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+          display: 'flex', alignItems: 'center', gap: '12px', minWidth: '300px', maxWidth: '90vw',
+          animation: 'fadeInDown 0.4s ease-out forwards'
+        }}>
+          <div style={{ fontSize: '24px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 'bold', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
+              {paymentResultMsg.type === 'success' ? '결제 성공' : '결제 실패'}
+            </div>
+            <div style={{ color: '#4a5568', fontSize: '0.9rem', marginTop: '2px', wordBreak: 'keep-all' }}>{paymentResultMsg.text}</div>
+          </div>
+          <button onClick={() => setPaymentResultMsg(null)} style={{ background: 'none', border: 'none', fontSize: '24px', color: '#a0aec0', cursor: 'pointer', padding: '0 0 0 10px' }}>&times;</button>
+        </div>
+      )}
+
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* ── 모바일 프로필 + 탭 네비게이션 ── */}

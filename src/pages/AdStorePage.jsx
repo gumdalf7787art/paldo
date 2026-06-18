@@ -30,6 +30,14 @@ const AdStorePage = () => {
   // 상품 정보
   const items = [
     {
+      id: 9,
+      name: '[테스트] 100원 결제 테스트 상품',
+      price: 100,
+      description: 'PG사 결제 연동 테스트를 위한 임시 100원 결제용 상품입니다.',
+      type: 'test_100',
+      image: '/images/ads/ad_test.png'
+    },
+    {
       id: 1,
       name: '메인페이지 메인배너',
       price: 50000,
@@ -119,8 +127,18 @@ const AdStorePage = () => {
                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.04)'; }}>
             
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-block', padding: '2px 8px', backgroundColor: item.type.startsWith('post_limit') ? '#e8f4fd' : '#fffbf0', color: item.type.startsWith('post_limit') ? '#2980b9' : '#e6a800', borderRadius: '15px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '8px', border: `1px solid ${item.type.startsWith('post_limit') ? '#bde0fe' : '#ffeeba'}` }}>
-                {item.type.startsWith('post_limit') ? '✨ 30일간 한도 확장' : '✨ 노출 보장 기간: 7일'}
+              <div style={{ 
+                display: 'inline-block', 
+                padding: '2px 8px', 
+                backgroundColor: item.type === 'test_100' ? '#ebfbee' : (item.type.startsWith('post_limit') ? '#e8f4fd' : '#fffbf0'), 
+                color: item.type === 'test_100' ? '#2f3542' : (item.type.startsWith('post_limit') ? '#2980b9' : '#e6a800'), 
+                borderRadius: '15px', 
+                fontSize: '0.75rem', 
+                fontWeight: 'bold', 
+                marginBottom: '8px', 
+                border: `1px solid ${item.type === 'test_100' ? '#a4b0be' : (item.type.startsWith('post_limit') ? '#bde0fe' : '#ffeeba')}` 
+              }}>
+                {item.type === 'test_100' ? '🛠️ 테스트 결제용' : (item.type.startsWith('post_limit') ? '✨ 30일간 한도 확장' : '✨ 노출 보장 기간: 7일')}
               </div>
               <h2 style={{ fontSize: '1.2rem', fontWeight: '900', marginBottom: '6px', lineHeight: '1.4' }}>
                 {renderAdName(item.name)}
@@ -139,11 +157,23 @@ const AdStorePage = () => {
               </div>
               <button 
                 onClick={() => handlePurchaseClick(item)}
-                style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: item.type.startsWith('post_limit') ? '0 4px 10px rgba(52, 152, 219, 0.3)' : '0 4px 10px rgba(255, 171, 0, 0.3)' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = item.type.startsWith('post_limit') ? '#2980b9' : 'var(--primary-dark)'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)'}
+                style={{ 
+                  width: '100%', 
+                  padding: '10px', 
+                  borderRadius: '10px', 
+                  backgroundColor: item.type === 'test_100' ? '#2f3542' : (item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)'), 
+                  color: 'white', 
+                  border: 'none', 
+                  fontWeight: '900', 
+                  fontSize: '0.95rem', 
+                  cursor: 'pointer', 
+                  transition: 'all 0.2s', 
+                  boxShadow: item.type === 'test_100' ? '0 4px 10px rgba(47, 53, 66, 0.3)' : (item.type.startsWith('post_limit') ? '0 4px 10px rgba(52, 152, 219, 0.3)' : '0 4px 10px rgba(255, 171, 0, 0.3)') 
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = item.type === 'test_100' ? '#57606f' : (item.type.startsWith('post_limit') ? '#2980b9' : 'var(--primary-dark)')}
+                onMouseLeave={(e) => e.target.style.backgroundColor = item.type === 'test_100' ? '#2f3542' : (item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)')}
               >
-                {item.type.startsWith('post_limit') ? '구독(추가) 혜택 안내' : '광고 위치 및 결제 안내'}
+                {item.type === 'test_100' ? '테스트 결제 진행' : (item.type.startsWith('post_limit') ? '구독(추가) 혜택 안내' : '광고 위치 및 결제 안내')}
               </button>
             </div>
           </div>
@@ -158,7 +188,7 @@ const AdStorePage = () => {
             {/* 왼쪽: 아이템 미리보기 */}
             <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px', display: 'flex', flexDirection: 'column' }}>
               <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>
-                {selectedItem.type.startsWith('post_limit') ? '📦 정기구독 혜택 상세' : '📺 광고 노출 위치 미리보기'}
+                {selectedItem.type.startsWith('post_limit') ? '📦 정기구독 혜택 상세' : (selectedItem.type === 'test_100' ? '🛠️ 테스트 결제 상세' : '📺 광고 노출 위치 미리보기')}
               </h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
               <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>

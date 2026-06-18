@@ -768,11 +768,11 @@ export const api = {
 
   // 11. 포트원 결제 및 본인인증 (Payment / Certification)
   payment: {
-    async verify(imp_uid, merchant_uid, amount, adId, pay_method) {
+    async verify(imp_uid, merchant_uid, amount, adId, pay_method, extra = {}) {
       try {
         const { data } = await request(`${BASE_URL}/api/payment/verify`, {
           method: 'POST',
-          body: JSON.stringify({ imp_uid, merchant_uid, amount, ad_id: adId, pay_method }),
+          body: JSON.stringify({ imp_uid, merchant_uid, amount, ad_id: adId, pay_method, ...extra }),
         });
         return { data, error: null };
       } catch (err) {

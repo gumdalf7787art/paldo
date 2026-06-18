@@ -368,7 +368,13 @@ const AdStorePage = () => {
                           rsp.merchant_uid,
                           rsp.paid_amount || selectedItem.price,
                           adId,
-                          resolvedPayMethod
+                          resolvedPayMethod,
+                          {
+                            vbank_num: rsp.vbank_num,
+                            vbank_name: rsp.vbank_name,
+                            vbank_holder: rsp.vbank_holder,
+                            vbank_date: rsp.vbank_date
+                          }
                         );
 
                         setIsSubmitting(false);

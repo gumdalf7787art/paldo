@@ -109,10 +109,18 @@ export async function onRequestPost(context) {
       portone_status = portone_pay_method === 'vbank' ? 'ready' : 'paid';
 
       if (portone_pay_method === 'vbank') {
-        vbank_num = '123-456-789012';
-        vbank_name = '하나은행';
-        vbank_holder = '블루프라임';
-        vbank_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7일 후 기한
+        vbank_num = body.vbank_num || '123-456-789012';
+        vbank_name = body.vbank_name || '하나은행';
+        vbank_holder = body.vbank_holder || '블루프라임';
+        if (body.vbank_date) {
+          if (typeof body.vbank_date === 'number') {
+            vbank_date = new Date(body.vbank_date * 1000).toISOString();
+          } else {
+            vbank_date = new Date(body.vbank_date).toISOString();
+          }
+        } else {
+          vbank_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        }
       }
     } else {
       // 실제 포트원 결제 단건 조회

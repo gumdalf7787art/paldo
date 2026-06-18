@@ -127,6 +127,13 @@ const MyPage = () => {
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       navigate('/mypage', { replace: true, state: newState });
+    } else if (location.state?.paymentReady && location.state?.vbank) {
+      const v = location.state.vbank;
+      setPaymentResultMsg({ type: 'success', text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] 으로 기한 내 입금해주세요.` });
+      const newState = { ...location.state };
+      delete newState.paymentReady;
+      delete newState.vbank;
+      navigate('/mypage', { replace: true, state: newState });
     }
   }, [location.search, location.state, navigate]);
 
@@ -1169,6 +1176,14 @@ const MyPage = () => {
                                 <div style={{ fontSize: '0.75rem', color: '#aaa', wordBreak: 'break-all' }}>
                                   {payment.merchant_uid}
                                 </div>
+                                {payment.status === 'ready' && payment.vbank_num && (
+                                  <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef', fontSize: '0.85rem' }}>
+                                    <div style={{ color: '#e67e22', fontWeight: 'bold', marginBottom: '4px' }}>가상계좌 입금 안내</div>
+                                    <div><strong>{payment.vbank_name}</strong> {payment.vbank_num}</div>
+                                    <div style={{ color: '#666', marginTop: '2px' }}>예금주: {payment.vbank_holder}</div>
+                                    <div style={{ color: '#e53e3e', marginTop: '2px' }}>기한: {payment.vbank_date ? new Date(payment.vbank_date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}까지</div>
+                                  </div>
+                                )}
                               </td>
                               <td style={{ padding: '15px 20px', fontWeight: 'bold', color: '#e67e22' }}>
                                 {payment.amount.toLocaleString()}원

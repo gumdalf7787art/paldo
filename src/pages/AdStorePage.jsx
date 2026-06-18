@@ -341,10 +341,10 @@ const AdStorePage = () => {
                           return;
                         }
 
-                        if (payMethod === 'vbank') {
-                          alert(`✅ 가상계좌 발급 완료!\n\n은행: ${rsp.vbank_name}\n계좌번호: ${rsp.vbank_num}\n예금주: ${rsp.vbank_holder}\n기한: ${rsp.vbank_date}\n\n입금이 완료되면 자동으로 광고가 노출됩니다.`);
+                        if (verifyData && verifyData.status === 'ready' && verifyData.vbank) {
+                          const v = verifyData.vbank;
                           setIsModalOpen(false);
-                          navigate('/mypage');
+                          navigate('/mypage', { state: { paymentReady: true, vbank: v } });
                         } else {
                           setIsModalOpen(false);
                           navigate('/mypage', { state: { paymentSuccess: true } });

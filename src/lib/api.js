@@ -778,6 +778,25 @@ export const api = {
       } catch (err) {
         return { data: null, error: err.message };
       }
+    },
+    async getHistory() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/history`);
+        return { data: data.history || [], error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async requestCancel(paymentId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/cancel-request`, {
+          method: 'POST',
+          body: JSON.stringify({ payment_id: paymentId })
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
     }
   },
 

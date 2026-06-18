@@ -88,6 +88,7 @@ const MyPage = () => {
   const [chartData, setChartData] = useState([]);
   const [userCoupons, setUserCoupons] = useState([]);
   const [myNotifications, setMyNotifications] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
   
   const [selectedRoom, setSelectedRoom] = useState(null);
   
@@ -270,6 +271,12 @@ const MyPage = () => {
       chartArr.push({ date: new Date().toLocaleDateString(), views: 0 });
     }
     setChartData(chartArr);
+
+    // 4. 결제 내역 가져오기
+    const { data: historyData } = await api.payment.getHistory();
+    if (historyData) {
+      setPaymentHistory(historyData);
+    }
   };
 
   const fetchChatRooms = async () => {
@@ -496,13 +503,28 @@ const MyPage = () => {
       return alert('완료 처리 실패: ' + updateError);
     }
 
-    const { error: deleteError } = await api.dogs.delete(dogId);
     if (!deleteError) {
       alert(`분양 완료 처리되었습니다! (누적 완료 달성: ${newCount}건)`);
       setProfile({ ...profile, completed_adoption_count: newCount });
       setMyDogs(prev => prev.filter(d => d.id !== dogId));
     } else {
       alert('완료 후 게시물 제거 실패: ' + deleteError);
+    }
+  };
+
+  const handleCancelPayment = async (paymentId) => {
+    if (!window.confirm('정말로 결제를 취소하시겠습니까?\n\n* 취소 요청은 접수 후 관리자 승인을 거쳐 실제 환불 처리됩니다.')) return;
+    
+    setLoading(true);
+    const { error } = await api.payment.requestCancel(paymentId);
+    setLoading(false);
+
+    if (error) {
+      alert('취소 요청 중 오류가 발생했습니다: ' + error);
+    } else {
+      alert('✅ 결제 취소 요청이 정상적으로 접수되었습니다.\n(관리자 확인 후 최종 취소 완료 처리됩니다)');
+      // 상태 업데이트
+      setPaymentHistory(prev => prev.map(p => p.id === paymentId ? { ...p, status: 'cancel_requested' } : p));
     }
   };
 
@@ -531,6 +553,7 @@ const MyPage = () => {
       { id: 'posts', label: '🐶 게시물' },
       { id: 'store', label: '🏪 스토어' },
       { id: 'ads', label: '📢 광고' },
+      { id: 'payments', label: '💳 결제 관리' },
       { id: 'adStore', label: '🛒 광고 스토어', action: () => navigate('/ad-store') },
       { id: 'subscription', label: '💎 파트너스 구독', action: () => navigate('/subscription') },
       { id: 'stats', label: '📊 통계' },
@@ -634,6 +657,7 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('posts')} style={navBtnStyle('posts')}>🐶 게시물관리</button>
                     <button onClick={() => setActiveTab('store')} style={navBtnStyle('store')}>🏪 내 스토어 관리</button>
                     <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 광고관리</button>
+                    <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
                     <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 광고 스토어</button>
                     <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 구독</button>
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
@@ -1098,6 +1122,83 @@ const MyPage = () => {
                         ))}
                         {myDogs.length === 0 && <div style={{ color: '#ccc' }}>통계 데이터가 없습니다.</div>}
                       </div>
+                    </div>
+                  </div>
+                </div>
+              {activeTab === 'payments' && isSeller && (
+                <div className="fade-in">
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '10px' }}>결제 내역 관리</h2>
+                  <p style={{ color: '#666', marginBottom: '30px', fontSize: '0.95rem' }}>
+                    신청하신 광고 및 구독의 결제 내역을 확인하고 취소를 요청하실 수 있습니다.
+                  </p>
+                  
+                  <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #e0e0e0' }}>
+                            <th style={{ padding: '15px 20px', color: '#555', fontSize: '0.9rem', width: '20%' }}>결제일시</th>
+                            <th style={{ padding: '15px 20px', color: '#555', fontSize: '0.9rem', width: '35%' }}>상품명/주문번호</th>
+                            <th style={{ padding: '15px 20px', color: '#555', fontSize: '0.9rem', width: '15%' }}>금액</th>
+                            <th style={{ padding: '15px 20px', color: '#555', fontSize: '0.9rem', width: '15%' }}>상태</th>
+                            <th style={{ padding: '15px 20px', color: '#555', fontSize: '0.9rem', width: '15%' }}>관리</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paymentHistory.length === 0 ? (
+                            <tr>
+                              <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>
+                                결제 내역이 없습니다.
+                              </td>
+                            </tr>
+                          ) : paymentHistory.map(payment => (
+                            <tr key={payment.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                              <td style={{ padding: '15px 20px', color: '#777', fontSize: '0.85rem' }}>
+                                {new Date(payment.created_at).toLocaleString('ko-KR', {
+                                  year: 'numeric', month: '2-digit', day: '2-digit',
+                                  hour: '2-digit', minute: '2-digit'
+                                })}
+                              </td>
+                              <td style={{ padding: '15px 20px' }}>
+                                <div style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#333', marginBottom: '4px' }}>
+                                  {payment.item_name || '결제 상품'}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: '#aaa', wordBreak: 'break-all' }}>
+                                  {payment.merchant_uid}
+                                </div>
+                              </td>
+                              <td style={{ padding: '15px 20px', fontWeight: 'bold', color: '#e67e22' }}>
+                                {payment.amount.toLocaleString()}원
+                              </td>
+                              <td style={{ padding: '15px 20px' }}>
+                                {payment.status === 'paid' && <span style={{ display: 'inline-block', padding: '4px 8px', backgroundColor: '#e6fffa', color: '#319795', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>결제완료</span>}
+                                {payment.status === 'ready' && <span style={{ display: 'inline-block', padding: '4px 8px', backgroundColor: '#fffaf0', color: '#dd6b20', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>입금대기</span>}
+                                {payment.status === 'cancel_requested' && <span style={{ display: 'inline-block', padding: '4px 8px', backgroundColor: '#edf2f7', color: '#4a5568', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>취소 대기중</span>}
+                                {payment.status === 'cancelled' && <span style={{ display: 'inline-block', padding: '4px 8px', backgroundColor: '#fff5f5', color: '#e53e3e', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>취소됨</span>}
+                                {payment.status === 'failed' && <span style={{ display: 'inline-block', padding: '4px 8px', backgroundColor: '#fff5f5', color: '#c53030', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>결제실패</span>}
+                              </td>
+                              <td style={{ padding: '15px 20px' }}>
+                                {payment.status === 'paid' ? (
+                                  <button
+                                    onClick={() => handleCancelPayment(payment.id)}
+                                    style={{
+                                      padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0',
+                                      backgroundColor: 'white', color: '#e53e3e', fontSize: '0.8rem',
+                                      fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => { e.target.style.backgroundColor = '#fff5f5'; e.target.style.borderColor = '#feb2b2'; }}
+                                    onMouseLeave={(e) => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#e2e8f0'; }}
+                                  >
+                                    취소 요청
+                                  </button>
+                                ) : (
+                                  <span style={{ fontSize: '0.8rem', color: '#a0aec0' }}>-</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>

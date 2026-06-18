@@ -244,6 +244,7 @@ const AdStorePage = () => {
                       transition: 'all 0.2s'
                     }}
                   >
+                    🏦 가상계좌 (무통장)
                   </button>
                 </div>
 

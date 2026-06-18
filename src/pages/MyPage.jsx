@@ -132,7 +132,8 @@ const MyPage = () => {
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       setPaymentResultMsg({ 
         type: 'success', 
-        text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.` 
+        text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`,
+        vbankInfo: `${v.name} ${v.num}`
       });
       const newState = { ...location.state };
       delete newState.paymentReady;
@@ -594,6 +595,23 @@ const MyPage = () => {
             </div>
             <div style={{ color: '#4a5568', fontSize: '1.05rem', marginTop: '6px', wordBreak: 'keep-all', lineHeight: '1.4' }}>{paymentResultMsg.text}</div>
           </div>
+          {paymentResultMsg.vbankInfo && (
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(paymentResultMsg.vbankInfo);
+                alert('계좌 정보가 클립보드에 복사되었습니다: ' + paymentResultMsg.vbankInfo);
+              }} 
+              style={{ 
+                background: '#319795', border: 'none', fontSize: '0.9rem', fontWeight: 'bold',
+                color: 'white', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', marginLeft: '10px',
+                transition: 'all 0.2s', flexShrink: 0
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#285e61'}
+              onMouseLeave={(e) => e.target.style.background = '#319795'}
+            >
+              계좌 복사
+            </button>
+          )}
           <button 
             onClick={() => setPaymentResultMsg(null)} 
             style={{ 

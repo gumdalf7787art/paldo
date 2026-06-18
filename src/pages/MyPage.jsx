@@ -1164,10 +1164,15 @@ const MyPage = () => {
                           ) : paymentHistory.map(payment => (
                             <tr key={payment.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                               <td style={{ padding: '15px 20px', color: '#777', fontSize: '0.85rem' }}>
-                                {new Date(payment.created_at).toLocaleString('ko-KR', {
+                                <div>{new Date(payment.created_at).toLocaleString('ko-KR', {
                                   year: 'numeric', month: '2-digit', day: '2-digit',
                                   hour: '2-digit', minute: '2-digit'
-                                })}
+                                })}</div>
+                                <div style={{ marginTop: '8px' }}>
+                                  <span style={{ display: 'inline-block', padding: '2px 6px', backgroundColor: '#edf2f7', color: '#4a5568', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                    {payment.pay_method === 'vbank' ? '무통장입금' : payment.pay_method === 'card' ? '신용카드' : payment.pay_method === 'trans' ? '계좌이체' : (payment.pay_method || '신용카드')}
+                                  </span>
+                                </div>
                               </td>
                               <td style={{ padding: '15px 20px' }}>
                                 <div style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#333', marginBottom: '4px' }}>

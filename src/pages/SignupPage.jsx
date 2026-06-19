@@ -122,6 +122,12 @@ const SignupPage = () => {
 
   const emailMsg = getEmailMsg();
 
+  const handleKakaoSignup = () => {
+    const redirectUri = `${window.location.origin}/api/auth/kakao`;
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=1e125441d9fd216da9509e331e584cd4&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
+    window.location.href = kakaoAuthUrl;
+  };
+
   return (
     <div className="fade-in" style={{ 
       minHeight: '80vh', 
@@ -302,7 +308,7 @@ const SignupPage = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
-          <div style={socialBtnStyle('#FEE500')} title="카카오 가입">K</div>
+          <div style={socialBtnStyle('#FEE500')} title="카카오 가입" onClick={handleKakaoSignup}>K</div>
           <div style={socialBtnStyle('#03C75A')} title="네이버 가입">N</div>
           <div style={socialBtnStyle('#fff', '#eee')} title="구글 가입">G</div>
         </div>

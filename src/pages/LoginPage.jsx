@@ -12,6 +12,23 @@ const LoginPage = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [showForgotModal, setShowForgotModal] = useState(false);
 
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const error = params.get('error');
+
+    if (token) {
+      localStorage.setItem('paldo_session_token', token);
+      window.dispatchEvent(new Event('auth-change'));
+      window.history.replaceState({}, null, window.location.pathname);
+      alert('로그인에 성공했습니다!');
+      navigate('/');
+    } else if (error) {
+      window.history.replaceState({}, null, window.location.pathname);
+      alert('소셜 로그인 실패: ' + decodeURIComponent(error));
+    }
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -34,6 +51,13 @@ const LoginPage = () => {
     e.preventDefault();
     alert('비밀번호 분실 시 관리자(goodduck2@naver.com)에게 문의해 주세요.');
     setShowForgotModal(false);
+  };
+
+  const handleKakaoLogin = () => {
+    const clientId = '1a125441d9fd216da9509a331a584cd4';
+    const redirectUri = `${window.location.origin}/api/auth/kakao`;
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
+    window.location.href = kakaoAuthUrl;
   };
 
 
@@ -116,7 +140,7 @@ const LoginPage = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
-          <div style={socialBtnStyle('#FEE500')} title="카카오 로그인">K</div>
+          <div style={socialBtnStyle('#FEE500')} title="카카오 로그인" onClick={handleKakaoLogin}>K</div>
           <div style={socialBtnStyle('#03C75A')} title="네이버 로그인">N</div>
           <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인">G</div>
         </div>

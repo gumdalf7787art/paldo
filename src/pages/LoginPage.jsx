@@ -59,6 +59,14 @@ const LoginPage = () => {
     window.location.href = kakaoAuthUrl;
   };
 
+  const handleNaverLogin = () => {
+    const redirectUri = `${window.location.origin}/api/auth/naver`;
+    const state = Math.random().toString(36).substring(2, 11);
+    localStorage.setItem('naver_state', state);
+    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Q2vmXowiBqzcUgm13IF0&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    window.location.href = naverAuthUrl;
+  };
+
 
   return (
     <div className="fade-in" style={{ 
@@ -140,7 +148,7 @@ const LoginPage = () => {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
           <div style={socialBtnStyle('#FEE500')} title="카카오 로그인" onClick={handleKakaoLogin}>K</div>
-          <div style={socialBtnStyle('#03C75A')} title="네이버 로그인">N</div>
+          <div style={socialBtnStyle('#03C75A')} title="네이버 로그인" onClick={handleNaverLogin}>N</div>
           <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인">G</div>
         </div>
 

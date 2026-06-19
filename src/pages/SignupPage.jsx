@@ -128,6 +128,14 @@ const SignupPage = () => {
     window.location.href = kakaoAuthUrl;
   };
 
+  const handleNaverSignup = () => {
+    const redirectUri = `${window.location.origin}/api/auth/naver`;
+    const state = Math.random().toString(36).substring(2, 11);
+    localStorage.setItem('naver_state', state);
+    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Q2vmXowiBqzcUgm13IF0&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    window.location.href = naverAuthUrl;
+  };
+
   return (
     <div className="fade-in" style={{ 
       minHeight: '80vh', 
@@ -309,7 +317,7 @@ const SignupPage = () => {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
           <div style={socialBtnStyle('#FEE500')} title="카카오 가입" onClick={handleKakaoSignup}>K</div>
-          <div style={socialBtnStyle('#03C75A')} title="네이버 가입">N</div>
+          <div style={socialBtnStyle('#03C75A')} title="네이버 가입" onClick={handleNaverSignup}>N</div>
           <div style={socialBtnStyle('#fff', '#eee')} title="구글 가입">G</div>
         </div>
 

@@ -67,6 +67,15 @@ const LoginPage = () => {
     window.location.href = naverAuthUrl;
   };
 
+  const handleGoogleLogin = () => {
+    const redirectUri = `${window.location.origin}/api/auth/google`;
+    const state = Math.random().toString(36).substring(2, 11);
+    localStorage.setItem('google_state', state);
+    const clientId = '231325371389-u2sstvm5bhqnr1jg6gt73v598iudoddu' + '.apps.googleusercontent.com';
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('openid email profile')}&state=${state}`;
+    window.location.href = googleAuthUrl;
+  };
+
 
   return (
     <div className="fade-in" style={{ 
@@ -149,7 +158,7 @@ const LoginPage = () => {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
           <div style={socialBtnStyle('#FEE500')} title="카카오 로그인" onClick={handleKakaoLogin}>K</div>
           <div style={socialBtnStyle('#03C75A')} title="네이버 로그인" onClick={handleNaverLogin}>N</div>
-          <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인">G</div>
+          <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인" onClick={handleGoogleLogin}>G</div>
         </div>
 
         <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)' }}>

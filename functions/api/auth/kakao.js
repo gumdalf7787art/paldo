@@ -26,6 +26,7 @@ export async function onRequestGet(context) {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         client_id: '1e125441d9fd216da9509e331e584cd4',
+        client_secret: '7eNj5dRdkP9XOMe9udQuJiE3hscWqi3g',
         redirect_uri: `${origin}/api/auth/kakao`,
         code: code
       })

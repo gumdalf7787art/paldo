@@ -200,7 +200,7 @@ const MyPage = () => {
     fetchChatRooms(session.user.id);
     const intervalId = setInterval(() => {
       fetchChatRooms(session.user.id);
-    }, 5000);
+    }, 2000);
 
     return () => {
       clearInterval(intervalId);
@@ -1735,8 +1735,8 @@ const ChatWindow = ({ room, userId, onClose }) => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMessages();
-    // 실시간 대신 3초 폴링 방식으로 신규 메시지 감지
-    const intervalId = setInterval(fetchMessages, 3000);
+    // 실시간 감지를 극대화하기 위해 1초(1000ms) 폴링 방식으로 신규 메시지 감지
+    const intervalId = setInterval(fetchMessages, 1000);
     return () => clearInterval(intervalId);
   }, [room.id]);
 

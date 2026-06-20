@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     room_id TEXT NOT NULL,
     sender_id TEXT NOT NULL,
     message TEXT NOT NULL,
+    is_read INTEGER DEFAULT 0,                 -- 0: 안읽음, 1: 읽음
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
     FOREIGN KEY(sender_id) REFERENCES profiles(id) ON DELETE CASCADE

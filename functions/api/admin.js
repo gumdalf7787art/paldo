@@ -186,10 +186,16 @@ export async function onRequestPost(context) {
     if (!id || !user_id) {
       return createResponse({ error: '신청서 ID와 유저 ID는 필수입니다.' }, 400);
     }
-
     try {
+      const app = await env.DB.prepare('SELECT business_name FROM business_applications WHERE id = ?').bind(id).first();
+      const bizName = app ? app.business_name : null;
+
       await env.DB.prepare('UPDATE business_applications SET status = "approved" WHERE id = ?').bind(id).run();
-      await env.DB.prepare('UPDATE profiles SET role = "seller" WHERE id = ?').bind(user_id).run();
+      if (bizName) {
+        await env.DB.prepare('UPDATE profiles SET role = "seller", nickname = ? WHERE id = ?').bind(bizName, user_id).run();
+      } else {
+        await env.DB.prepare('UPDATE profiles SET role = "seller" WHERE id = ?').bind(user_id).run();
+      }
       
       // 자동 발급 쿠폰(welcome 타입) 지급
       const { results: welcomeCoupons } = await env.DB.prepare('SELECT id, valid_until FROM coupons WHERE auto_issue_type = "welcome"').all();

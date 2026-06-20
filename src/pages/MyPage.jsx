@@ -156,16 +156,34 @@ const MyPage = () => {
       setActiveTab('notifications');
       // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지
       navigate(location.pathname, { replace: true, state: {} });
-    } else if (location.state?.openRoomId && chatRooms.length > 0) {
-      const room = chatRooms.find(r => r.id === location.state.openRoomId);
-      if (room) {
-        setSelectedRoom(room);
+    } else if (location.state?.activeTab === 'chats' || location.state?.openRoomId) {
+      if (activeTab !== 'chats') {
         setActiveTab('chats');
-        // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지
+      }
+
+      if (location.state.openRoomId) {
+        if (chatRooms.length > 0) {
+          const room = chatRooms.find(r => r.id === location.state.openRoomId);
+          if (room) {
+            setSelectedRoom(room);
+            // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지
+            navigate(location.pathname, { replace: true, state: {} });
+          }
+        }
+      } else {
+        // 방 ID 정보는 없고 단순 탭 전환만 필요한 경우 state를 비워 리렌더링 시 반복 방지
         navigate(location.pathname, { replace: true, state: {} });
       }
     }
-  }, [location.state, chatRooms, navigate, location.pathname]);
+  }, [location.state, chatRooms, navigate, location.pathname, activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'chats' && !selectedRoom && chatRooms.length > 0) {
+      if (!location.state?.openRoomId) {
+        setSelectedRoom(chatRooms[0]);
+      }
+    }
+  }, [activeTab, selectedRoom, chatRooms, location.state]);
 
   useEffect(() => {
     if (newPassword && confirmPassword) {
@@ -297,7 +315,20 @@ const MyPage = () => {
       const enrichedRooms = rooms.map(room => {
         return {
           ...room,
-          seller_business_name: room.seller_business_name || room.seller?.nickname || '판매자'
+          dogs: {
+            nickname: room.dog_nickname,
+            breed: room.dog_breed,
+            image_url: room.dog_image_url
+          },
+          buyer: {
+            nickname: room.buyer_nickname,
+            profile_image: room.buyer_profile_image
+          },
+          seller: {
+            nickname: room.seller_nickname,
+            profile_image: room.seller_profile_image
+          },
+          seller_business_name: room.seller_nickname || '판매자'
         };
       });
       setChatRooms(enrichedRooms);
@@ -725,7 +756,7 @@ const MyPage = () => {
 
           {/* ── 메인 콘텐츠 영역 ── */}
           <main>
-            <div className="glass-card mypage-main-card" style={{ padding: '40px', minHeight: '700px' }}>
+            <div className="glass-card mypage-main-card" style={{ padding: activeTab === 'chats' ? '0' : '40px', minHeight: '700px', overflow: activeTab === 'chats' ? 'hidden' : 'visible' }}>
               
               {/* === 프로필 편집 화면 === */}
               {isEditingProfile && (
@@ -1266,68 +1297,101 @@ const MyPage = () => {
                       {chatRooms.length === 0 ? (
                         <div style={{ ...emptyStyle, paddingTop: '50px' }}>진행 중인 대화가 없습니다.</div>
                       ) : (
-                        chatRooms.map(room => (
-                          <div 
-                            key={room.id} 
-                            onClick={() => {
-                              setSelectedRoom(room);
-                            }} 
-                            style={{ 
-                              ...chatRoomItemStyle, 
-                              borderRadius: '0', 
-                              border: 'none', 
-                              borderBottom: '1px solid #f5f5f5',
-                              backgroundColor: selectedRoom?.id === room.id ? '#fff0f0' : 'white',
-                              transition: 'all 0.2s',
-                              position: 'relative'
-                            }}
-                          >
-                            <img src={room.dogs?.image_url} alt="dog" style={{ width: '45px', height: '45px', borderRadius: '10px', objectFit: 'cover' }} />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                   {/* 상대방 정보 표시 (구매자/판매자에 따라 다름) */}
-                                   <div style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '3px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                     {session.user.id === room.buyer_id ? (
-                                       // 내가 구매자라면: 업체명 - 강아지
-                                       <span style={{ color: 'var(--primary-dark)' }}>{room.seller_business_name} <span style={{ fontWeight: '400', color: '#888', fontSize: '0.9rem' }}>- {room.dogs?.nickname}</span></span>
-                                     ) : (
-                                       // 내가 판매자라면: 구매자닉네임 - 강아지
-                                       <span style={{ color: '#333' }}>{room.buyer?.nickname} <span style={{ fontWeight: '400', color: '#888', fontSize: '0.9rem' }}>- {room.dogs?.nickname}</span></span>
-                                     )}
-                                   </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                   {/* 안읽음 표시 */}
-                                   {((session.user.id === room.buyer_id && room.buyer_has_unread) || 
-                                     (session.user.id === room.seller_id && room.seller_has_unread)) && (
-                                     <span style={{ width: '8px', height: '8px', backgroundColor: '#e63946', borderRadius: '50%' }}></span>
-                                   )}
-                                   {/* 게시물 바로가기 버튼 */}
-                                   <button 
-                                     onClick={(e) => {
-                                       e.preventDefault();
-                                       e.stopPropagation();
-                                       window.open(`/detail?id=${room.dog_id}`, '_blank');
-                                     }}
-                                     style={{ 
-                                       padding: '3px 8px', 
-                                       fontSize: '0.75rem', 
-                                       backgroundColor: 'var(--primary-dark)', 
-                                       color: 'white', 
-                                       border: 'none', 
-                                       borderRadius: '6px', 
-                                       cursor: 'pointer',
-                                       fontWeight: 'bold',
-                                       minWidth: '70px'
-                                     }}
-                                   >
-                                     게시물 🔗
-                                   </button>
+                        chatRooms.map(room => {
+                          // 내가 읽지 않은 메시지가 있는지 확인
+                          const hasUnread = session.user.id === room.buyer_id
+                            ? !!room.buyer_has_unread
+                            : !!room.seller_has_unread;
+                          // 상대방 표시명
+                          const opponentName = session.user.id === room.buyer_id
+                            ? (room.seller_nickname || '판매자')
+                            : (room.buyer_nickname || '구매자');
+                          return (
+                            <div
+                              key={room.id}
+                              onClick={() => {
+                                setSelectedRoom(room);
+                                // 읽음 처리: 내 unread 플래그를 0으로
+                                if (hasUnread) {
+                                  api.chat.markRead(room.id).then(() => {
+                                    // 로컬 상태도 즉시 업데이트
+                                    setChatRooms(prev => prev.map(r =>
+                                      r.id === room.id
+                                        ? {
+                                            ...r,
+                                            buyer_has_unread: session.user.id === r.buyer_id ? 0 : r.buyer_has_unread,
+                                            seller_has_unread: session.user.id === r.seller_id ? 0 : r.seller_has_unread,
+                                          }
+                                        : r
+                                    ));
+                                  });
+                                }
+                              }}
+                              style={{
+                                ...chatRoomItemStyle,
+                                borderRadius: '0',
+                                border: 'none',
+                                borderBottom: '1px solid #f5f5f5',
+                                backgroundColor: selectedRoom?.id === room.id ? '#fff0f0' : (hasUnread ? '#fffaf0' : 'white'),
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                              }}
+                            >
+                              {/* 강아지 이미지 */}
+                              {room.dog_image_url
+                                ? <img src={room.dog_image_url} alt="dog" style={{ width: '45px', height: '45px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                                : <div style={{ width: '45px', height: '45px', borderRadius: '10px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>🐶</div>
+                              }
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
+                                  <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    <span style={{ color: 'var(--primary-dark)' }}>{opponentName}</span>
+                                    <span style={{ fontWeight: '400', color: '#888', fontSize: '0.85rem' }}> · {room.dog_nickname || '강아지'}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                    {/* NEW 배지 */}
+                                    {hasUnread && (
+                                      <span style={{
+                                        padding: '2px 7px',
+                                        backgroundColor: '#e63946',
+                                        color: 'white',
+                                        borderRadius: '10px',
+                                        fontSize: '0.68rem',
+                                        fontWeight: '900',
+                                        letterSpacing: '0.05em',
+                                        animation: 'pulse 1.5s infinite',
+                                      }}>NEW</span>
+                                    )}
+                                    {/* 게시물 바로가기 */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        window.open(`/detail?id=${room.dog_id}`, '_blank');
+                                      }}
+                                      style={{
+                                        padding: '3px 8px',
+                                        fontSize: '0.72rem',
+                                        backgroundColor: 'var(--primary-dark)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontWeight: 'bold',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      게시물 🔗
+                                    </button>
+                                  </div>
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {room.last_message || '대화를 시작해주세요.'}
                                 </div>
                               </div>
-                              <div style={{ fontSize: '0.8rem', color: '#444', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>{room.last_message || '대화를 시작해주세요.'}</div>
                             </div>
-                          </div>
-                        ))
+                          );
+                        })
                       )}
                     </div>
                   </div>
@@ -1659,6 +1723,12 @@ const ChatWindow = ({ room, userId, onClose }) => {
         content: m.content || m.message || '',
       }));
       setMessages(normalized);
+
+      // 상대방이 보낸 메시지 중 내가 아직 읽지 않은 것이 있는지 체크
+      const hasUnreadFromOpponent = normalized.some(m => m.sender_id !== userId && Number(m.is_read) === 0);
+      if (hasUnreadFromOpponent) {
+        await api.chat.markRead(room.id);
+      }
     }
   };
 
@@ -1710,7 +1780,7 @@ const ChatWindow = ({ room, userId, onClose }) => {
   const chatTitle = room.dog_nickname || room.dogs?.nickname || '상담';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div style={{ ...chatHeaderStyle }}>
         <div><div style={{ fontWeight: '800' }}>{chatTitle} 상담</div></div>
         <button
@@ -1731,20 +1801,46 @@ const ChatWindow = ({ room, userId, onClose }) => {
         {messages.map((msg, i) => {
           const isMe = msg.sender_id === userId;
           const avatarUrl = getAvatar(msg);
+          const showReadStatus = isMe && (String(msg.id).startsWith('temp_') || Number(msg.is_read) === 0);
+
           return (
             <div key={msg.id || i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row', marginBottom: '15px' }}>
               <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: '#eee', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="프사" /> : <span style={{ fontSize: '1.2rem' }}>🐶</span>}
               </div>
-              <div style={{ padding: '10px 15px', borderRadius: '15px', maxWidth: '70%', backgroundColor: isMe ? 'var(--primary)' : '#f0f0f0', color: isMe ? 'white' : '#333' }}>
-                {msg.content}
+              
+              <div style={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: '8px', maxWidth: '70%' }}>
+                <div style={{ padding: '10px 15px', borderRadius: '15px', backgroundColor: isMe ? 'var(--primary)' : '#f0f0f0', color: isMe ? 'white' : '#333', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
+                  {msg.content}
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', fontSize: '0.75rem', color: '#999', minWidth: 'fit-content' }}>
+                  {showReadStatus && (
+                    <span style={{ color: '#ffd200', fontWeight: 'bold', fontSize: '0.8rem', marginBottom: '2px' }}>1</span>
+                  )}
+                  <span style={{ fontSize: '0.68rem', color: '#bbb' }}>
+                    {msg.created_at ? new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
+                  </span>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
       <form onSubmit={sendMessage} style={chatInputAreaStyle}>
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="메시지를 입력하세요..." style={chatInputStyle} />
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage(e);
+            }
+          }}
+          placeholder="메시지를 입력하세요... (Shift+Enter: 줄바꿈)"
+          rows={1}
+          style={chatInputStyle}
+        />
         <button type="submit" style={sendBtnStyle}>전송</button>
       </form>
     </div>
@@ -1760,10 +1856,10 @@ const emptyStyle = { textAlign: 'center', color: '#ccc', paddingTop: '100px', fo
 const chatRoomItemStyle = { display: 'flex', gap: '15px', padding: '20px', borderRadius: '15px', border: '1px solid #eee', cursor: 'pointer', backgroundColor: 'white' };
 const modalOverlayStyle = { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 };
 const chatHeaderStyle = { padding: '20px', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
-const messageAreaStyle = { flex: 1, padding: '20px', overflowY: 'auto', backgroundColor: '#fafafa', display: 'flex', flexDirection: 'column' };
-const chatInputAreaStyle = { padding: '15px', borderTop: '1px solid #eee', display: 'flex', gap: '10px', backgroundColor: 'white' };
-const chatInputStyle = { flex: 1, padding: '10px 15px', borderRadius: '20px', border: '1px solid #eee', outline: 'none' };
-const sendBtnStyle = { padding: '10px 20px', borderRadius: '20px', border: 'none', backgroundColor: 'var(--primary)', color: 'white', fontWeight: '800', cursor: 'pointer' };
+const messageAreaStyle = { flex: 1, minHeight: 0, padding: '20px', overflowY: 'auto', backgroundColor: '#fafafa', display: 'flex', flexDirection: 'column' };
+const chatInputAreaStyle = { padding: '15px', borderTop: '1px solid #eee', display: 'flex', gap: '10px', backgroundColor: 'white', flexShrink: 0 };
+const chatInputStyle = { flex: 1, padding: '10px 15px', borderRadius: '12px', border: '1px solid #eee', outline: 'none', resize: 'none', minHeight: '42px', maxHeight: '120px', lineHeight: '1.5', fontFamily: 'inherit', fontSize: '0.95rem', overflowY: 'auto' };
+const sendBtnStyle = { padding: '10px 20px', borderRadius: '20px', border: 'none', backgroundColor: 'var(--primary)', color: 'white', fontWeight: '800', cursor: 'pointer', alignSelf: 'flex-end', flexShrink: 0 };
 const thStyle = { padding: '12px', fontSize: '0.85rem', color: '#666' };
 const tdStyle = { padding: '12px', fontSize: '0.9rem', color: '#444' };
 const tableBtnStyle = { padding: '6px 12px', borderRadius: '6px', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', fontSize: '0.8rem' };

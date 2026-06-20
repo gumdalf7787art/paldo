@@ -5,7 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    chunkSizeWarningLimit: 2000
+    chunkSizeWarningLimit: 2000,
+    minify: false,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // 빌드가 다운되는 것을 방지하기 위해 과도한 경고 출력을 억제합니다.
+        return;
+      }
+    }
   },
   server: {
     watch: {

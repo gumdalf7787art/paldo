@@ -416,6 +416,18 @@ export const api = {
       } catch (err) {
         return { data: null, error: err.message };
       }
+    },
+
+    async markRead(roomId) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/chat?action=mark_read`, {
+          method: 'POST',
+          body: JSON.stringify({ room_id: roomId }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
     }
   },
 

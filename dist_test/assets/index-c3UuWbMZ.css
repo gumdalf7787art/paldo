@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap');
 /* Last Updated: 2026-04-14 14:49 (Mobile Force Update) */
-
 html {
   font-size: 77%; /* Scale down overall font-size by 23% (15% further from 90%) */
 }
-
 :root {
   --primary: #26A69A; /* Mint */
   --primary-light: #B2DFDB;
@@ -25,13 +23,11 @@ html {
   --p1: #FF5252; --p2: #FFAD42; --p3: #F4FF81; --p4: #64FFDA;
   --p5: #40C4FF; --p6: #7C4DFF; --p7: #E040FB; --p8: #FF4081;
 }
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 body {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: var(--bg-primary);
@@ -39,19 +35,16 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
-
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   color: var(--body-text);
 }
-
 a {
   text-decoration: none;
   color: inherit;
   transition: var(--transition);
 }
-
 button {
   cursor: pointer;
   border: none;
@@ -59,11 +52,9 @@ button {
   transition: var(--transition);
   font-family: inherit;
 }
-
 ul {
   list-style: none;
 }
-
 /* Common Layout */
 .container {
   max-width: 1020px; /* Reduced from 1200px by 15% */
@@ -71,13 +62,11 @@ ul {
   padding: 0 20px;
   width: 100%;
 }
-
 @media (max-width: 768px) {
   .container {
     padding: 0 15px;
   }
 }
-
 .glass-card {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -85,77 +74,64 @@ ul {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
 }
-
 /* Response Grid Classes */
 .responsive-grid-2 {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 15px; /* Reduced from 20px */
 }
-
 .adoption-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 15px;
 }
-
 @media (max-width: 1200px) {
   .responsive-grid-2 { grid-template-columns: repeat(4, 1fr) !important; }
   .adoption-grid { grid-template-columns: repeat(5, 1fr) !important; }
 }
-
 @media (max-width: 992px) {
   .responsive-grid-2 { grid-template-columns: repeat(3, 1fr) !important; }
   .adoption-grid { grid-template-columns: repeat(4, 1fr) !important; }
 }
-
 @media (max-width: 768px) {
   .adoption-grid { grid-template-columns: repeat(3, 1fr) !important; }
 }
-
 @media (max-width: 600px) {
   .responsive-grid-2 { 
     grid-template-columns: repeat(2, 1fr) !important; 
     gap: 10px; /* Reduced from 12px */
   }
 }
-
 @media (max-width: 480px) {
   .adoption-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px;
   }
 }
-
 .recommend-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
 }
-
 @media (max-width: 768px) {
   .recommend-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
-
 .responsive-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px; /* Reduced from 24px */
 }
-
 @media (max-width: 1200px) {
   .responsive-grid-4 { grid-template-columns: repeat(3, 1fr) !important; }
 }
-
 @media (max-width: 768px) {
   .responsive-grid-4 { 
     grid-template-columns: repeat(2, 1fr) !important; 
     gap: 12px; /* Reduced from 15px */
   }
 }
-
 /* Section Title Styles */
 .section-title-wrap {
   margin-bottom: 25px;
@@ -164,20 +140,17 @@ ul {
   gap: 15px;
   flex-wrap: wrap;
 }
-
 .section-title-wrap h2 {
   font-size: 1.8rem;
   font-weight: 800;
   white-space: nowrap;
   word-break: keep-all;
 }
-
 .section-title-wrap span {
   color: var(--muted-text);
   font-size: 1rem;
   white-space: nowrap;
 }
-
 @media (max-width: 600px) {
   .section-title-wrap {
     gap: 5px;
@@ -192,23 +165,14 @@ ul {
     margin-top: -2px;
   }
 }
-
-
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.75; transform: scale(1.08); }
-}
-
 .fade-in {
   animation: fadeIn 0.8s ease forwards;
 }
-
 /* Badge Styles */
 .badge {
   padding: 4px 12px;
@@ -219,27 +183,22 @@ ul {
   display: inline-block;
   white-space: nowrap;
 }
-
 .badge-safe { background: #E8F5E9; color: #2E7D32; }
 .badge-popular { background: #FFF3E0; color: #E65100; }
 .badge-special { background: #F3E5F5; color: #7B1FA2; }
 .badge-recommend { background: #E0F2FE; color: #0369A1; }
 .badge-new { background: #FFE4E6; color: #E11D48; }
-
 /* Modern Card Layout */
 .modern-card:hover .card-image-container {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
-
 .modern-card:hover h3 {
   color: var(--primary);
 }
-
 .card-image-container {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
 }
-
 .card-image-container::after {
   content: '';
   position: absolute;
@@ -250,53 +209,42 @@ ul {
   background: linear-gradient(to bottom, rgba(0,0,0,0.05), transparent 30%);
   pointer-events: none;
 }
-
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
-
 ::-webkit-scrollbar-thumb {
   background: var(--primary-light);
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
-
 /* Popular Breeds Section */
 .breed-item {
   transition: transform 0.3s ease;
 }
-
 .breed-item:hover {
   transform: translateY(-5px);
 }
-
 .breed-item:hover .breed-icon-circle {
   background-color: var(--primary-light);
   border-color: var(--primary);
 }
-
 .breed-item:hover span {
   color: var(--primary-dark);
 }
-
 .breed-icon-circle {
   transition: var(--transition);
 }
-
 @media (max-width: 992px) {
   .breed-grid {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }
-
 @media (max-width: 600px) {
   .breed-grid {
     grid-template-columns: repeat(3, 1fr) !important;
@@ -307,7 +255,6 @@ ul {
     font-size: 1.5rem !important;
   }
 }
-
 /* Utility for text truncation */
 .line-clamp-1 {
   display: -webkit-box;
@@ -315,31 +262,26 @@ ul {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 /* Logo Responsive */
 .logo-container {
   display: flex;
   align-items: center;
 }
-
 .logo-image {
   height: 42px;
   width: auto;
   object-fit: contain;
   transition: var(--transition);
 }
-
 @media (max-width: 600px) {
   .logo-image {
     height: 32px;
   }
 }
-
 /* Header Responsive */
 .header-responsive {
   transition: var(--transition);
 }
-
 @media (max-width: 600px) {
   .header-content {
     height: 60px !important;
@@ -355,7 +297,6 @@ ul {
     font-size: 0.75rem !important;
   }
 }
-
 @media (max-width: 400px) {
   .nav-group {
     gap: 5px !important;
@@ -365,22 +306,17 @@ ul {
     font-size: 0.7rem !important;
   }
 }
-
 html, body {
   max-width: 100%;
   overflow-x: hidden;
 }
-
-
 /* Mobile Helpers */
 .mobile-only {
   display: none;
 }
-
 .desktop-only {
   display: block;
 }
-
 @media (max-width: 600px) {
   .mobile-only {
     display: block;
@@ -389,14 +325,12 @@ html, body {
     display: none;
   }
 }
-
 /* Detail Page Responsive */
 .detail-main-grid {
   display: grid;
   grid-template-columns: 1fr 310px;
   gap: 30px;
 }
-
 @media (max-width: 992px) {
   .detail-main-grid {
     display: flex !important;
@@ -413,11 +347,9 @@ html, body {
     order: 2 !important; /* 상세 설명은 그 다음 */
   }
 }
-
 .detail-image-section {
   margin-bottom: 25px;
 }
-
 .mobile-bottom-bar {
   position: fixed;
   bottom: 0;
@@ -431,7 +363,6 @@ html, body {
   gap: 10px;
   z-index: 9999; /* 최상단 보장 */
 }
-
 @media (max-width: 768px) {
   .mobile-bottom-bar {
     display: grid !important;
@@ -440,18 +371,15 @@ html, body {
     padding-bottom: 80px !important; /* 하단 바 공간 확보 */
   }
 }
-
 .info-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
 }
-
 .info-grid-child-border {
   border-left: 1px solid #eee;
   padding-left: 40px;
 }
-
 @media (max-width: 768px) {
   .info-grid-2 {
     grid-template-columns: 1fr !important;
@@ -464,39 +392,31 @@ html, body {
     padding-top: 20px;
   }
 }
-
-
 /* =============================
    MyPage Mobile Optimization
    ============================= */
-
 /* 마이페이지 전체 레이아웃 */
 .mypage-layout {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) 3fr;
   gap: 30px;
 }
-
 @media (max-width: 992px) {
   .mypage-layout {
     grid-template-columns: 1fr !important;
     gap: 15px !important;
   }
 }
-
 /* 모바일 탭 내비게이션 */
 .mypage-mobile-nav {
   display: none;
 }
-
 .mypage-desktop-sidebar {
   display: block;
 }
-
 .mypage-profile-card {
   display: none;
 }
-
 @media (max-width: 992px) {
   .mypage-mobile-nav {
     display: flex;
@@ -519,7 +439,6 @@ html, body {
     text-align: left !important;
   }
 }
-
 /* 탭 칩 버튼 */
 .mypage-nav-chip {
   flex-shrink: 0;
@@ -539,7 +458,6 @@ html, body {
   color: white;
   border-color: var(--primary-dark);
 }
-
 /* 메인 컨텐츠 패딩 */
 @media (max-width: 992px) {
   .mypage-main-card {
@@ -547,10 +465,8 @@ html, body {
     min-height: auto !important;
   }
 }
-
 /* 게시물‧광고 테이블 숨기고 카드 보이기 (모바일) */
 .post-card-list { display: none; }
-
 @media (max-width: 768px) {
   .post-table-wrap { display: none !important; }
   .post-card-list {
@@ -559,7 +475,6 @@ html, body {
     gap: 12px;
   }
 }
-
 /* 포스트 모바일 카드 */
 .post-mobile-card {
   border: 1px solid #eee;
@@ -570,37 +485,28 @@ html, body {
   gap: 12px;
   align-items: flex-start;
 }
-
 /* 채팅 레이아웃 모바일 대응 */
 .chat-layout {
   display: grid;
   grid-template-columns: 350px 1fr;
-  grid-template-rows: 700px;
-  gap: 0;
+  gap: 20px;
   height: 700px;
   background: white;
   border-radius: 20px;
-  border: none;
+  border: 1px solid #eee;
   overflow: hidden;
 }
-
 .chat-room-panel {
   border-right: 1px solid #eee;
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
 }
-
 .chat-detail-panel {
   height: 100%;
   background: #fcfcfc;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
-
 @media (max-width: 768px) {
   .chat-layout {
     grid-template-columns: 1fr !important;
@@ -629,7 +535,6 @@ html, body {
   .chat-layout.room-open .chat-room-panel { display: none; }
   .chat-layout.room-open .chat-detail-panel { height: 80vh; }
 }
-
 /* 폼 그리드 모바일 1열 */
 .form-grid-2 {
   display: grid;
@@ -642,7 +547,6 @@ html, body {
     gap: 12px !important;
   }
 }
-
 /* 통계 그리드 */
 .stats-grid {
   display: grid;
@@ -655,7 +559,6 @@ html, body {
     gap: 15px !important;
   }
 }
-
 /* =============================
    Naver Style Portal Layout
    ============================= */
@@ -666,14 +569,12 @@ html, body {
   margin-top: 10px; /* Reduced by 50% */
   margin-bottom: 22px; /* Reduced by 50% */
 }
-
 @media (max-width: 1024px) {
   .main-portal-layout {
     grid-template-columns: 1fr;
     gap: 15px;
   }
 }
-
 /* Naver Style Search Bar */
 .naver-search-container {
   display: flex;
@@ -681,7 +582,6 @@ html, body {
   padding: 20px 0; /* Reduced from 30px 0 */
   background-color: var(--bg-primary);
 }
-
 .naver-search-bar {
   display: flex;
   align-items: center;
@@ -694,7 +594,6 @@ html, body {
   padding: 0 14px;
   box-shadow: 0 2px 8px rgba(38, 166, 154, 0.08);
 }
-
 .naver-search-input {
   flex: 1;
   border: none;
@@ -704,7 +603,6 @@ html, body {
   color: var(--body-text);
   padding: 0 10px;
 }
-
 .naver-search-button {
   background: none;
   border: none;
@@ -715,7 +613,6 @@ html, body {
   align-items: center;
   justify-content: center;
 }
-
 /* Breed Chips (Naver Style Quick Shortcuts) */
 .breed-chips-container {
   display: flex;
@@ -730,7 +627,6 @@ html, body {
 .breed-chips-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
-
 .breed-chip {
   flex-shrink: 0;
   padding: 8px 16px;
@@ -746,13 +642,11 @@ html, body {
   align-items: center;
   gap: 6px;
 }
-
 .breed-chip:hover {
   border-color: var(--primary);
   color: var(--primary-dark);
   background-color: var(--primary-light);
 }
-
 /* Cast Tabs (안심 / 인기 / 스페셜) */
 .cast-tabs-container {
   border: 1px solid #e2e8f0;
@@ -762,13 +656,11 @@ html, body {
   box-shadow: var(--shadow);
   margin-bottom: 30px;
 }
-
 .cast-tabs-header {
   display: flex;
   background-color: #f7fafc;
   border-bottom: 1px solid #e2e8f0;
 }
-
 .cast-tab-btn {
   flex: 1;
   padding: 16px;
@@ -781,18 +673,15 @@ html, body {
   text-align: center;
   transition: var(--transition);
 }
-
 .cast-tab-btn.active {
   color: var(--primary-dark);
   background-color: white;
   border-bottom: 2px solid var(--primary);
   margin-bottom: -1px;
 }
-
 .cast-tab-content {
   padding: 24px;
 }
-
 /* Login Widget (Sidebar) */
 .naver-login-widget {
   background-color: white;
@@ -802,13 +691,11 @@ html, body {
   box-shadow: var(--shadow);
   margin-bottom: 10px;
 }
-
 .naver-login-widget-text {
   font-size: 0.85rem;
   color: #718096;
   margin-bottom: 12px;
 }
-
 .naver-login-btn {
   display: block;
   width: 100%;
@@ -823,11 +710,9 @@ html, body {
   margin-bottom: 12px;
   transition: var(--transition);
 }
-
 .naver-login-btn:hover {
   background-color: var(--primary-dark);
 }
-
 .naver-login-links {
   display: flex;
   justify-content: center;
@@ -836,16 +721,13 @@ html, body {
   color: #a0aec0;
   padding: 0;
 }
-
 .naver-login-links a {
   color: #a0aec0 !important;
 }
-
 .naver-login-links a:hover {
   text-decoration: underline;
   color: var(--body-text) !important;
 }
-
 /* Profile Widget (Sidebar - Logged In) */
 .naver-profile-widget {
   background-color: white;
@@ -855,14 +737,12 @@ html, body {
   box-shadow: var(--shadow);
   margin-bottom: 10px;
 }
-
 .profile-widget-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
 }
-
 .profile-widget-avatar {
   width: 50px;
   height: 50px;
@@ -876,17 +756,14 @@ html, body {
   color: var(--primary-dark);
   overflow: hidden;
 }
-
 .profile-widget-info h4 {
   font-size: 0.95rem;
   margin-bottom: 2px;
 }
-
 .profile-widget-info span {
   font-size: 0.75rem;
   color: #718096;
 }
-
 .profile-widget-menu {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -894,7 +771,6 @@ html, body {
   border-top: 1px solid #edf2f7;
   padding-top: 16px;
 }
-
 .profile-widget-menu-btn {
   padding: 10px;
   font-size: 0.85rem;
@@ -905,24 +781,20 @@ html, body {
   border: 1px solid #cbd5e1;
   transition: var(--transition);
 }
-
 .profile-widget-menu-btn:hover {
   background-color: #edf2f7;
   color: var(--primary-dark);
 }
-
 .profile-widget-logout-btn {
   grid-column: 1 / -1;
   background-color: white;
   border: 1px solid #fed7d7;
   color: #e53e3e;
 }
-
 .profile-widget-logout-btn:hover {
   background-color: #fff5f5;
   color: #c53030;
 }
-
 /* Header User Dropdown Item */
 .header-dropdown-item {
   padding: 10px 16px;
@@ -939,12 +811,10 @@ html, body {
   cursor: pointer;
   box-sizing: border-box;
 }
-
 .header-dropdown-item:hover {
   background-color: #f1f5f9;
   color: var(--primary) !important;
 }
-
 /* MyPage Dashboard Stats Grid */
 .dashboard-stats-grid {
   display: grid;
@@ -952,18 +822,15 @@ html, body {
   gap: 15px;
   margin-bottom: 40px;
 }
-
 .dashboard-stats-grid.buyer {
   grid-template-columns: repeat(2, 1fr);
 }
-
 @media (max-width: 768px) {
   .dashboard-stats-grid {
     grid-template-columns: 1fr !important;
     gap: 12px;
   }
 }
-
 /* Ad Section Carousel Arrow Button */
 .ad-carousel-btn {
   position: absolute;
@@ -983,21 +850,17 @@ html, body {
   transition: all 0.2s ease;
   color: #475569;
 }
-
 .ad-carousel-btn:hover {
   background-color: #ffffff;
   transform: translateY(-50%) scale(1.1);
   color: #26A69A; /* var(--primary) */
 }
-
 .ad-carousel-btn.left {
   left: 5px;
 }
-
 .ad-carousel-btn.right {
   right: 5px;
 }
-
 /* Header Slogans Responsive */
 @media (max-width: 900px) {
   .header-slogans-container {

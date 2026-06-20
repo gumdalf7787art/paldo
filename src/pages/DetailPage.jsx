@@ -72,7 +72,7 @@ function renderPrice(dog) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '2rem' }}>{formattedMain}</span>
-          {dog.is_negotiable && <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', fontWeight: 'bold' }}>협의가능</span>}
+          {!!dog.is_negotiable && <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', fontWeight: 'bold' }}>협의가능</span>}
         </div>
       </div>
     );
@@ -80,7 +80,7 @@ function renderPrice(dog) {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {formattedMain}
-      {dog.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
+      {!!dog.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
         <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', marginLeft: '10px', fontWeight: 'bold' }}>협의가능</span>
       )}
     </div>
@@ -636,7 +636,7 @@ const DetailPage = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--muted-text)' }}>성별 {" / "} 접종</span>
-                  <span>{dog.gender} {" / "} {dog.vaccination || '미등록'}</span>
+                  <span>{dog.gender} {" / "} {dog.vaccine || '미등록'}</span>
                 </div>
                 {sellerInfo && (
                   <>

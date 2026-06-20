@@ -102,9 +102,25 @@ export async function onRequestGet(context) {
       .bind(sellerId)
       .first();
 
+    // 현재 분양중인 게시물 수 조회
+    const activeCountResult = await env.DB.prepare('SELECT COUNT(*) as count FROM dogs WHERE seller_id = ? AND status = "available"')
+      .bind(sellerId)
+      .first();
+    const active_count = activeCountResult ? activeCountResult.count : 0;
+
+    // 해당 상점에 대한 리뷰들 조회
+    const { results: reviews } = await env.DB.prepare(
+      'SELECT r.id, r.seller_id, r.reviewer_id, r.rating, r.content, r.created_at, p.nickname, p.profile_image FROM store_reviews r LEFT JOIN profiles p ON r.reviewer_id = p.id WHERE r.seller_id = ? ORDER BY r.created_at DESC'
+    )
+      .bind(sellerId)
+      .all();
+
     return createResponse({
       profile,
-      biz: biz || null
+      biz: biz || null,
+      business: biz || null,
+      active_count,
+      reviews: reviews || []
     });
   } catch (err) {
     return createResponse({ error: `상점 정보 조회 실패: ${err.message}` }, 500);

@@ -231,7 +231,8 @@ export async function onRequestPost(context) {
 
     const { 
       nickname, phone, address, profile_image,
-      store_header_image, store_contact, kakao_channel, store_description, store_address, store_additional_images
+      store_header_image, store_contact, kakao_channel, store_description, store_address, store_additional_images,
+      completed_adoption_count
     } = body;
 
     let additionalImagesStr = undefined;
@@ -239,6 +240,14 @@ export async function onRequestPost(context) {
       additionalImagesStr = Array.isArray(store_additional_images) 
         ? JSON.stringify(store_additional_images) 
         : store_additional_images;
+    }
+
+    let finalNickname = nickname;
+    if (authUser.role === 'seller') {
+      const app = await env.DB.prepare('SELECT business_name FROM business_applications WHERE user_id = ? AND status = "approved" ORDER BY created_at DESC LIMIT 1').bind(authUser.id).first();
+      if (app && app.business_name) {
+        finalNickname = app.business_name;
+      }
     }
 
     try {
@@ -254,11 +263,12 @@ export async function onRequestPost(context) {
             kakao_channel = COALESCE(?, kakao_channel),
             store_description = COALESCE(?, store_description),
             store_address = COALESCE(?, store_address),
-            store_additional_images = COALESCE(?, store_additional_images)
+            store_additional_images = COALESCE(?, store_additional_images),
+            completed_adoption_count = COALESCE(?, completed_adoption_count)
         WHERE id = ?
       `)
         .bind(
-          nickname !== undefined ? nickname : null,
+          finalNickname !== undefined ? finalNickname : null,
           phone !== undefined ? phone : null,
           address !== undefined ? address : null,
           profile_image !== undefined ? profile_image : null,
@@ -268,6 +278,7 @@ export async function onRequestPost(context) {
           store_description !== undefined ? store_description : null,
           store_address !== undefined ? store_address : null,
           additionalImagesStr !== undefined ? additionalImagesStr : null,
+          completed_adoption_count !== undefined ? completed_adoption_count : null,
           authUser.id
         )
         .run();

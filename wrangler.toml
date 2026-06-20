@@ -1,6 +1,6 @@
 # Cloudflare Pages / D1 Configuration for Paldo
 name = "paldo-dog"
-pages_build_output_dir = "dist"
+pages_build_output_dir = ".vercel/output/static"
 compatibility_date = "2026-06-10"
 
 [vars]

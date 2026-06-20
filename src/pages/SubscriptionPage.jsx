@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import { useRouter } from 'next/navigation';
 import { api } from '../lib/api';
 
 const SubscriptionPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,7 +55,7 @@ const SubscriptionPage = () => {
   const handleSubscribe = async (plan) => {
     if (!currentUser) {
       alert('로그인이 필요한 서비스입니다.');
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
@@ -98,7 +99,7 @@ const SubscriptionPage = () => {
         }
 
         alert(`✅ ${plan.name} 요금제 정기결제 카드가 성공적으로 등록되었습니다!\n(월 정기결제가 시작됩니다)`);
-        navigate('/mypage');
+        router.push('/mypage');
       } else {
         setIsSubmitting(false);
         alert('카드 등록에 실패하였습니다: ' + rsp.error_msg);

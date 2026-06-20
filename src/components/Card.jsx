@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import { useRouter } from 'next/navigation';
 import { api } from '../lib/api';
 
 const Card = ({ data, badgeText }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLiked, setIsLiked] = useState(false);
   const [userId, setUserId] = useState(null);
 
@@ -23,7 +24,7 @@ const Card = ({ data, badgeText }) => {
     e.stopPropagation();
     if (!userId) {
       alert('관심아이 등록을 위해 먼저 로그인해 주세요!');
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
@@ -50,7 +51,7 @@ const Card = ({ data, badgeText }) => {
 
   return (
     <div 
-      onClick={() => navigate('/detail', { state: { dog: data } })}
+      onClick={() => router.push('/detail', { state: { dog: data } })}
       style={{
         width: '100%',
         height: '100%',

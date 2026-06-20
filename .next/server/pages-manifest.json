@@ -1,0 +1,20 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/AdSetupPage": "pages/AdSetupPage.html",
+  "/AdStorePage": "pages/AdStorePage.html",
+  "/AdminPage": "pages/AdminPage.html",
+  "/BreedPage": "pages/BreedPage.html",
+  "/DetailPage": "pages/DetailPage.html",
+  "/PrivacyPage": "pages/PrivacyPage.html",
+  "/LoginPage": "pages/LoginPage.html",
+  "/MyPage": "pages/MyPage.html",
+  "/RefundPolicyPage": "pages/RefundPolicyPage.html",
+  "/StorePage": "pages/StorePage.html",
+  "/SignupPage": "pages/SignupPage.html",
+  "/ResetPasswordPage": "pages/ResetPasswordPage.html",
+  "/SubscriptionPage": "pages/SubscriptionPage.html",
+  "/TermsPage": "pages/TermsPage.html",
+  "/_document": "pages/_document.js",
+  "/404": "pages/404.html"
+}

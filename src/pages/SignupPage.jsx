@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Logo from '../components/Logo';
 import { api } from '../lib/api';
 
@@ -14,7 +16,7 @@ const SignupPage = () => {
   const [passwordMatch, setPasswordMatch] = useState(null); // null, true, false
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // 실시간 이메일 형식 체크
   useEffect(() => {
@@ -104,7 +106,7 @@ const SignupPage = () => {
 
       if (userData) {
         alert('회원가입이 완료되었습니다!');
-        navigate('/login');
+        router.push('/login');
       }
     } catch (error) {
       alert(error.message);
@@ -331,7 +333,7 @@ const SignupPage = () => {
         </div>
 
         <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)' }}>
-          이미 계정이 있으신가요? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>로그인</Link>
+          이미 계정이 있으신가요? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>로그인</Link>
         </div>
 
         <div style={{ marginTop: '40px', textAlign: 'center' }}>

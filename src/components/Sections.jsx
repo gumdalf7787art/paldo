@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import { useRouter } from 'next/navigation';
 import Card from './Card';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
@@ -736,7 +737,7 @@ const LoginWidget = () => {
 
 
 const PersonalRecommendWidget = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [recommendedDogs, setRecommendedDogs] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -792,7 +793,7 @@ const PersonalRecommendWidget = () => {
         {recommendedDogs.map((dog) => (
           <div 
             key={dog.id} 
-            onClick={() => navigate('/detail', { state: { dog } })}
+            onClick={() => router.push('/detail', { state: { dog } })}
             style={itemCardStyle}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f8fafc';

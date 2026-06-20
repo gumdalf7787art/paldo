@@ -1,5 +1,8 @@
+'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Logo from './Logo';
 import { api } from '../lib/api';
 
@@ -12,7 +15,7 @@ const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
-  const navigate = useNavigate();
+  const router = useRouter();
   const dropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
 
@@ -91,7 +94,7 @@ const Header = () => {
     setTotalUnreadCount(0);
     window.dispatchEvent(new Event('auth-change'));
     alert('로그아웃되었습니다.');
-    navigate('/');
+    router.push('/');
   };
 
   const markAsRead = async (id, link_url) => {
@@ -107,8 +110,8 @@ const Header = () => {
     window.dispatchEvent(new Event('notifications-updated'));
 
     if (link_url) {
-      if(link_url === '/mypage') navigate('/mypage', { state: { tab: 'notifications' }});
-      else navigate(link_url);
+      if(link_url === '/mypage') router.push('/mypage', { state: { tab: 'notifications' }});
+      else router.push(link_url);
     }
   };
 
@@ -125,7 +128,7 @@ const Header = () => {
           height: '80px',
           position: 'relative'
         }}>
-          <Link to="/"><Logo /></Link>
+          <Link href="/"><Logo /></Link>
           
           {/* 헤더 중앙 리브랜딩 슬로건 (2개 카피 배치) */}
           <div className="header-slogans-container" style={{
@@ -207,8 +210,8 @@ const Header = () => {
           <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             {!session ? (
               <>
-                <Link to="/login" style={navLinkStyle} className="nav-link">로그인</Link>
-                <Link to="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
+                <Link href="/login" style={navLinkStyle} className="nav-link">로그인</Link>
+                <Link href="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
               </>
             ) : (
               <>
@@ -222,7 +225,7 @@ const Header = () => {
                     <div style={dropdownStyle}>
                       <div style={{ padding: '15px', borderBottom: '1px solid #eee', fontWeight: '800', display: 'flex', justifyContent: 'space-between' }}>
                         <span>새로운 알림</span>
-                        <Link to="/mypage" state={{ tab: 'notifications' }} onClick={() => setShowDropdown(false)} style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'underline' }}>모두 보기</Link>
+                        <Link href="/mypage" state={{ tab: 'notifications' }} onClick={() => setShowDropdown(false)} style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'underline' }}>모두 보기</Link>
                       </div>
                       <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                         {notifications.slice(0, 5).map(n => (
@@ -285,8 +288,7 @@ const Header = () => {
                       padding: '6px 0'
                     }}>
                       {role === 'admin' && (
-                        <Link 
-                          to="/admin" 
+                        <Link href="/admin" 
                           onClick={() => setShowUserDropdown(false)}
                           className="header-dropdown-item"
                         >
@@ -294,16 +296,14 @@ const Header = () => {
                         </Link>
                       )}
                       
-                      <Link 
-                        to="/mypage" 
+                      <Link href="/mypage" 
                         onClick={() => setShowUserDropdown(false)}
                         className="header-dropdown-item"
                       >
                         👤 마이페이지
                       </Link>
 
-                      <Link 
-                        to="/mypage" 
+                      <Link href="/mypage" 
                         state={{ tab: 'chats' }}
                         onClick={() => setShowUserDropdown(false)}
                         className="header-dropdown-item"
@@ -312,8 +312,7 @@ const Header = () => {
                       </Link>
 
                       {role !== 'user' && (
-                        <Link 
-                          to="/subscription" 
+                        <Link href="/subscription" 
                           onClick={() => setShowUserDropdown(false)}
                           className="header-dropdown-item"
                           style={{ color: '#9b59b6', fontWeight: 'bold' }}

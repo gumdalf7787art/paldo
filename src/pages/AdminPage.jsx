@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '../lib/api';
-import { useNavigate } from 'react-router-dom';
+
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   BarChart, Bar, Legend, Cell 
@@ -23,7 +24,7 @@ const AdminPage = () => {
   const [bannerUploadForm, setBannerUploadForm] = useState({ slot_key: '', image_url: '', link_url: '' });
   const [bannerUploadFile, setBannerUploadFile] = useState(null);
   const [isBannerUploading, setIsBannerUploading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // 쿠폰 생성용 상태
   const [newCoupon, setNewCoupon] = useState({ 
@@ -43,13 +44,13 @@ const AdminPage = () => {
 
   async function checkAdmin() {
     const { data: sessionData, error: sessionErr } = await api.auth.getSession();
-    if (sessionErr || !sessionData?.session) return navigate('/login');
+    if (sessionErr || !sessionData?.session) return router.push('/login');
 
     const { data: profile } = await api.auth.getUser();
 
     if (profile?.role !== 'admin') {
       alert('관리자만 접근 가능합니다.');
-      return navigate('/');
+      return router.push('/');
     }
 
     setIsAdmin(true);
@@ -535,7 +536,7 @@ const AdminPage = () => {
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>
                       <button 
-                        onClick={() => navigate(`/detail/${dog.id}`)} 
+                        onClick={() => router.push(`/detail/${dog.id}`)} 
                         style={{ ...tableBtnStyle, backgroundColor: '#3498db', fontSize: '0.8rem', padding: '5px 10px' }}
                       >
                         게시물 보기

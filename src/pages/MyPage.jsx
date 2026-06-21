@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { api } from '../lib/api';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '../components/Card';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer 
@@ -51,16 +50,8 @@ const MyPage = () => {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  
-    const pathname = usePathname();
-    const searchParamsObj = useSearchParams();
-    const location = { 
-      pathname, 
-      search: searchParamsObj ? '?' + searchParamsObj.toString() : '',
-      state: null // Next.js doesn't support state object in history
-    };
-    
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // 폼 상태 관리
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -130,12 +121,12 @@ const MyPage = () => {
       } else {
         setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
       }
-      router.push('/mypage', { replace: true });
+      navigate('/mypage', { replace: true });
     } else if (location.state?.paymentSuccess) {
       setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
       const newState = { ...location.state };
       delete newState.paymentSuccess;
-      router.push('/mypage', { replace: true, state: newState });
+      navigate('/mypage', { replace: true, state: newState });
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
@@ -147,9 +138,9 @@ const MyPage = () => {
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
-      router.push('/mypage', { replace: true, state: newState });
+      navigate('/mypage', { replace: true, state: newState });
     }
-  }, [location.search, location.state, router]);
+  }, [location.search, location.state, navigate]);
 
   useEffect(() => {
     if (paymentResultMsg) {
@@ -164,7 +155,7 @@ const MyPage = () => {
     if (location.state?.tab === 'notifications') {
       setActiveTab('notifications');
       // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지
-      router.push(location.pathname, { replace: true, state: {} });
+      navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state?.activeTab === 'chats' || location.state?.openRoomId) {
       if (activeTab !== 'chats') {
         setActiveTab('chats');
@@ -176,15 +167,15 @@ const MyPage = () => {
           if (room) {
             setSelectedRoom(room);
             // 처리가 완료되면 state를 비워 리렌더링 시 반복 실행 방지
-            router.push(location.pathname, { replace: true, state: {} });
+            navigate(location.pathname, { replace: true, state: {} });
           }
         }
       } else {
         // 방 ID 정보는 없고 단순 탭 전환만 필요한 경우 state를 비워 리렌더링 시 반복 방지
-        router.push(location.pathname, { replace: true, state: {} });
+        navigate(location.pathname, { replace: true, state: {} });
       }
     }
-  }, [location.state, chatRooms, router, location.pathname, activeTab]);
+  }, [location.state, chatRooms, navigate, location.pathname, activeTab]);
 
   useEffect(() => {
     if (activeTab === 'chats' && !selectedRoom && chatRooms.length > 0) {
@@ -222,7 +213,7 @@ const MyPage = () => {
     const session = sessionData?.session;
 
     if (!session) {
-      router.push('/login');
+      navigate('/login');
       return;
     }
     setSession(session);
@@ -581,7 +572,7 @@ const MyPage = () => {
     }
   };
 
-  const handleEditPost = (dog) => router.push('/upload', { state: { editDog: dog } });
+  const handleEditPost = (dog) => navigate('/upload', { state: { editDog: dog } });
 
   if (loading && !profile) {
     return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>데이터를 불러오는 중입니다...</div>;
@@ -602,13 +593,13 @@ const MyPage = () => {
   const navItems = [
     { id: 'dashboard', label: '🏠 대시보드' },
     ...(isSeller ? [
-      { id: 'upload', label: '➕ 분양등록', action: () => router.push('/upload') },
+      { id: 'upload', label: '➕ 분양등록', action: () => navigate('/upload') },
       { id: 'posts', label: '🐶 게시물' },
       { id: 'store', label: '🏪 스토어' },
       { id: 'ads', label: '📢 광고' },
       { id: 'payments', label: '💳 결제 관리' },
-      { id: 'adStore', label: '🛒 광고 스토어', action: () => router.push('/ad-store') },
-      { id: 'subscription', label: '💎 파트너스 구독', action: () => router.push('/subscription') },
+      { id: 'adStore', label: '🛒 광고 스토어', action: () => navigate('/ad-store') },
+      { id: 'subscription', label: '💎 파트너스 구독', action: () => navigate('/subscription') },
       { id: 'stats', label: '📊 통계' },
     ] : []),
     { id: 'chats', label: '💬 다잇톡' },
@@ -682,7 +673,7 @@ const MyPage = () => {
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
             <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>⚙️</button>
-            <button onClick={async () => { await api.auth.logout(); router.push('/'); }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
+            <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.8rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
           </div>
         </div>
 
@@ -723,13 +714,13 @@ const MyPage = () => {
                 <button onClick={() => setActiveTab('dashboard')} style={navBtnStyle('dashboard')}>🏠 대시보드</button>
                 {isSeller && (
                   <>
-                    <button onClick={() => router.push('/upload')} style={{ ...navBtnStyle('upload'), color: 'var(--primary)', fontWeight: '900' }}>➕ 분양등록</button>
+                    <button onClick={() => navigate('/upload')} style={{ ...navBtnStyle('upload'), color: 'var(--primary)', fontWeight: '900' }}>➕ 분양등록</button>
                     <button onClick={() => setActiveTab('posts')} style={navBtnStyle('posts')}>🐶 게시물관리</button>
                     <button onClick={() => setActiveTab('store')} style={navBtnStyle('store')}>🏪 내 스토어 관리</button>
                     <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 광고관리</button>
                     <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
-                    <button onClick={() => router.push('/ad-store')} style={navBtnStyle('adStore')}>🛒 광고 스토어</button>
-                    <button onClick={() => router.push('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 구독</button>
+                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 광고 스토어</button>
+                    <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 구독</button>
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}
@@ -741,7 +732,7 @@ const MyPage = () => {
               {/* 설정, 로그아웃 */}
               <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
                 <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ ...actionBtnStyle, fontSize: '0.85rem', marginBottom: '10px' }}>⚙️ 프로필 설정</button>
-                <button onClick={async () => { await api.auth.logout(); router.push('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
+                <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
 
                 {!isSeller && (
                   <>
@@ -878,7 +869,7 @@ const MyPage = () => {
                 <div className="fade-in">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>게시물 관리</h2>
-                    <button onClick={() => router.push('/upload')} style={miniBtnStyle}>+ 새 분양등록</button>
+                    <button onClick={() => navigate('/upload')} style={miniBtnStyle}>+ 새 분양등록</button>
                   </div>
 
                   {/* 데스크탑 테이블 */}
@@ -1046,7 +1037,7 @@ const MyPage = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>광고 관리</h2>
                     <button 
-                      onClick={() => router.push('/ad-store')}
+                      onClick={() => navigate('/ad-store')}
                       style={{ padding: '10px 20px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.2)' }}
                       onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary-dark)'; e.target.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.transform = 'translateY(0)'; }}
@@ -1091,7 +1082,7 @@ const MyPage = () => {
                               )}
                             </td>
                             <td style={{ ...tdStyle, textAlign: 'center' }}>
-                              <button onClick={() => router.push(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', padding: '10px 15px' }}>📢 광고 설정하기</button>
+                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', padding: '10px 15px' }}>📢 광고 설정하기</button>
                             </td>
                           </tr>
                           );
@@ -1120,7 +1111,7 @@ const MyPage = () => {
                               </div>
                             )}
 
-                            <button onClick={() => router.push(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
+                            <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
                           </div>
                         </div>
                       );
@@ -1130,7 +1121,7 @@ const MyPage = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 광고 아이템 현황</h3>
                     <button 
-                      onClick={() => router.push('/ad-store')}
+                      onClick={() => navigate('/ad-store')}
                       style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                       onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
                       onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}

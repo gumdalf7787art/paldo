@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { api } from '../lib/api';
 
@@ -9,7 +7,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [forgotEmail, setForgotEmail] = useState('');
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -24,12 +22,12 @@ const LoginPage = () => {
       window.dispatchEvent(new Event('auth-change'));
       window.history.replaceState({}, null, window.location.pathname);
       alert('로그인에 성공했습니다!');
-      router.push('/');
+      navigate('/');
     } else if (error) {
       window.history.replaceState({}, null, window.location.pathname);
       alert('소셜 로그인 실패: ' + decodeURIComponent(error));
     }
-  }, [router]);
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,7 +39,7 @@ const LoginPage = () => {
 
       window.dispatchEvent(new Event('auth-change'));
       alert('로그인되었습니다!');
-      router.push('/');
+      navigate('/');
     } catch (error) {
       alert('로그인 실패: ' + error.message);
     } finally {
@@ -164,7 +162,7 @@ const LoginPage = () => {
         </div>
 
         <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)' }}>
-          아직 회원이 아니신가요? <Link href="/signup" style={{ color: 'var(--primary)', fontWeight: '700' }}>회원가입</Link>
+          아직 회원이 아니신가요? <Link to="/signup" style={{ color: 'var(--primary)', fontWeight: '700' }}>회원가입</Link>
         </div>
 
         <div style={{ marginTop: '50px', padding: '15px', backgroundColor: '#F1F8F7', borderRadius: '12px' }}>

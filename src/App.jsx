@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
-
-import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom'
 import { api } from './lib/api'
 import Header from './components/Header'
 import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from './components/Sections'
@@ -24,15 +22,7 @@ import SubscriptionPage from './pages/SubscriptionPage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
-  
-    const pathname = usePathname();
-    const searchParamsObj = useSearchParams();
-    const location = { 
-      pathname, 
-      search: searchParamsObj ? '?' + searchParamsObj.toString() : '',
-      state: null // Next.js doesn't support state object in history
-    };
-    
+  const location = useLocation();
 
   useEffect(() => {
     const trackView = async () => {
@@ -147,9 +137,9 @@ function App() {
                 <p style={{ fontSize: '12px' }}>© 2026 Daitdog. All rights reserved.</p>
               </div>
               <div style={{ display: 'flex', gap: '25px', fontSize: '14px', flexWrap: 'wrap' }}>
-                <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>
-                <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>이용약관</Link>
-                <Link href="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
+                <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>
+                <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>이용약관</Link>
+                <Link to="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
                 <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1538703544" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>사업자정보확인</a>
               </div>
             </div>

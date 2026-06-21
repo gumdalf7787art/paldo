@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
 import Card from '../components/Card';
@@ -89,16 +88,8 @@ function renderPrice(dog) {
 }
 
 const DetailPage = () => {
-  
-    const pathname = usePathname();
-    const searchParamsObj = useSearchParams();
-    const location = { 
-      pathname, 
-      search: searchParamsObj ? '?' + searchParamsObj.toString() : '',
-      state: null // Next.js doesn't support state object in history
-    };
-    
-  const router = useRouter();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [dog, setDog] = useState(location.state?.dog || null); // Card에서 넘겨받은 강아지 정보 (없을 경우 fetch)
   
   const [currentUser, setCurrentUser] = useState(null);
@@ -240,7 +231,7 @@ const DetailPage = () => {
           checkLikeStatus(data.id);
         } else {
           alert('존재하지 않거나 삭제된 게시물입니다.');
-          router.push('/');
+          navigate('/');
           return;
         }
         setLoading(false);
@@ -285,7 +276,7 @@ const DetailPage = () => {
   const toggleLike = async () => {
     if (!currentUser) {
       alert('관심아이 등록을 위해 먼저 로그인해 주세요!');
-      router.push('/login');
+      navigate('/login');
       return;
     }
 
@@ -306,7 +297,7 @@ const DetailPage = () => {
   const handleStartChat = async () => {
     if (!currentUser) {
       alert('상담을 위해 먼저 로그인해 주세요!');
-      router.push('/login');
+      navigate('/login');
       return;
     }
 
@@ -319,7 +310,7 @@ const DetailPage = () => {
       const targetSellerId = dog?.seller_id || '00000000-0000-0000-0000-000000000000';
       const { data, error } = await api.chat.createRoom(targetSellerId, currentUser.id, dog.id);
       if (!error && data) {
-        router.push('/mypage', { state: { activeTab: 'chats', openRoomId: data.room_id } });
+        navigate('/mypage', { state: { activeTab: 'chats', openRoomId: data.room_id } });
       } else {
         alert('채팅방 생성에 실패했습니다: ' + (error || '알 수 없는 오류'));
       }
@@ -376,7 +367,7 @@ const DetailPage = () => {
   const handleSubmitReview = async () => {
     if (!currentUser) {
       alert('리뷰 작성을 위해 먼저 로그인해 주세요!');
-      router.push('/login');
+      navigate('/login');
       return;
     }
     
@@ -435,7 +426,7 @@ const DetailPage = () => {
     return (
       <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>
         <h3>올바르지 않은 접근입니다.</h3>
-        <button onClick={() => router.push('/')} style={{ marginTop: '20px' }}>홈으로 가기</button>
+        <button onClick={() => navigate('/')} style={{ marginTop: '20px' }}>홈으로 가기</button>
       </div>
     );
   }
@@ -450,7 +441,7 @@ const DetailPage = () => {
   const handleSubmitReport = async () => {
     if (!currentUser) {
       alert('신고를 위해 먼저 로그인해 주세요.');
-      router.push('/login');
+      navigate('/login');
       return;
     }
     if (!reportData.reason) {
@@ -693,7 +684,7 @@ const DetailPage = () => {
                   </button>
 
                   {sellerInfo && (
-                    <button onClick={() => router.push(`/store/${dog.seller_id}`)} style={{ ...chatBtnStyle, backgroundColor: '#f0f0f0', color: '#555' }}>
+                    <button onClick={() => navigate(`/store/${dog.seller_id}`)} style={{ ...chatBtnStyle, backgroundColor: '#f0f0f0', color: '#555' }}>
                       🏪 이 스토어의 모든 게시물 보기
                     </button>
                   )}

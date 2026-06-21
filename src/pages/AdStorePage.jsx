@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
 const AdStorePage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,7 +116,7 @@ const AdStorePage = () => {
             결제하신 광고 아이템은 관리자 확인 후 즉시 <b style={{color: 'var(--primary-dark)'}}>보유 아이템 현황</b>으로 지급됩니다.
           </p>
         </div>
-        <button onClick={() => router.push('/mypage')} style={{ padding: '12px 24px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#333', border: 'none', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button onClick={() => navigate('/mypage')} style={{ padding: '12px 24px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#333', border: 'none', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>← 마이페이지로 이동</span>
         </button>
       </div>
@@ -299,7 +298,7 @@ const AdStorePage = () => {
                   onClick={async () => {
                     if (!currentUser) {
                       alert('로그인이 필요한 서비스입니다.');
-                      router.push('/login');
+                      navigate('/login');
                       return;
                     }
 
@@ -382,7 +381,7 @@ const AdStorePage = () => {
 
                         if (verifyError) {
                           setIsModalOpen(false);
-                          router.push('/mypage', { state: { paymentError: verifyError } });
+                          navigate('/mypage', { state: { paymentError: verifyError } });
                           return;
                         }
 
@@ -392,15 +391,15 @@ const AdStorePage = () => {
                             amount: selectedItem.price
                           };
                           setIsModalOpen(false);
-                          router.push('/mypage', { state: { paymentReady: true, vbank: v } });
+                          navigate('/mypage', { state: { paymentReady: true, vbank: v } });
                         } else {
                           setIsModalOpen(false);
-                          router.push('/mypage', { state: { paymentSuccess: true } });
+                          navigate('/mypage', { state: { paymentSuccess: true } });
                         }
                       } else {
                         setIsSubmitting(false);
                         setIsModalOpen(false);
-                        router.push('/mypage', { state: { paymentError: rsp.error_msg } });
+                        navigate('/mypage', { state: { paymentError: rsp.error_msg } });
                       }
                     });
                   }}

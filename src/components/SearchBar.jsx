@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { BREEDS, REGIONS, GENDERS, PRICES } from '../utils/constants';
 
 const SearchBar = ({ hideBreed, defaultBreed }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [selectedBreed, setSelectedBreed] = useState(defaultBreed || '');
   const [selectedRegion, setSelectedRegion] = useState('전국');
   const [selectedGender, setSelectedGender] = useState('모두선택');
@@ -18,7 +17,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
     if (selectedPrice && selectedPrice !== '전체') params.append('price', selectedPrice);
     
     const queryString = params.toString() ? `?${params.toString()}` : '';
-    router.push(`/breed/${breed}${queryString}`);
+    navigate(`/breed/${breed}${queryString}`);
   };
 
   const row1 = [
@@ -119,7 +118,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
                     <div 
                       key={i} 
                       className="breed-chip"
-                      onClick={() => router.push(`/breed/${breed.name}`)}
+                      onClick={() => navigate(`/breed/${breed.name}`)}
                       style={chipStyle}
                     >
                       <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
@@ -139,7 +138,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
                     <div 
                       key={i} 
                       className="breed-chip"
-                      onClick={() => router.push(`/breed/${breed.name}`)}
+                      onClick={() => navigate(`/breed/${breed.name}`)}
                       style={chipStyle}
                     >
                       <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>

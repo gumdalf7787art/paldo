@@ -1,9 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-
-import { useRouter } from 'next/navigation';
 const RefundPolicyPage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   return (
     <div className="container fade-in" style={{ padding: '60px 20px', minHeight: '80vh', maxWidth: '800px', margin: '0 auto' }}>
@@ -16,7 +15,7 @@ const RefundPolicyPage = () => {
           </h1>
         </div>
         <button 
-          onClick={() => router.push(-1)} 
+          onClick={() => navigate(-1)} 
           style={{ 
             padding: '10px 20px', 
             borderRadius: '10px', 

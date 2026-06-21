@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import Logo from '../components/Logo';
 
@@ -9,7 +8,7 @@ const ResetPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(null);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 비밀번호 일치 실시간 체크
@@ -42,7 +41,7 @@ const ResetPasswordPage = () => {
       alert('비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해 주세요.');
       // 변경 후 로그아웃 처리하여 깔끔하게 재로그인 유도
       await api.auth.logout();
-      router.push('/login');
+      navigate('/login');
     } catch (error) {
       alert('비밀번호 변경 실패: ' + error.message);
     } finally {

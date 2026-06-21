@@ -27,15 +27,5 @@ dist-ssr
 
 # Cloudflare Wrangler cache & local database
 .wrangler
-.next/
-.vercel/
-*.txt
-# OpenNext
-.open-next
+build_result.txt
 
-# wrangler files
-.wrangler
-.dev.vars*
-!.dev.vars.example
-
-.open-next

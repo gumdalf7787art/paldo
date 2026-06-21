@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Card from './Card'; // 미리보기용 컴포넌트 임포트
 import { api } from '../lib/api';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 import { calculateAge } from '../utils/age';
 
 const breedOptions = [
@@ -41,16 +40,8 @@ const UploadForm = () => {
   const [userCoupons, setUserCoupons] = useState([]);
   const [selectedCouponId, setSelectedCouponId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
-  const router = useRouter();
-  
-    const pathname = usePathname();
-    const searchParamsObj = useSearchParams();
-    const location = { 
-      pathname, 
-      search: searchParamsObj ? '?' + searchParamsObj.toString() : '',
-      state: null // Next.js doesn't support state object in history
-    };
-    
+  const navigate = useNavigate();
+  const location = useLocation();
   const editDog = location.state?.editDog;
 
   useEffect(() => {
@@ -214,7 +205,7 @@ const UploadForm = () => {
         const { error } = await api.dogs.update(editDog.id, postData);
         if (error) throw new Error(error);
         alert('분양 게시물이 정상적으로 수정되었습니다!');
-        router.push(-1);
+        navigate(-1);
       } else {
         // 신규 등록 시 최종 한도 체크
         if (!postingStats.loading && postingStats.used >= postingStats.limit) {
@@ -223,7 +214,7 @@ const UploadForm = () => {
         const { error } = await api.dogs.create(postData);
         if (error) throw new Error(error);
         alert('분양 게시물이 정상적으로 등록되었습니다!');
-        router.push('/');
+        navigate('/');
       }
     } catch (err) {
       alert('게시물 처리 실패: ' + err.message);

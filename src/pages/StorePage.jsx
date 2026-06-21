@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import Card from '../components/Card';
 
 const StorePage = () => {
-  const { sellerId  } = useParams() || {};
-  const router = useRouter();
+  const { sellerId } = useParams();
+  const navigate = useNavigate();
   const [storeInfo, setStoreInfo] = useState(null);
   const [storeDogs, setStoreDogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +21,7 @@ const StorePage = () => {
     
     if (storeError || !storeData || !storeData.profile || storeData.profile.role === 'user') {
       alert('존재하지 않거나 유효하지 않은 스토어입니다.');
-      router.push('/');
+      navigate('/');
       return;
     }
 

@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
-
-import { useRouter, usePathname, useSearchParams, useParams } from 'next/navigation';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../lib/api';
 import Card from '../components/Card';
 import SearchBar from '../components/SearchBar';
 import { HeroCarousel, LoginWidget, DynamicBanner } from '../components/Sections';
 
 const BreedPage = () => {
-  const { breedName  } = useParams() || {};
-  const router = useRouter();
-  
-    const pathname = usePathname();
-    const searchParamsObj = useSearchParams();
-    const location = { 
-      pathname, 
-      search: searchParamsObj ? '?' + searchParamsObj.toString() : '',
-      state: null // Next.js doesn't support state object in history
-    };
-    
+  const { breedName } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [adDogs, setAdDogs] = useState([]);
   const [regularDogs, setRegularDogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -261,7 +252,7 @@ const BreedPage = () => {
               {otherBreeds.filter(b => b !== breedName).map(breed => (
                 <div 
                   key={breed}
-                  onClick={() => router.push(`/breed/${breed}`)}
+                  onClick={() => navigate(`/breed/${breed}`)}
                   style={{
                     padding: '6px 12px',
                     backgroundColor: '#f1f5f9',

@@ -1,8 +1,9 @@
 # Cloudflare Pages / D1 Configuration for Paldo
 name = "paldo-dog"
-pages_build_output_dir = ".open-next/assets"
-compatibility_date = "2026-06-21"
-compatibility_flags = [ "nodejs_compat", "global_fetch_strictly_public" ]
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-10"
+
+[vars]
 
 [[d1_databases]]
 binding = "DB"
@@ -12,3 +13,21 @@ database_id = "049c3da8-77fa-45f4-8d18-8c22d2a73a53"
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "paldo-r2"
+
+[env.production]
+compatibility_date = "2024-03-01"
+compatibility_flags = [ "nodejs_compat" ]
+
+[env.production.vars]
+
+[[env.production.d1_databases]]
+database_id = "049c3da8-77fa-45f4-8d18-8c22d2a73a53"
+binding = "DB"
+database_name = "DB"
+
+[[env.production.r2_buckets]]
+bucket_name = "paldo-r2"
+binding = "R2"
+
+
+

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
 const AdSetupPage = () => {
-  const { id: dogId  } = useParams() || {};
-  const router = useRouter();
+  const { id: dogId } = useParams();
+  const navigate = useNavigate();
   
 
   const [dog, setDog] = useState(null);
@@ -30,7 +29,7 @@ const AdSetupPage = () => {
     const { data: sessionData, error: sessionErr } = await api.auth.getSession();
     if (sessionErr || !sessionData?.session) {
       alert('로그인이 필요합니다.');
-      router.push('/login');
+      navigate('/login');
       return;
     }
     const currentSession = sessionData.session;
@@ -41,7 +40,7 @@ const AdSetupPage = () => {
     if (dogData) {
       if (dogData.seller_id !== currentSession.user.id && currentSession.user.role !== 'admin') {
         alert('본인의 게시물만 광고 설정이 가능합니다.');
-        router.push('/mypage');
+        navigate('/mypage');
         return;
       }
       setDog(dogData);
@@ -102,7 +101,7 @@ const AdSetupPage = () => {
       const endDate = data?.endDate ? new Date(data.endDate) : new Date();
 
       alert(`광고 설정이 완료되었습니다!\n(${endDate.toLocaleDateString()} 까지)\n내 게시물이 즉시 홍보됩니다.`);
-      router.push('/mypage');
+      navigate('/mypage');
       
     } catch (error) {
       console.error(error);
@@ -122,7 +121,7 @@ const AdSetupPage = () => {
 
   return (
     <div className="container" style={{ padding: '60px 0', maxWidth: '600px', margin: '0 auto' }}>
-      <button onClick={() => router.push(-1)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', marginBottom: '20px', fontSize: '1rem' }}>
+      <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', marginBottom: '20px', fontSize: '1rem' }}>
         ← 마이페이지로 돌아가기
       </button>
 
@@ -208,7 +207,7 @@ const AdSetupPage = () => {
                   </p>
                   <button 
                     type="button"
-                    onClick={() => router.push('/ad-store')}
+                    onClick={() => navigate('/ad-store')}
                     style={{ padding: '8px 20px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
                     onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}

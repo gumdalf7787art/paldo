@@ -23,7 +23,18 @@ export async function OPTIONS(request) {
 }
 
 export async function GET(request) {
-  const env = getRequestContext().env;
+  try {
+    let env;
+    try {
+      const context = getRequestContext();
+      env = context ? context.env : null;
+    } catch (e) {
+      env = null;
+    }
+
+    if (!env || !env.DB) {
+      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getRequestContext failed.' }, 500);
+    }
 
   try {
     const { results } = await env.DB.prepare(`
@@ -51,5 +62,8 @@ export async function GET(request) {
     return createResponse(grouped);
   } catch (err) {
     return createResponse({ error: `배너 조회 실패: ${err.message}` }, 500);
+  }
+  } catch (outerErr) {
+    return createResponse({ error: `상위 배너 GET 핸들러 예외: ${outerErr.message}` }, 500);
   }
 }

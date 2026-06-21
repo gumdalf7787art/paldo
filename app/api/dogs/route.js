@@ -54,8 +54,20 @@ export async function OPTIONS(request) {
 
 // GET 요청 처리 (목록 필터링 또는 상세 조회)
 export async function GET(request) {
-  const env = getRequestContext().env;
-  const url = new URL(request.url);
+  try {
+    let env;
+    try {
+      const context = getRequestContext();
+      env = context ? context.env : null;
+    } catch (e) {
+      env = null;
+    }
+
+    if (!env || !env.DB) {
+      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getRequestContext failed.' }, 500);
+    }
+
+    const url = new URL(request.url);
   const id = url.searchParams.get('id');
 
   // 1. 단일 매물 상세 조회
@@ -172,6 +184,9 @@ export async function GET(request) {
     return createResponse(cleanResults);
   } catch (err) {
     return createResponse({ error: `매물 목록 조회 실패: ${err.message}` }, 500);
+  }
+  } catch (outerErr) {
+    return createResponse({ error: `상위 GET 핸들러 예외: ${outerErr.message}` }, 500);
   }
 }
 

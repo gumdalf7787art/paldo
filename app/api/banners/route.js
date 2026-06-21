@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 function createResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -26,14 +26,14 @@ export async function GET(request) {
   try {
     let env;
     try {
-      const context = getRequestContext();
+      const context = getCloudflareContext();
       env = context ? context.env : null;
     } catch (e) {
       env = null;
     }
 
     if (!env || !env.DB) {
-      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getRequestContext failed.' }, 500);
+      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getCloudflareContext failed.' }, 500);
     }
 
   try {

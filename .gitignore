@@ -30,3 +30,12 @@ dist-ssr
 .next/
 .vercel/
 *.txt
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+
+.open-next

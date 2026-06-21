@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: POST /api/analytics
 
@@ -54,7 +54,7 @@ export async function OPTIONS(request) {
 
 // POST 요청 처리 (행동로그 기록)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authUser = getAuthenticatedUser(request);
   const userId = authUser ? authUser.id : null; // 로그인하지 않은 사용자도 기록 허용

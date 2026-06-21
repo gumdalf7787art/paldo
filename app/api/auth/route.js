@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/auth
 
@@ -83,7 +83,7 @@ export async function OPTIONS(request) {
 
 // GET 요청 처리 (세션 확인 및 쿠폰 조회)
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
   const user = getAuthenticatedUser(request);
@@ -148,7 +148,7 @@ export async function GET(request) {
 
 // POST 요청 처리 (가입, 로그인, 정보수정 등)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 

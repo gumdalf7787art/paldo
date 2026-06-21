@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/coupons
 
@@ -49,7 +49,7 @@ export async function OPTIONS(request) {
 }
 
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const authUser = getAuthenticatedUser(request);
 
   if (!authUser) {
@@ -80,7 +80,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   
   // Basic security - this should realistically check for admin or handle auto-issue upon signup.
   // For demo/admin purposes, we will allow issuing a coupon pack.

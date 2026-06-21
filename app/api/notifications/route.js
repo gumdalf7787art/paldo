@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/notifications
 
@@ -54,7 +54,7 @@ export async function OPTIONS(request) {
 
 // GET 요청 처리 (알림 조회)
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const authUser = getAuthenticatedUser(request);
   if (!authUser) {
     return createResponse({ error: '로그인이 필요한 작업입니다.' }, 401);
@@ -75,7 +75,7 @@ export async function GET(request) {
 
 // POST 요청 처리 (전체 읽음 또는 신규 생성)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 

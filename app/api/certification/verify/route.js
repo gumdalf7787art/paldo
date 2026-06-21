@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: POST /api/certification/verify
 export async function OPTIONS(request) {
@@ -14,7 +14,7 @@ export async function OPTIONS(request) {
 }
 
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   let body;
   try {

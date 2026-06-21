@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST/DELETE /api/dogs
 
@@ -57,14 +57,14 @@ export async function GET(request) {
   try {
     let env;
     try {
-      const context = getRequestContext();
+      const context = getCloudflareContext();
       env = context ? context.env : null;
     } catch (e) {
       env = null;
     }
 
     if (!env || !env.DB) {
-      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getRequestContext failed.' }, 500);
+      return createResponse({ error: 'Cloudflare D1 Database binding is missing or getCloudflareContext failed.' }, 500);
     }
 
     const url = new URL(request.url);
@@ -192,7 +192,7 @@ export async function GET(request) {
 
 // POST 요청 처리 (신규 등록 또는 수정)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 
@@ -400,7 +400,7 @@ export async function POST(request) {
 
 // DELETE 요청 처리 (매물 삭제)
 export async function DELETE(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const id = url.searchParams.get('id');
 

@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: POST /api/upload
 
@@ -49,7 +49,7 @@ export async function OPTIONS(request) {
 }
 
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   
   const authUser = getAuthenticatedUser(request);
   if (!authUser) {

@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET /api/images
 
@@ -27,7 +27,7 @@ export async function OPTIONS(request) {
 }
 
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const key = url.searchParams.get('key');
 

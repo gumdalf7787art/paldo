@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 function verifyToken(token) {
   try {
@@ -47,7 +47,7 @@ export async function OPTIONS(request) {
 }
 
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const authUser = getAuthenticatedUser(request);
 
   if (!authUser || authUser.role !== 'admin') {
@@ -83,7 +83,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const authUser = getAuthenticatedUser(request);
 
   if (!authUser || authUser.role !== 'admin') {

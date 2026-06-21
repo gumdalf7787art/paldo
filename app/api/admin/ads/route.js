@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/PATCH /api/admin/ads
 export async function OPTIONS(request) {
@@ -29,7 +29,7 @@ function verifyToken(token) {
 }
 
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -64,7 +64,7 @@ export async function GET(request) {
 }
 
 export async function PATCH(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

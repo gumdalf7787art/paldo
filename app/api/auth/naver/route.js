@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // GET /api/auth/naver
 // 네이버 로그인 콜백 API
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');

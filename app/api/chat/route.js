@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/chat
 
@@ -51,7 +51,7 @@ export async function OPTIONS(request) {
 
 // GET: 채팅방 목록 / 메시지 내역 조회
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 
@@ -100,7 +100,7 @@ export async function GET(request) {
 
 // POST: 채팅방 개설 / 메시지 전송 / 읽음 처리
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 

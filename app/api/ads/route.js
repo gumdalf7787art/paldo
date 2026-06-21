@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/ads
 
@@ -54,7 +54,7 @@ export async function OPTIONS(request) {
 
 // GET 요청 처리 (활성화된 광고 목록 조회 및 카운트 조회)
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   
   const action = url.searchParams.get('action');
@@ -149,7 +149,7 @@ export async function GET(request) {
 
 // POST 요청 처리 (광고 신청 등록 및 즉시 사용 처리)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authUser = getAuthenticatedUser(request);
   if (!authUser) {

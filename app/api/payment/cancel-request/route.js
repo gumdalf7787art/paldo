@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: POST /api/payment/cancel-request
 export async function OPTIONS(request) {
@@ -29,7 +29,7 @@ function verifyToken(token) {
 }
 
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

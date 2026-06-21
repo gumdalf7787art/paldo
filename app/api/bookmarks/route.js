@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: GET/POST /api/bookmarks
 
@@ -54,7 +54,7 @@ export async function OPTIONS(request) {
 
 // GET 요청 처리 (북마크 목록 조회 및 특정 매물 북마크 여부 확인)
 export async function GET(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 
@@ -110,7 +110,7 @@ export async function GET(request) {
 
 // POST 요청 처리 (북마크 토글)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
 

@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 // Cloudflare Pages Functions: POST /api/reports
 
@@ -54,7 +54,7 @@ export async function OPTIONS(request) {
 
 // POST 요청 처리 (신고 등록)
 export async function POST(request) {
-  const env = getRequestContext().env;
+  const env = getCloudflareContext().env;
 
   const authUser = getAuthenticatedUser(request);
   if (!authUser) {

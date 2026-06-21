@@ -5,7 +5,7 @@ const Logo = () => {
   return (
     <div className="logo-container">
       <img 
-        src={logoImg} 
+        src={logoImg.src || logoImg} 
         alt="Daitdog Logo" 
         className="logo-image"
       />

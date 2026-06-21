@@ -1,7 +1,5 @@
 'use client';
 
-export const runtime = 'edge';
-
 import React, { Suspense } from 'react';
 import AdSetupPage from '../../../src/pages/AdSetupPage';
 

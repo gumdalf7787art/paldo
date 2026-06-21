@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
 // Cloudflare Pages Functions: GET/POST /api/bookmarks

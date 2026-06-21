@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
 function createResponse(data, status = 200) {

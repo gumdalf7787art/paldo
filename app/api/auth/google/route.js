@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
 // GET /api/auth/google

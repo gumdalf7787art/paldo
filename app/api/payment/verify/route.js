@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
 // Cloudflare Pages Functions: POST /api/payment/verify

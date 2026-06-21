@@ -1,5 +1,7 @@
 'use client';
 
+
+export const dynamic = 'force-dynamic';
 import React from 'react';
 import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from '../src/components/Sections';
 import SearchBar from '../src/components/SearchBar';

@@ -234,7 +234,7 @@ const HeroCarousel = ({ breedName }) => {
 
   if (isMobile) {
     return (
-      <section style={{ padding: '8px 0 5px 0', position: 'relative' }}>
+      <section style={{ padding: '0px 0 5px 0', position: 'relative' }}>
         <div 
           style={{ 
             overflowX: 'auto', 

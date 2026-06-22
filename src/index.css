@@ -342,7 +342,7 @@ ul {
 
 @media (max-width: 600px) {
   .header-content {
-    height: 60px !important;
+    height: 44px !important;
   }
   .nav-group {
     gap: 10px !important;

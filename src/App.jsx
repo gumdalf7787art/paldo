@@ -163,7 +163,7 @@ const Home = () => {
   if (isMobile) {
     // 📱 모바일 최적화 메인 페이지
     return (
-      <main style={{ padding: '0 12px', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '40px' }}>
+      <main style={{ padding: '0 12px', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '40px', marginTop: '0px', paddingTop: '2px' }}>
         {/* 1. 가로형 배너 */}
         <div style={{ marginBottom: '15px' }}>
           <HeroCarousel />

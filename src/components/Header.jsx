@@ -124,7 +124,7 @@ const Header = () => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          height: isMobile ? '48px' : '80px',
+          height: isMobile ? '44px' : '80px',
           padding: isMobile ? '0 8px' : '0 20px',
           position: 'relative'
         }}>

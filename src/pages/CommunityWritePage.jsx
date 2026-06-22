@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
@@ -8,11 +8,12 @@ const CommunityWritePage = () => {
   const editPostData = location.state?.post || null; // 수정 모드 여부
 
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
   const [category, setCategory] = useState('');
-  const [imagesBase64, setImagesBase64] = useState([]); // Base64 스트링 배열
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+
+  const editorRef = useRef(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -27,17 +28,13 @@ const CommunityWritePage = () => {
       // 수정 모드일 때 폼 초기화
       if (editPostData) {
         setTitle(editPostData.title);
-        setContent(editPostData.content);
         setCategory(editPostData.category);
-        if (editPostData.images) {
-          try {
-            setImagesBase64(JSON.parse(editPostData.images));
-          } catch (e) {
-            setImagesBase64([]);
-          }
+        // 에디터 내용 로드
+        if (editorRef.current) {
+          editorRef.current.innerHTML = editPostData.content;
         }
       } else {
-        // 새 글 작성 시 역할에 따라 첫 번째로 쓸 수 있는 카테고리 디폴트 설정
+        // 새 글 작성 시 역할에 따라 카테고리 디폴트 설정
         if (data.role === 'admin') {
           setCategory('notice');
         } else if (data.role === 'seller') {
@@ -50,26 +47,127 @@ const CommunityWritePage = () => {
     checkAuth();
   }, [editPostData, navigate]);
 
-  // 이미지 파일 읽기 및 Base64 변환
-  const handleImageChange = (e) => {
+  // 에디터에 로드하는 마운트 시점 재점검
+  useEffect(() => {
+    if (editPostData && editorRef.current && currentUser) {
+      editorRef.current.innerHTML = editPostData.content;
+    }
+  }, [editPostData, currentUser]);
+
+  // 에디터 서식 적용 함수
+  const executeCommand = (command, value = null) => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+      document.execCommand(command, false, value);
+    }
+  };
+
+  // 폰트 크기 변경 대안 (execCommand의 fontSize는 1~7 크기 제한이 있으므로 블록 레벨 포맷 적용)
+  const handleBlockFormat = (format) => {
+    executeCommand('formatBlock', format);
+  };
+
+  // 폰트 색상 변경
+  const handleColorChange = (e) => {
+    executeCommand('foreColor', e.target.value);
+  };
+
+  // 커서 위치에 엘리먼트 삽입 헬퍼
+  const insertElementAtCursor = (element) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      // 포커스가 에디터 내부에 있을 때만 삽입
+      if (editorRef.current.contains(range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(element);
+        
+        // 빈 문단 추가하여 이어서 타이핑할 수 있게 처리
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        element.after(p);
+
+        // 커서를 빈 문단 뒤로 이동
+        const newRange = document.createRange();
+        newRange.setStartAfter(p);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        return;
+      }
+    }
+    // 포커스가 없거나 에디터 밖이면 맨 뒤에 추가
+    editorRef.current.appendChild(element);
+    const p = document.createElement('p');
+    p.innerHTML = '<br>';
+    editorRef.current.appendChild(p);
+  };
+
+  // 이미지 인라인 업로드 및 본문 삽입
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    if (imagesBase64.length + files.length > 5) {
-      alert('이미지는 최대 5장까지만 등록 가능합니다.');
+    if (files.length === 0) return;
+
+    setUploadingMedia(true);
+
+    for (const file of files) {
+      const { data, error } = await api.uploadFile(file, file.name);
+      if (error || !data) {
+        alert(`이미지 업로드 실패: ${error || '알 수 없는 오류'}`);
+        continue;
+      }
+
+      // 이미지 태그 생성하여 본문 삽입
+      const img = document.createElement('img');
+      img.src = data.url;
+      img.alt = '커뮤니티 첨부 이미지';
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '12px';
+      img.style.margin = '15px 0';
+      img.style.display = 'block';
+      img.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+
+      insertElementAtCursor(img);
+    }
+
+    setUploadingMedia(false);
+    e.target.value = ''; // input 리셋
+  };
+
+  // 동영상 인라인 업로드 및 본문 삽입
+  const handleVideoUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const file = files[0];
+    if (file.size > 50 * 1024 * 1024) {
+      alert('동영상은 최대 50MB까지만 업로드 가능합니다.');
       return;
     }
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagesBase64((prev) => [...prev, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+    setUploadingMedia(true);
 
-  // 이미지 삭제
-  const handleRemoveImage = (index) => {
-    setImagesBase64((prev) => prev.filter((_, i) => i !== index));
+    const { data, error } = await api.uploadFile(file, file.name);
+    if (error || !data) {
+      alert(`동영상 업로드 실패: ${error || '알 수 없는 오류'}`);
+    } else {
+      // 비디오 태그 생성하여 본문 삽입
+      const video = document.createElement('video');
+      video.src = data.url;
+      video.controls = true;
+      video.style.maxWidth = '100%';
+      video.style.borderRadius = '12px';
+      video.style.margin = '15px 0';
+      video.style.display = 'block';
+      video.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+
+      insertElementAtCursor(video);
+    }
+
+    setUploadingMedia(false);
+    e.target.value = ''; // input 리셋
   };
 
   // 등록/수정 전송
@@ -83,18 +181,28 @@ const CommunityWritePage = () => {
       alert('제목을 입력해 주세요.');
       return;
     }
-    if (!content.trim()) {
+
+    const contentHtml = editorRef.current ? editorRef.current.innerHTML.trim() : '';
+    // 단순 빈 태그 구성 시 본문 없음 예외처리
+    const plainText = editorRef.current ? editorRef.current.innerText.trim() : '';
+    if (!contentHtml || contentHtml === '<p><br></p>' || (!plainText && !contentHtml.includes('img') && !contentHtml.includes('video'))) {
       alert('내용을 입력해 주세요.');
       return;
     }
 
     setLoading(true);
 
+    // 본문에서 이미지 src들을 파싱하여 썸네일용/갤러리용으로 추출(호환성 유지)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = contentHtml;
+    const imgTags = Array.from(tempDiv.querySelectorAll('img'));
+    const imgUrls = imgTags.map(img => img.src);
+
     const payload = {
       category,
       title: title.trim(),
-      content: content.trim(),
-      images_base64: imagesBase64,
+      content: contentHtml, // HTML 포맷으로 전송
+      images_base64: imgUrls, // 백엔드 스키마 호환을 위해 본문 이미지 URL 배열 전달
     };
 
     if (editPostData) {
@@ -148,7 +256,7 @@ const CommunityWritePage = () => {
   const categories = getAvailableCategories();
 
   return (
-    <div className="container fade-in" style={{ padding: '40px 20px', maxWidth: '700px' }}>
+    <div className="container fade-in" style={{ padding: '40px 20px', maxWidth: '850px' }}>
       
       {/* 뒤로가기 */}
       <button onClick={() => navigate(-1)} style={backButtonStyle}>
@@ -189,58 +297,90 @@ const CommunityWritePage = () => {
             />
           </div>
 
-          {/* 이미지 첨부 */}
+          {/* 리치 에디터 및 툴바 */}
           <div style={inputGroupStyle}>
             <label style={labelStyle}>
-              이미지 첨부 (최대 5장)
-              <span style={{ fontSize: '0.8rem', color: '#888', fontWeight: 'normal', marginLeft: '6px' }}>
-                ({imagesBase64.length}/5)
-              </span>
+              본문 내용
+              {uploadingMedia && (
+                <span style={{ fontSize: '0.85rem', color: 'var(--primary)', marginLeft: '10px', fontWeight: 'bold' }}>
+                  ⏳ 미디어 업로드 중...
+                </span>
+              )}
             </label>
-            
-            <div style={imageUploadRowStyle}>
-              {imagesBase64.length < 5 && (
-                <label style={uploadTriggerStyle}>
-                  📷 이미지 추가
+
+            {/* 에디터 툴바 */}
+            <div style={toolbarStyle}>
+              {/* 글자 크기 */}
+              <select onChange={(e) => handleBlockFormat(e.target.value)} defaultValue="p" style={toolSelectStyle} title="글자 크기 및 서식">
+                <option value="p">기본 본문</option>
+                <option value="h2">큰 제목 (H2)</option>
+                <option value="h3">중간 제목 (H3)</option>
+                <option value="h4">소제목 (H4)</option>
+              </select>
+
+              <div style={dividerStyle} />
+
+              {/* 글자 스타일 */}
+              <button type="button" onClick={() => executeCommand('bold')} style={toolBtnStyle} title="굵게"><b>B</b></button>
+              <button type="button" onClick={() => executeCommand('italic')} style={toolBtnStyle} title="기울임"><i>I</i></button>
+              <button type="button" onClick={() => executeCommand('underline')} style={toolBtnStyle} title="밑줄"><u>U</u></button>
+              <button type="button" onClick={() => executeCommand('strikeThrough')} style={toolBtnStyle} title="취소선"><s>S</s></button>
+
+              <div style={dividerStyle} />
+
+              {/* 정렬 */}
+              <button type="button" onClick={() => executeCommand('justifyLeft')} style={toolBtnStyle} title="왼쪽 정렬">Align L</button>
+              <button type="button" onClick={() => executeCommand('justifyCenter')} style={toolBtnStyle} title="가운데 정렬">Align C</button>
+              <button type="button" onClick={() => executeCommand('justifyRight')} style={toolBtnStyle} title="오른쪽 정렬">Align R</button>
+
+              <div style={dividerStyle} />
+
+              {/* 글자 색상 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontSize: '0.8rem', color: '#718096', fontWeight: 'bold' }}>Color:</span>
+                <input type="color" onChange={handleColorChange} defaultValue="#2d3748" style={toolColorStyle} title="글자 색상" />
+              </div>
+
+              <div style={dividerStyle} />
+
+              {/* 미디어 업로드 */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <label style={mediaBtnStyle} title="사진 삽입">
+                  📷 사진 추가
                   <input
                     type="file"
                     accept="image/*"
                     multiple
-                    onChange={handleImageChange}
+                    onChange={handleImageUpload}
                     style={{ display: 'none' }}
+                    disabled={uploadingMedia}
                   />
                 </label>
-              )}
 
-              {imagesBase64.map((imgSrc, idx) => (
-                <div key={idx} style={thumbnailWrapperStyle}>
-                  <img src={imgSrc} alt="" style={thumbnailStyle} />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(idx)}
-                    style={removeImageButtonStyle}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+                <label style={{ ...mediaBtnStyle, backgroundColor: '#ebf8ff', color: '#2b6cb0' }} title="동영상 삽입">
+                  🎥 동영상 추가
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    style={{ display: 'none' }}
+                    disabled={uploadingMedia}
+                  />
+                </label>
+              </div>
             </div>
-          </div>
 
-          {/* 본문 내용 */}
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>내용</label>
-            <textarea
-              placeholder="반려동물과 관련된 따뜻하고 유익한 이야기를 적어주세요. 욕설이나 비방글은 예고 없이 삭제될 수 있습니다."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              style={textareaStyle}
-              rows="12"
+            {/* WYSIWYG 에디터 내용 영역 */}
+            <div
+              ref={editorRef}
+              contentEditable="true"
+              placeholder="여기에 반려동물과 관련된 유익하고 따뜻한 스토리를 작성해 주세요. 툴바를 이용해 텍스트 크기와 굵기를 변경하고, 사진과 영상을 본문 중간 원하는 위치에 마음껏 추가할 수 있습니다."
+              style={editorAreaStyle}
             />
           </div>
 
           {/* 전송 버튼 */}
-          <button type="submit" disabled={loading} style={submitButtonStyle}>
+          <button type="submit" disabled={loading || uploadingMedia} style={submitButtonStyle}>
             {loading ? '처리 중...' : editPostData ? '수정 완료' : '게시글 등록'}
           </button>
         </form>
@@ -315,72 +455,86 @@ const inputStyle = {
   fontSize: '0.95rem',
 };
 
-const textareaStyle = {
-  padding: '15px',
-  borderRadius: '10px',
-  border: '1px solid #cbd5e1',
-  outline: 'none',
-  fontSize: '0.95rem',
-  lineHeight: '1.6',
-  resize: 'vertical',
-  fontFamily: 'inherit',
-};
-
-const imageUploadRowStyle = {
+// --- 에디터 툴바 스타일 ---
+const toolbarStyle = {
   display: 'flex',
   flexWrap: 'wrap',
-  gap: '12px',
+  gap: '8px',
   alignItems: 'center',
-  marginTop: '5px',
+  padding: '10px 15px',
+  backgroundColor: '#f8fafc',
+  border: '1px solid #cbd5e1',
+  borderBottom: 'none',
+  borderTopLeftRadius: '10px',
+  borderTopRightRadius: '10px',
 };
 
-const uploadTriggerStyle = {
-  width: '100px',
-  height: '100px',
-  border: '2px dashed #cbd5e1',
-  borderRadius: '12px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+const toolSelectStyle = {
+  padding: '6px 10px',
+  borderRadius: '6px',
+  border: '1px solid #cbd5e1',
   fontSize: '0.85rem',
   fontWeight: 'bold',
-  color: '#718096',
+  backgroundColor: 'white',
   cursor: 'pointer',
-  transition: 'all 0.2s',
-  backgroundColor: '#f8fafc',
+  outline: 'none',
 };
 
-const thumbnailWrapperStyle = {
-  position: 'relative',
-  width: '100px',
-  height: '100px',
-  borderRadius: '12px',
-  overflow: 'hidden',
+const toolBtnStyle = {
+  padding: '6px 10px',
+  borderRadius: '6px',
   border: '1px solid #cbd5e1',
-};
-
-const thumbnailStyle = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-};
-
-const removeImageButtonStyle = {
-  position: 'absolute',
-  top: '4px',
-  right: '4px',
-  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  color: 'white',
-  border: 'none',
-  borderRadius: '50%',
-  width: '20px',
-  height: '20px',
+  backgroundColor: 'white',
+  fontSize: '0.85rem',
+  fontWeight: 'bold',
   cursor: 'pointer',
+  transition: 'background-color 0.2s',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '0.75rem',
-  lineHeight: 1,
+};
+
+const toolColorStyle = {
+  border: 'none',
+  width: '32px',
+  height: '28px',
+  cursor: 'pointer',
+  backgroundColor: 'transparent',
+};
+
+const dividerStyle = {
+  width: '1px',
+  height: '20px',
+  backgroundColor: '#cbd5e1',
+  margin: '0 4px',
+};
+
+const mediaBtnStyle = {
+  padding: '6px 12px',
+  borderRadius: '6px',
+  backgroundColor: '#e6fffa',
+  color: '#00a389',
+  fontSize: '0.85rem',
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  border: '1px solid #b2f5ea',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '5px',
+};
+
+const editorAreaStyle = {
+  padding: '20px',
+  border: '1px solid #cbd5e1',
+  borderBottomLeftRadius: '10px',
+  borderBottomRightRadius: '10px',
+  minHeight: '400px',
+  fontSize: '1rem',
+  lineHeight: '1.7',
+  outline: 'none',
+  backgroundColor: 'white',
+  overflowY: 'auto',
+  fontFamily: 'inherit',
 };
 
 const submitButtonStyle = {

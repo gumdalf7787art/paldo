@@ -70,9 +70,9 @@ export async function onRequestPost(context) {
       return createResponse({ error: '업로드할 파일이 전송되지 않았습니다.' }, 400);
     }
 
-    // 파일 크기 검증 (예: 5MB)
-    if (uploadBody.byteLength > 5 * 1024 * 1024) {
-      return createResponse({ error: '파일 크기는 최대 5MB까지 가능합니다.' }, 400);
+    // 파일 크기 검증 (예: 50MB)
+    if (uploadBody.byteLength > 50 * 1024 * 1024) {
+      return createResponse({ error: '파일 크기는 최대 50MB까지 가능합니다.' }, 400);
     }
 
     // 3. 고유 키 생성

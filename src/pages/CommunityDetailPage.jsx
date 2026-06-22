@@ -146,8 +146,8 @@ const CommunityDetailPage = () => {
           </div>
         </div>
 
-        {/* 게시글 이미지 갤러리 */}
-        {images.length > 0 && (
+        {/* 게시글 이미지 갤러리 (본문 내에 삽입된 이미지가 없는 레거시 글의 하위호환성 유지) */}
+        {images.length > 0 && !(post.content && post.content.includes('<img')) && (
           <div style={galleryStyle}>
             {images.map((imgUrl, index) => (
               <img
@@ -160,10 +160,11 @@ const CommunityDetailPage = () => {
           </div>
         )}
 
-        {/* 게시글 본문 */}
-        <div style={bodyContentStyle}>
-          {post.content}
-        </div>
+        {/* 게시글 본문 (Rich HTML 지원) */}
+        <div 
+          style={bodyContentStyle} 
+          dangerouslySetInnerHTML={{ __html: post.content }} 
+        />
 
         {/* 게시글 관리 버튼 (본인 혹은 어드민) */}
         {canManage && (

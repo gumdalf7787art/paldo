@@ -11,6 +11,7 @@ const CommunityPage = () => {
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
 
   const navigate = useNavigate();
   const limit = 10;
@@ -139,10 +140,14 @@ const CommunityPage = () => {
               <div
                 key={post.id}
                 onClick={() => navigate(`/community/${post.id}`)}
+                onMouseEnter={() => setHoveredId(post.id)}
+                onMouseLeave={() => setHoveredId(null)}
                 style={{
                   ...postCardStyle,
-                  backgroundColor: isNotice ? '#f8fafc' : 'white',
-                  border: isNotice ? '1px solid #cbd5e1' : '1px solid #edf2f7',
+                  backgroundColor: isNotice 
+                    ? '#f8fafc' 
+                    : (hoveredId === post.id ? '#f1f5f9' : 'white'),
+                  borderBottom: '1px solid #e2e8f0',
                 }}
               >
                 {/* 왼쪽 본문 정보 */}
@@ -321,24 +326,27 @@ const writeButtonStyle = {
 const listContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
-  gap: '15px',
+  gap: '0',
+  borderTop: '2px solid #475569',
+  borderBottom: '1px solid #e2e8f0',
 };
 
 const postCardStyle = {
   display: 'flex',
   justifyContent: 'space-between',
-  padding: '24px',
-  borderRadius: '16px',
+  alignItems: 'center',
+  padding: '12px 16px',
+  borderRadius: '0',
   cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+  transition: 'background-color 0.15s ease',
+  boxShadow: 'none',
 };
 
 const cardLeftStyle = {
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   marginRight: '20px',
 };
 
@@ -346,7 +354,7 @@ const badgeRowStyle = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  marginBottom: '10px',
+  marginBottom: '6px',
 };
 
 const noticeBadgeStyle = {
@@ -383,9 +391,9 @@ const dateStyle = {
 };
 
 const postTitleStyle = {
-  fontSize: '1.15rem',
+  fontSize: '1rem',
   color: 'var(--body-text)',
-  marginBottom: '12px',
+  marginBottom: '6px',
   lineHeight: '1.4',
 };
 
@@ -422,9 +430,9 @@ const viewsStyle = {
 };
 
 const thumbnailContainerStyle = {
-  width: '100px',
-  height: '100px',
-  borderRadius: '12px',
+  width: '60px',
+  height: '60px',
+  borderRadius: '4px',
   overflow: 'hidden',
   flexShrink: 0,
 };

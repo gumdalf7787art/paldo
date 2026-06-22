@@ -197,20 +197,21 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
 
         {/* 하단 검색 필터 영역 */}
         {isMobile ? (
-          /* 📱 모바일 상세검색 (2x2 그리드 + 하단 와이드 버튼) */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+          /* 📱 모바일 상세검색 (좌측 2x2 필터 그리드 + 우측 세로형 검색 버튼) */
+          <div style={{ display: 'flex', gap: '8px', width: '100%', alignItems: 'stretch' }}>
+            {/* 좌측 2x2 필터 그리드 */}
             <div style={{
+              flex: 1,
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '8px 10px',
-              width: '100%'
+              gap: '6px 8px'
             }}>
               {/* 1. 품종선택 (hideBreed가 아닐 때만) */}
               {!hideBreed && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
                   <select 
-                    style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }} 
+                    style={{ ...selectStyle, height: '30px', fontSize: '0.75rem' }} 
                     value={selectedBreed}
                     onChange={(e) => setSelectedBreed(e.target.value)}
                   >
@@ -221,10 +222,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
               )}
 
               {/* 2. 분양지역 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>지역</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
                 <select 
-                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  style={{ ...selectStyle, height: '30px', fontSize: '0.75rem' }}
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
                 >
@@ -233,10 +234,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
               </div>
 
               {/* 3. 성별 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>성별</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
                 <select 
-                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  style={{ ...selectStyle, height: '30px', fontSize: '0.75rem' }}
                   value={selectedGender}
                   onChange={(e) => setSelectedGender(e.target.value)}
                 >
@@ -245,10 +246,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
               </div>
 
               {/* 4. 가격 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>가격</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
                 <select 
-                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  style={{ ...selectStyle, height: '30px', fontSize: '0.75rem' }}
                   value={selectedPrice}
                   onChange={(e) => setSelectedPrice(e.target.value)}
                 >
@@ -257,15 +258,14 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
               </div>
             </div>
 
-            {/* 하단 풀와이드 검색하기 버튼 */}
+            {/* 우측 통합 검색 버튼 (2줄 높이) */}
             <button 
               onClick={handleSearch}
               style={{
-                width: '100%',
+                width: '65px',
+                flexShrink: 0,
                 backgroundColor: 'var(--primary)',
                 color: 'var(--white)',
-                padding: '8px 0',
-                height: '36px',
                 borderRadius: '8px',
                 fontWeight: '700',
                 fontSize: '0.8rem',
@@ -274,14 +274,18 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
                 boxShadow: '0 4px 12px rgba(38, 166, 154, 0.15)',
                 transition: 'all 0.2s',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: '4px'
+                gap: '4px',
+                padding: '0 4px',
+                alignSelf: 'stretch'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-dark, #00796b)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--primary)'}
             >
-              🔍 조건으로 입양 정보 찾기
+              <span style={{ fontSize: '1.1rem' }}>🔍</span>
+              <span style={{ fontSize: '0.75rem' }}>검색</span>
             </button>
           </div>
         ) : (

@@ -205,6 +205,7 @@ const Header = () => {
           </div>
 
           <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <Link to="/community" style={{ ...navLinkStyle, marginRight: '10px' }} className="nav-link">🐾 커뮤니티</Link>
             {!session ? (
               <>
                 <Link to="/login" style={navLinkStyle} className="nav-link">로그인</Link>

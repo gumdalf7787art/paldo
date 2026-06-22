@@ -839,5 +839,84 @@ export const api = {
         return { data: null, error: err.message };
       }
     }
+  },
+
+  // 13. 커뮤니티 게시판 (Community Board)
+  board: {
+    async getList(category = 'all', page = 1, limit = 10, search = '') {
+      try {
+        const { data } = await request(`${BASE_URL}/api/board?action=list&category=${category}&page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: { posts: [], total: 0 }, error: err.message };
+      }
+    },
+    async getDetail(id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/board?action=detail&id=${id}`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async create(postData) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/board?action=create`, {
+          method: 'POST',
+          body: JSON.stringify(postData),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async update(postData) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/board?action=update`, {
+          method: 'POST',
+          body: JSON.stringify(postData),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async delete(id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/board?action=delete`, {
+          method: 'POST',
+          body: JSON.stringify({ id }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
+  },
+
+  // 14. 댓글 (Comments)
+  comments: {
+    async create(post_id, content) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/comments?action=create`, {
+          method: 'POST',
+          body: JSON.stringify({ post_id, content }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+    async delete(id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/comments?action=delete`, {
+          method: 'POST',
+          body: JSON.stringify({ id }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
   }
 };

@@ -193,3 +193,29 @@ CREATE TABLE IF NOT EXISTS system_banners (
     link_url TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 15. 커뮤니티 게시글 테이블
+CREATE TABLE IF NOT EXISTS board_posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,                     -- 작성자 ID (profiles.id)
+    category TEXT NOT NULL,                    -- 'notice', 'daily', 'review', 'knowledge', 'store_story'
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    images TEXT,                               -- 이미지 URL 리스트 (JSON 형식 예: '["url1", "url2"]')
+    views INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES profiles(id) ON DELETE CASCADE
+);
+
+-- 16. 커뮤니티 댓글 테이블
+CREATE TABLE IF NOT EXISTS board_comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL,                  -- 게시글 ID (board_posts.id)
+    user_id TEXT NOT NULL,                     -- 댓글 작성자 ID (profiles.id)
+    content TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(post_id) REFERENCES board_posts(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES profiles(id) ON DELETE CASCADE
+);
+

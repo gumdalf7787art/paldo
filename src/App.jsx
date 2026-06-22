@@ -19,6 +19,9 @@ import RefundPolicyPage from './pages/RefundPolicyPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import SubscriptionPage from './pages/SubscriptionPage'
+import CommunityPage from './pages/CommunityPage'
+import CommunityDetailPage from './pages/CommunityDetailPage'
+import CommunityWritePage from './pages/CommunityWritePage'
 
 // 페이지 뷰 트래킹 컴포넌트
 const AnalyticsTracker = () => {
@@ -118,6 +121,9 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/community/:id" element={<CommunityDetailPage />} />
+          <Route path="/community/write" element={<CommunityWritePage />} />
         </Routes>
         <footer style={{ 
           padding: '60px 0', 

@@ -67,10 +67,10 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
   return (
     <section className="fade-in search-bar-section" style={{ padding: isMobile ? '0px 0 2px 0' : '5px 0' }}>
       <div className="glass-card search-bar-container" style={{ 
-        padding: isMobile ? '12px 14px' : (hideBreed ? '16px 24px' : '10px 16px'), 
+        padding: isMobile ? '12px 14px 6px 14px' : (hideBreed ? '16px 24px' : '10px 16px'), 
         display: 'flex', 
         flexDirection: 'column', 
-        gap: '10px',
+        gap: '8px',
         backgroundColor: 'rgba(241, 245, 249, 0.95)',
         backdropFilter: 'blur(10px)',
         borderRadius: '12px',

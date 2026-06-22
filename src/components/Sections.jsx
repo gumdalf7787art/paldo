@@ -438,9 +438,9 @@ const SectionTitle = ({ title, sub, isAd }) => {
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'flex-end', 
-      marginBottom: isMobile ? '4px' : '15px' 
+      marginBottom: isMobile ? '0px' : '15px' 
     }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
         <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', margin: 0 }}>{title}</h2>
         <span style={{ fontSize: '0.85rem' }}>{sub}</span>
       </div>

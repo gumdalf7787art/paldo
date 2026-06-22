@@ -124,11 +124,11 @@ const Header = () => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          height: isMobile ? '60px' : '80px',
-          padding: isMobile ? '0 12px' : '0 20px',
+          height: isMobile ? '48px' : '80px',
+          padding: isMobile ? '0 8px' : '0 20px',
           position: 'relative'
         }}>
-          <Link to="/"><Logo style={{ transform: isMobile ? 'scale(0.85)' : 'none', transformOrigin: 'left center' }} /></Link>
+          <Link to="/"><Logo style={{ transform: isMobile ? 'scale(0.7)' : 'none', transformOrigin: 'left center' }} /></Link>
           
           {/* 헤더 중앙 리브랜딩 슬로건 - 모바일에서는 미노출 */}
           {!isMobile && (
@@ -209,15 +209,19 @@ const Header = () => {
             </div>
           )}
 
-          <div className="nav-group" style={{ display: 'flex', gap: isMobile ? '8px' : '15px', alignItems: 'center' }}>
-            {!isMobile && (
+          <div className="nav-group" style={{ display: 'flex', gap: isMobile ? '6px' : '15px', alignItems: 'center' }}>
+            {isMobile ? (
+              <Link to="/community" style={{ ...navLinkStyle, fontSize: '0.78rem' }} className="nav-link">커뮤니티</Link>
+            ) : (
               <Link to="/community" style={{ ...navLinkStyle, marginRight: '10px' }} className="nav-link">🐾 커뮤니티</Link>
             )}
             
             {!session ? (
               <>
-                <Link to="/login" style={isMobile ? { ...navLinkStyle, fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 'bold' } : navLinkStyle} className="nav-link">로그인</Link>
-                {!isMobile && (
+                <Link to="/login" style={{ ...navLinkStyle, fontSize: isMobile ? '0.78rem' : '0.9rem', color: 'var(--primary)', fontWeight: 'bold' }} className="nav-link">로그인</Link>
+                {isMobile ? (
+                  <Link to="/signup" style={{ ...navLinkStyle, fontSize: '0.78rem' }} className="nav-link">회원가입</Link>
+                ) : (
                   <Link to="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
                 )}
               </>

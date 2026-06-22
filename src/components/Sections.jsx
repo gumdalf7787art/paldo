@@ -252,7 +252,7 @@ const HeroCarousel = ({ breedName }) => {
             <div 
               key={`hero-slide-mobile-${dog.id}-${i}`}
               style={{
-                flex: '0 0 calc(33.333% - 8px)',
+                flex: '0 0 calc(45% - 8px)',
                 scrollSnapAlign: 'start'
               }}
             >
@@ -570,7 +570,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
               overflowX: 'auto', 
               display: 'flex',
               gap: '10px',
-              padding: '4px 0',
+              padding: '4px 10px',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none', 
@@ -582,13 +582,11 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
               <div 
                 key={`mobile-ad-${badge}-${dog.id}-${i}`} 
                 style={{ 
-                  flex: '0 0 calc(65% - 10px)',
-                  height: '195px',
+                  flex: '0 0 calc(45% - 8px)',
                   scrollSnapAlign: 'start'
                 }}
               >
                 <Card 
-                  type="middle" 
                   badgeText={dog.badgeText || badge} 
                   data={dog} 
                 />

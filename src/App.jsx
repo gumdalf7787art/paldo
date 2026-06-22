@@ -52,7 +52,7 @@ const AnalyticsTracker = () => {
 };
 
 
-// 메인 페이지 노출용 최신 커뮤니티 글 위젯
+// 메인 페이지 노출용 최신 커뮤니티 글 위젯 (소식 배지 제거, 폰트 상향)
 const LatestCommunityWidget = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,29 +81,9 @@ const LatestCommunityWidget = () => {
     return `${yyyymmdd} ${hhmm}`;
   };
 
-  const getCategoryLabel = (cat) => {
-    switch (cat) {
-      case 'notice': return '공지';
-      case 'daily': return '일상';
-      case 'review': return '후기';
-      case 'knowledge': return 'Q&A';
-      case 'store_story': return '소식';
-      default: return '일반';
-    }
-  };
-
-  const categoryColor = (cat) => {
-    if (cat === 'notice') return { bgColor: '#fef2f2', color: '#ef4444' };
-    if (cat === 'daily') return { bgColor: '#e0f2fe', color: '#0284c7' };
-    if (cat === 'review') return { bgColor: '#fce7f3', color: '#db2777' };
-    if (cat === 'knowledge') return { bgColor: '#fef3c7', color: '#d97706' };
-    if (cat === 'store_story') return { bgColor: '#dcfce7', color: '#15803d' };
-    return { bgColor: '#e2e8f0', color: '#4a5568' };
-  };
-
   if (loading) {
     return (
-      <div style={{ padding: '20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: '20px' }}>
+      <div style={{ padding: '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: '20px' }}>
         불러오는 중...
       </div>
     );
@@ -113,25 +93,25 @@ const LatestCommunityWidget = () => {
 
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: '#ffffff',
       borderRadius: '12px',
       border: '1px solid #edf2f7',
       padding: '20px',
-      marginTop: '25px',
+      marginTop: '15px',
+      marginBottom: '15px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--body-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--body-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
           🐾 커뮤니티 최근 이야기
         </h3>
-        <Link to="/community" style={{ fontSize: '0.85rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
+        <Link to="/community" style={{ fontSize: '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
           전체보기 ➔
         </Link>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
         {posts.map((post, idx) => {
-          const colors = categoryColor(post.category);
           return (
             <div
               key={post.id}
@@ -140,7 +120,7 @@ const LatestCommunityWidget = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '10px 8px',
+                padding: '12px 8px',
                 borderBottom: idx === posts.length - 1 ? 'none' : '1px solid #edf2f7',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease',
@@ -149,20 +129,9 @@ const LatestCommunityWidget = () => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden', flex: 1, marginRight: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', flex: 1, marginRight: '15px' }}>
                 <span style={{
-                  backgroundColor: colors.bgColor,
-                  color: colors.color,
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  fontSize: '0.72rem',
-                  fontWeight: '800',
-                  flexShrink: 0
-                }}>
-                  {getCategoryLabel(post.category)}
-                </span>
-                <span style={{
-                  fontSize: '0.92rem',
+                  fontSize: '1.02rem',
                   color: '#2d3748',
                   fontWeight: post.category === 'notice' ? 'bold' : 'normal',
                   whiteSpace: 'nowrap',
@@ -173,12 +142,12 @@ const LatestCommunityWidget = () => {
                   {post.title}
                 </span>
                 {post.comment_count > 0 && (
-                  <span style={{ color: '#e53e3e', fontSize: '0.85rem', fontWeight: 'bold', flexShrink: 0 }}>
+                  <span style={{ color: '#e53e3e', fontSize: '0.92rem', fontWeight: 'bold', flexShrink: 0 }}>
                     [{post.comment_count}]
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a0aec0', fontSize: '0.78rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a0aec0', fontSize: '0.85rem', flexShrink: 0 }}>
                 <span style={{ fontWeight: '500', color: '#718096' }}>{post.nickname || '사용자'}</span>
                 <span>•</span>
                 <span>{formatDate(post.created_at)}</span>
@@ -206,7 +175,6 @@ const Home = () => (
       <div className="portal-main-col">
         <AdSections />
         <AdoptionList />
-        <LatestCommunityWidget />
       </div>
       
       {/* 우측 사이드바 영역 */}
@@ -231,6 +199,8 @@ const Home = () => (
             <li>• 계약서 작성 시 15일 이내 폐사/질병에 대한 보상 조건을 확인하세요.</li>
           </ul>
         </div>
+
+        <LatestCommunityWidget />
 
         {/* 맞춤형 개별 추천 위젯 */}
         <PersonalRecommendWidget />

@@ -73,7 +73,9 @@ const CommunityPage = () => {
   // 날짜 포맷팅 함수
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    const yyyymmdd = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    const hhmm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return `${yyyymmdd} ${hhmm}`;
   };
 
   return (
@@ -106,23 +108,6 @@ const CommunityPage = () => {
         ))}
       </div>
 
-      {/* 액션바 (검색창 + 글쓰기 버튼) */}
-      <div style={actionRowStyle}>
-        <form onSubmit={handleSearchSubmit} style={searchFormStyle}>
-          <input
-            type="text"
-            placeholder="제목, 내용 검색..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            style={searchInputStyle}
-          />
-          <button type="submit" style={searchButtonStyle}>🔍 검색</button>
-        </form>
-
-        <button onClick={handleWriteClick} style={writeButtonStyle}>
-          ✏️ 글쓰기
-        </button>
-      </div>
 
       {/* 목록 리스트 */}
       {loading ? (
@@ -226,6 +211,24 @@ const CommunityPage = () => {
           </button>
         </div>
       )}
+
+      {/* 액션바 (검색창 + 글쓰기 버튼) */}
+      <div style={actionRowStyle}>
+        <form onSubmit={handleSearchSubmit} style={searchFormStyle}>
+          <input
+            type="text"
+            placeholder="제목, 내용 검색..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={searchInputStyle}
+          />
+          <button type="submit" style={searchButtonStyle}>🔍 검색</button>
+        </form>
+
+        <button onClick={handleWriteClick} style={writeButtonStyle}>
+          ✏️ 글쓰기
+        </button>
+      </div>
     </div>
   );
 };
@@ -278,9 +281,9 @@ const actionRowStyle = {
   alignItems: 'center',
   flexWrap: 'wrap',
   gap: '15px',
-  marginBottom: '25px',
-  borderBottom: '1px solid #edf2f7',
-  paddingBottom: '20px',
+  marginTop: '30px',
+  borderTop: '1px solid #edf2f7',
+  paddingTop: '20px',
 };
 
 const searchFormStyle = {

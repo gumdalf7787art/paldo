@@ -170,7 +170,7 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ marginBottom: '5px' }}>
+        <div style={{ marginBottom: '0px' }}>
           <SearchBar />
         </div>
         

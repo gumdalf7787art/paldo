@@ -544,9 +544,10 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   const extendedPairs = showSlider ? [...pairs, ...pairs.slice(0, 4)] : pairs;
 
   if (isMobile) {
+    const isSafeAd = title.includes("안심");
     return (
       <section style={{ 
-        padding: '15px 10px 10px 10px', 
+        padding: isSafeAd ? '2px 10px 10px 10px' : '10px 10px 10px 10px', 
         backgroundColor: 'transparent', 
         borderRadius: 0, 
         border: 'none', 

@@ -121,7 +121,7 @@ const LatestCommunityWidget = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '12px 8px',
-                borderBottom: idx === posts.length - 1 ? 'none' : '1px solid #edf2f7',
+                borderBottom: idx === posts.length - 1 ? 'none' : '1px solid #cbd5e1',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease',
                 borderRadius: '6px'
@@ -131,7 +131,7 @@ const LatestCommunityWidget = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', flex: 1, marginRight: '15px' }}>
                 <span style={{
-                  fontSize: '1.02rem',
+                  fontSize: '1.15rem',
                   color: '#2d3748',
                   fontWeight: post.category === 'notice' ? 'bold' : 'normal',
                   whiteSpace: 'nowrap',
@@ -147,10 +147,8 @@ const LatestCommunityWidget = () => {
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a0aec0', fontSize: '0.85rem', flexShrink: 0 }}>
-                <span style={{ fontWeight: '500', color: '#718096' }}>{post.nickname || '사용자'}</span>
-                <span>•</span>
-                <span>{formatDate(post.created_at)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#718096', fontSize: '0.85rem', flexShrink: 0 }}>
+                <span style={{ fontWeight: '500' }}>{post.nickname || '사용자'}</span>
               </div>
             </div>
           );
@@ -180,6 +178,8 @@ const Home = () => (
       {/* 우측 사이드바 영역 */}
       <div className="portal-side-col">
         <LoginWidget />
+
+        <LatestCommunityWidget />
         
         {/* 입양 안내 위젯 */}
         <div style={{
@@ -199,8 +199,6 @@ const Home = () => (
             <li>• 계약서 작성 시 15일 이내 폐사/질병에 대한 보상 조건을 확인하세요.</li>
           </ul>
         </div>
-
-        <LatestCommunityWidget />
 
         {/* 맞춤형 개별 추천 위젯 */}
         <PersonalRecommendWidget />

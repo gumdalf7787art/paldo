@@ -124,11 +124,11 @@ const Header = () => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          height: isMobile ? '44px' : '80px',
+          height: isMobile ? '48px' : '80px',
           padding: isMobile ? '0 8px' : '0 20px',
           position: 'relative'
         }}>
-          <Link to="/"><Logo style={{ transform: isMobile ? 'scale(0.7)' : 'none', transformOrigin: 'left center' }} /></Link>
+          <Link to="/"><Logo /></Link>
           
           {/* 헤더 중앙 리브랜딩 슬로건 - 모바일에서는 미노출 */}
           {!isMobile && (

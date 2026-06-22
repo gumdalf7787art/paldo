@@ -342,7 +342,7 @@ ul {
 
 @media (max-width: 600px) {
   .header-content {
-    height: 44px !important;
+    height: 48px !important;
   }
   .nav-group {
     gap: 10px !important;
@@ -438,6 +438,9 @@ html, body {
   }
   .fade-in {
     padding-bottom: 80px !important; /* 하단 바 공간 확보 */
+  }
+  header.fade-in {
+    padding-bottom: 0px !important; /* 헤더 컴포넌트 하단 여백 버그 수정 */
   }
 }
 

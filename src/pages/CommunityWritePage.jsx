@@ -47,10 +47,16 @@ const CommunityWritePage = () => {
     checkAuth();
   }, [editPostData, navigate]);
 
-  // 에디터에 로드하는 마운트 시점 재점검
+  // 에디터에 로드하는 마운트 시점 재점검 및 초기 포커스 설정
   useEffect(() => {
-    if (editPostData && editorRef.current && currentUser) {
-      editorRef.current.innerHTML = editPostData.content;
+    if (editorRef.current && currentUser) {
+      if (editPostData) {
+        editorRef.current.innerHTML = editPostData.content;
+      }
+      const timer = setTimeout(() => {
+        focusEditorAtEnd();
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [editPostData, currentUser]);
 
@@ -72,37 +78,85 @@ const CommunityWritePage = () => {
     executeCommand('foreColor', e.target.value);
   };
 
+  const lastRangeRef = useRef(null);
+
+  // 커서 위치(Selection Range)를 실시간 저장하는 헬퍼
+  const saveSelectionRange = () => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+        lastRangeRef.current = range.cloneRange();
+      }
+    }
+  };
+
+  // 에디터의 맨 끝으로 포커스 및 커서 이동 헬퍼
+  const focusEditorAtEnd = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorRef.current);
+    range.collapse(false); // 끝으로 축소
+    selection.removeAllRanges();
+    selection.addRange(range);
+    lastRangeRef.current = range.cloneRange();
+  };
+
   // 커서 위치에 엘리먼트 삽입 헬퍼
   const insertElementAtCursor = (element) => {
     if (!editorRef.current) return;
     editorRef.current.focus();
+    
     const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      // 포커스가 에디터 내부에 있을 때만 삽입
-      if (editorRef.current.contains(range.commonAncestorContainer)) {
-        range.deleteContents();
-        range.insertNode(element);
-        
-        // 빈 문단 추가하여 이어서 타이핑할 수 있게 처리
-        const p = document.createElement('p');
-        p.innerHTML = '<br>';
-        element.after(p);
+    let range = null;
 
-        // 커서를 빈 문단 뒤로 이동
-        const newRange = document.createRange();
-        newRange.setStartAfter(p);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-        return;
+    // 1. 저장된 Range가 있고 에디터 내부인 경우 우선 사용
+    if (lastRangeRef.current && editorRef.current.contains(lastRangeRef.current.commonAncestorContainer)) {
+      range = lastRangeRef.current;
+    }
+    // 2. 현재 선택 영역이 에디터 내부인 경우 사용
+    else if (selection.rangeCount > 0) {
+      const curRange = selection.getRangeAt(0);
+      if (editorRef.current.contains(curRange.commonAncestorContainer)) {
+        range = curRange;
       }
     }
-    // 포커스가 없거나 에디터 밖이면 맨 뒤에 추가
+
+    if (range) {
+      range.deleteContents();
+      range.insertNode(element);
+      
+      // 빈 문단 추가하여 이어서 타이핑할 수 있게 처리
+      const p = document.createElement('p');
+      p.innerHTML = '<br>';
+      element.after(p);
+
+      // 커서를 빈 문단 내부로 이동
+      const newRange = document.createRange();
+      newRange.setStart(p, 0);
+      newRange.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+      
+      // 저장된 Range 정보도 새로운 커서 위치로 갱신
+      lastRangeRef.current = newRange.cloneRange();
+      return;
+    }
+
+    // 3. 포커스나 선택 위치가 아예 유실된 경우 맨 뒤에 추가
     editorRef.current.appendChild(element);
     const p = document.createElement('p');
     p.innerHTML = '<br>';
     editorRef.current.appendChild(p);
+
+    const newRange = document.createRange();
+    newRange.setStart(p, 0);
+    newRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+    lastRangeRef.current = newRange.cloneRange();
   };
 
   // 이미지 인라인 업로드 및 본문 삽입
@@ -374,6 +428,10 @@ const CommunityWritePage = () => {
             <div
               ref={editorRef}
               contentEditable="true"
+              onKeyUp={saveSelectionRange}
+              onMouseUp={saveSelectionRange}
+              onInput={saveSelectionRange}
+              onBlur={saveSelectionRange}
               placeholder="여기에 반려동물과 관련된 유익하고 따뜻한 스토리를 작성해 주세요. 툴바를 이용해 텍스트 크기와 굵기를 변경하고, 사진과 영상을 본문 중간 원하는 위치에 마음껏 추가할 수 있습니다."
               style={editorAreaStyle}
             />

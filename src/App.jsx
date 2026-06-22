@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, Link, useNavigate } from 'react-router-dom'
 import { api } from './lib/api'
 import Header from './components/Header'
+import BottomNavigation from './components/BottomNavigation'
+import { MobileProvider, useMobile } from './context/MobileContext'
 import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from './components/Sections'
 import SearchBar from './components/SearchBar'
 import DetailPage from './pages/DetailPage'
@@ -74,12 +76,7 @@ const LatestCommunityWidget = () => {
     fetchLatestPosts();
   }, []);
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const yyyymmdd = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-    const hhmm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    return `${yyyymmdd} ${hhmm}`;
-  };
+
 
   if (loading) {
     return (
@@ -161,16 +158,7 @@ const LatestCommunityWidget = () => {
 
 
 const Home = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const { isMobile } = useMobile();
 
   if (isMobile) {
     // 📱 모바일 최적화 메인 페이지
@@ -264,60 +252,132 @@ const Home = () => {
   );
 };
 
+function Footer() {
+  const { isMobile } = useMobile();
+  const [showCompanyDetails, setShowCompanyDetails] = useState(false);
+
+  return (
+    <footer style={{ 
+      padding: isMobile ? '30px 15px' : '60px 0', 
+      backgroundColor: 'var(--body-text)', 
+      color: 'rgba(255,255,255,0.6)',
+      marginTop: isMobile ? '40px' : '100px',
+      fontSize: isMobile ? '12px' : '14px'
+    }}>
+      <div className={isMobile ? "" : "container"}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'flex-start', 
+          gap: isMobile ? '20px' : '30px' 
+        }}>
+          <div>
+            <h2 style={{ color: 'white', fontSize: isMobile ? '1.2rem' : '1.5rem', marginBottom: '10px' }}>다잇독</h2>
+            
+            {isMobile ? (
+              <div style={{ marginBottom: '15px' }}>
+                <button 
+                  onClick={() => setShowCompanyDetails(!showCompanyDetails)}
+                  style={{
+                    background: 'none',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: 'rgba(255,255,255,0.8)',
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    marginBottom: '10px'
+                  }}
+                >
+                  🏢 사업자 정보 {showCompanyDetails ? '접기 ▲' : '펼치기 ▼'}
+                </button>
+                {showCompanyDetails && (
+                  <div style={{ 
+                    fontSize: '11px', 
+                    lineHeight: '1.8', 
+                    color: 'rgba(255,255,255,0.5)',
+                    backgroundColor: 'rgba(255,255,255,0.03)',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(255,255,255,0.05)'
+                  }}>
+                    주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규<br />
+                    사업자등록번호 : 153-87-03544<br />
+                    주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
+                    고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
+                주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544<br />
+                주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
+                고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
+              </div>
+            )}
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>© 2026 Daitdog. All rights reserved.</p>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            gap: isMobile ? '12px' : '25px', 
+            flexWrap: 'wrap',
+            borderTop: isMobile ? '1px solid rgba(255,255,255,0.1)' : 'none',
+            paddingTop: isMobile ? '15px' : '0'
+          }}>
+            <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>
+            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>이용약관</Link>
+            <Link to="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
+            <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1538703544" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>사업자정보확인</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function AppContent() {
+  const { isMobile } = useMobile();
+  return (
+    <div className="App" style={{ paddingBottom: isMobile ? '68px' : '0px' }}>
+      <AnalyticsTracker />
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/detail" element={<DetailPage />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/upload" element={<UploadForm />} />
+        <Route path="/ad-setup/:id" element={<AdSetupPage />} />
+        <Route path="/ad-store" element={<AdStorePage />} />
+        <Route path="/store/:sellerId" element={<StorePage />} />
+        <Route path="/breed/:breedName" element={<BreedPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/refund" element={<RefundPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/community/:id" element={<CommunityDetailPage />} />
+        <Route path="/community/write" element={<CommunityWritePage />} />
+      </Routes>
+      <BottomNavigation />
+      <Footer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
-      <div className="App">
-        <AnalyticsTracker />
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/detail" element={<DetailPage />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/upload" element={<UploadForm />} />
-          <Route path="/ad-setup/:id" element={<AdSetupPage />} />
-          <Route path="/ad-store" element={<AdStorePage />} />
-          <Route path="/store/:sellerId" element={<StorePage />} />
-          <Route path="/breed/:breedName" element={<BreedPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/refund" element={<RefundPolicyPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/subscription" element={<SubscriptionPage />} />
-          <Route path="/community" element={<CommunityPage />} />
-          <Route path="/community/:id" element={<CommunityDetailPage />} />
-          <Route path="/community/write" element={<CommunityWritePage />} />
-        </Routes>
-        <footer style={{ 
-          padding: '60px 0', 
-          backgroundColor: 'var(--body-text)', 
-          color: 'rgba(255,255,255,0.6)',
-          marginTop: '100px'
-        }}>
-          <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '30px' }}>
-              <div>
-                <h2 style={{ color: 'white', marginBottom: '10px' }}>다잇독</h2>
-                <div style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
-                  주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544<br />
-                  주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
-                  고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
-                </div>
-                <p style={{ fontSize: '12px' }}>© 2026 Daitdog. All rights reserved.</p>
-              </div>
-              <div style={{ display: 'flex', gap: '25px', fontSize: '14px', flexWrap: 'wrap' }}>
-                <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>개인정보처리방침</Link>
-                <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>이용약관</Link>
-                <Link to="/refund" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontWeight: 'bold' }}>환불정책</Link>
-                <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1538703544" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>사업자정보확인</a>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
+      <MobileProvider>
+        <AppContent />
+      </MobileProvider>
     </Router>
   )
 }

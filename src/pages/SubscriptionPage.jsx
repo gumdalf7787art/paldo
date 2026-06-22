@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
+// 컴포넌트 렌더 스코프 바깥에 헬퍼 함수 정의
+const generateUniqueId = (prefix, id) => {
+  return `${prefix}_${id}_${Date.now()}`;
+};
+
 const SubscriptionPage = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
@@ -66,8 +71,8 @@ const SubscriptionPage = () => {
     setIsSubmitting(true);
 
     // 정기결제용 빌링키 발급 고유 ID 생성 (고객 식별용)
-    const customerUid = `customer_${currentUser.id}_${Date.now()}`;
-    const merchantUid = `billing_${plan.id}_${Date.now()}`;
+    const customerUid = generateUniqueId('customer', currentUser.id);
+    const merchantUid = generateUniqueId('billing', plan.id);
 
     // 포트원 빌링키 발급 요청 (IMP.request_pay에 customer_uid 전달)
     window.IMP.request_pay({
@@ -83,7 +88,7 @@ const SubscriptionPage = () => {
     }, async (rsp) => {
       if (rsp.success) {
         // 빌링키 발급 성공! 백엔드에 빌링키 등록 및 활성화 요청
-        const { data, error } = await api.subscription.register(
+        const { error } = await api.subscription.register(
           customerUid,
           plan.name,
           merchantUid,

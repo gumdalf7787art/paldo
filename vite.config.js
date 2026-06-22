@@ -7,11 +7,10 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2000,
     minify: false,
+    cssMinify: false,
+    sourcemap: true,
     rollupOptions: {
-      onwarn(warning, warn) {
-        // 빌드가 다운되는 것을 방지하기 위해 과도한 경고 출력을 억제합니다.
-        return;
-      }
+      // onwarn 생략하여 경고가 콘솔에 출력되게 함
     }
   },
   server: {

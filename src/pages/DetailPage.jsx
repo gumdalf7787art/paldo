@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
 import Card from '../components/Card';
+import { useMobile } from '../context/MobileContext';
 
 // 영상 URL 렌더링 헬퍼 (IIFE 대신 독립 함수로 분리 - Rolldown 파서 버그 우회)
 function renderVideoEmbed(videoUrl) {
@@ -88,6 +89,7 @@ function renderPrice(dog) {
 }
 
 const DetailPage = () => {
+  const { isMobile } = useMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const [dog, setDog] = useState(location.state?.dog || null); // Card에서 넘겨받은 강아지 정보 (없을 경우 fetch)
@@ -478,35 +480,42 @@ const DetailPage = () => {
 
 
   return (
-    <div className="fade-in" style={{ paddingBottom: '100px' }}>
-      <div className="container" style={{ maxWidth: '960px' }}>
-        <div style={{ padding: '20px 0', fontSize: '0.9rem', color: 'var(--muted-text)' }}>
-           홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
-        </div>
+    <div className="fade-in" style={{ paddingBottom: isMobile ? '80px' : '100px', backgroundColor: isMobile ? '#f8fafc' : 'transparent' }}>
+      <div className="container" style={{ maxWidth: isMobile ? '100%' : '960px', padding: isMobile ? '0' : '0 20px' }}>
+        
+        {!isMobile && (
+          <div style={{ padding: '20px 0', fontSize: '0.9rem', color: 'var(--muted-text)' }}>
+             홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
+          </div>
+        )}
 
-        <div className="detail-main-grid" style={{ width: '100%' }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', marginBottom: '15px', boxShadow: 'var(--shadow)' }}>
-              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '400px', aspectRatio: '4/3', objectFit: 'cover' }} />
+        {isMobile ? (
+          // ==================== 모바일 전용 레이아웃 ====================
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            {/* 메인 이미지 슬라이더 */}
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', backgroundColor: '#000', overflow: 'hidden' }}>
+              <img src={selectedImage} alt="Dog" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              {/* 이미지 뱃지 (분양상태 등) */}
+              <div style={{
+                position: 'absolute',
+                top: '15px',
+                left: '15px',
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                color: 'white',
+                padding: '4px 10px',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                backdropFilter: 'blur(4px)'
+              }}>
+                {dog.status === 'available' ? '🔥 분양중' : '🎉 분양완료'}
+              </div>
             </div>
 
-            
-            <div style={{ 
-              marginBottom: '15px', 
-              padding: '12px', 
-              backgroundColor: '#f1f3f5', 
-              borderRadius: '10px', 
-              fontSize: '0.85rem', 
-              color: '#495057', 
-              textAlign: 'center',
-              lineHeight: '1.5'
-            }}>
-              문의하실 때는 <b style={{ color: 'var(--primary)' }}>'다잇독에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
-            </div>
-            
-            
+            {/* 멀티 썸네일 가로 스크롤 */}
             {allImages.length > 1 && (
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', padding: '12px 15px', overflowX: 'auto', backgroundColor: '#fff', borderBottom: '1px solid #f1f5f9' }}>
                 {allImages.map((img, idx) => (
                   <img 
                     key={idx} 
@@ -514,8 +523,8 @@ const DetailPage = () => {
                     alt={`썸네일 ${idx + 1}`} 
                     onClick={() => setSelectedImage(img)}
                     style={{ 
-                      width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
-                      border: selectedImage === img ? '3px solid var(--primary)' : '1px solid #ddd',
+                      width: '56px', height: '56px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
+                      border: selectedImage === img ? '2px solid var(--primary)' : '1px solid #e2e8f0',
                       opacity: selectedImage === img ? 1 : 0.6,
                       transition: 'all 0.2s'
                     }} 
@@ -523,160 +532,418 @@ const DetailPage = () => {
                 ))}
               </div>
             )}
-            
-            <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
-              <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
-              <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
+
+            {/* 기본 상세 타이틀 카드 */}
+            <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 'bold' }}>{dog.breed}</span>
+                <button 
+                  onClick={toggleLike}
+                  style={{ 
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.4rem', 
+                    cursor: 'pointer',
+                    color: isLiked ? '#ff4757' : '#cbd5e1',
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                >
+                  {isLiked ? '❤️' : '🤍'}
+                </button>
+              </div>
+
+              <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#1e293b', marginBottom: '12px' }}>
+                {dog.nickname}
+              </h1>
+
+              <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
+                {renderPrice(dog)}
+              </div>
+
+              <div style={{ display: 'flex', gap: '15px', fontSize: '0.78rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                <span>관심 {engagement.likes}명</span>
+                <span>조회 {engagement.views}회</span>
+                <span style={{ marginLeft: 'auto' }}>등록일: {new Date(dog.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            {/* 꿀팁 정보 알림 */}
+            <div style={{ 
+              margin: '0 10px 10px 10px', 
+              padding: '12px 15px', 
+              backgroundColor: '#eff6ff', 
+              borderRadius: '8px', 
+              fontSize: '0.8rem', 
+              color: '#1e40af', 
+              lineHeight: '1.4',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span>💡</span>
+              <span>상담 시 <b>"다잇독 보고 연락드렸어요"</b> 라고 하시면 친절하고 빠른 안내를 받아보실 수 있습니다.</span>
+            </div>
+
+            {/* 강아지 프로필 카드 형식 스펙 그리드 */}
+            <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#1e293b' }}>🐶 강아지 기본 정보</h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>성별</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{dog.gender === '남아' ? '♂️ 남아' : '♀️ 여아'}</div>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>나이 (개월수)</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{calculateAge(dog.birthday, dog.age)}</div>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>접종 상태</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{dog.vaccine || '미등록'}</div>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>분양 지역</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{dog.region}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 판매 스토어 정보 */}
+            {sellerInfo && (
+              <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#1e293b' }}>🏪 안심 분양 매장 정보</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '15px' }}>
+                  <div style={{ 
+                    width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' 
+                  }}>
+                    🏪
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>
+                      {sellerInfo.business_name || sellerInfo.nickname || '인증 스토어'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
+                      현재 분양 중 {activeDogCount}건 &nbsp;|&nbsp; 완료 건수 {sellerInfo.completed_adoption_count || 0}건
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#64748b' }}>매장 주소</span>
+                    <span style={{ fontWeight: '500', color: '#334155' }}>{sellerInfo.store_address || '미등록'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#64748b' }}>매장 연락처</span>
+                    <span style={{ fontWeight: '500', color: '#334155' }}>{sellerInfo.store_contact || '미등록'}</span>
+                  </div>
+                  {sellerInfo.animal_sale_no && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#64748b' }}>동물판매업등록번호</span>
+                      <span style={{ fontWeight: '500', color: '#334155', fontSize: '0.75rem' }}>{sellerInfo.animal_sale_no}</span>
+                    </div>
+                  )}
+                </div>
+
+                <button 
+                  onClick={() => navigate(`/store/${dog.seller_id}`)} 
+                  style={{
+                    width: '100%', padding: '10px 0', border: '1px solid #e2e8f0', borderRadius: '8px',
+                    backgroundColor: 'white', color: '#475569', fontSize: '0.85rem', fontWeight: '600',
+                    cursor: 'pointer', marginTop: '15px'
+                  }}
+                >
+                  🏪 이 매장의 분양글 전체 보기
+                </button>
+              </div>
+            )}
+
+            {/* 상세 설명 */}
+            <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '12px', color: '#1e293b' }}>📄 상세 설명</h3>
+              <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.88rem', lineHeight: '1.6', margin: 0 }}>
                 {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
-              
-              
+
               {dog.video_url && (
-                <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'var(--primary-dark)' }}>🎥 생생한 영상 확인</h3>
+                <div style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '12px', color: 'var(--primary-dark)' }}>🎥 생생한 소개 영상</h4>
                   {renderVideoEmbed(dog.video_url)}
                 </div>
               )}
             </div>
 
-            
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <h2 style={{ marginBottom: '25px' }}>판매자 신뢰 평가</h2>
-              <div className="info-grid-2">
+            {/* 매장 리뷰 및 신뢰 평가 */}
+            <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#1e293b' }}>⭐ 매장 안심 평점</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '2rem', fontWeight: '900', color: '#1e293b' }}>{avgRating}</div>
                 <div>
-                  {reviewStats.map((stat, i) => (
-                    <div key={i} style={{ marginBottom: '15px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
-                        <span>{stat.label}</span>
-                        <span style={{ fontWeight: '700' }}>{stat.count}</span>
-                      </div>
-                      <div style={{ height: '8px', backgroundColor: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${(stat.count / maxCount) * 100}%`, height: '100%', backgroundColor: stat.color }} />
-                      </div>
-                    </div>
-                  ))}
+                  <div style={{ color: '#FFD54F', fontSize: '1.1rem' }}>
+                    {'★'.repeat(Math.round(parseFloat(avgRating)))}
+                    {'☆'.repeat(5 - Math.round(parseFloat(avgRating)))}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>총 {totalReviews}건의 리뷰 평점</div>
                 </div>
-                <div className="info-grid-child-border">
-                  <h4 style={{ marginBottom: '15px' }}>최근 리뷰</h4>
-                  <div style={{ fontSize: '0.9rem', color: '#666' }}>최근 등록된 리뷰가 {totalReviews}건 있습니다.</div>
-                  
-                  <div style={{ marginTop: '15px' }}>
-                    {storeReviews.slice(-3).reverse().map((r, idx) => (
-                      <div key={idx} style={{ marginBottom: '15px', fontSize: '0.85rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <img src={r.reviewer_image} alt="프로필" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
-                          <span style={{ fontWeight: 'bold', color: '#333' }}>{r.reviewer_nickname}</span>
-                          <span style={{ color: '#FFD54F', marginLeft: 'auto' }}>{'★'.repeat(r.rating)}</span>
+              </div>
+
+              {/* 매장 키워드 리뷰 통계 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                {reviewStats.map((stat, i) => (
+                  <div key={i}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.78rem', color: '#475569' }}>
+                      <span>{stat.label}</span>
+                      <span style={{ fontWeight: '700' }}>{stat.count}명</span>
+                    </div>
+                    <div style={{ height: '6px', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: `${(stat.count / maxCount) * 100}%`, height: '100%', backgroundColor: stat.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 매장 텍스트 리뷰 목록 */}
+              {storeReviews.length > 0 && (
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', marginBottom: '12px', color: '#334155' }}>최근 한줄평</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {storeReviews.slice(-2).reverse().map((r, idx) => (
+                      <div key={idx} style={{ fontSize: '0.8rem', backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                          <span style={{ fontWeight: 'bold', color: '#1e293b' }}>{r.reviewer_nickname}</span>
+                          <span style={{ color: '#FFD54F', fontSize: '0.75rem' }}>{'★'.repeat(r.rating)}</span>
                         </div>
-                        <div style={{ color: '#444', lineHeight: '1.4' }}>{r.content || '텍스트 리뷰가 없습니다.'}</div>
+                        <div style={{ color: '#475569', lineHeight: '1.4' }}>{r.content || '평점 및 태그 리뷰를 남겨주셨습니다.'}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* 리뷰 작성 & 신고 버튼 */}
+              {currentUser?.id !== dog?.seller_id && (
+                <div style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
+                  <button 
+                    onClick={() => {
+                      if (hasReviewedThisDog) {
+                        alert('이미 이 게시물에 평가를 남기셨습니다.');
+                      } else {
+                        setShowReviewForm(!showReviewForm);
+                      }
+                    }} 
+                    style={{ 
+                      flex: 1, padding: '10px 0', border: '1px solid var(--primary)', borderRadius: '8px',
+                      backgroundColor: showReviewForm ? '#eee' : 'white', color: showReviewForm ? '#999' : 'var(--primary)',
+                      fontSize: '0.82rem', fontWeight: '700', cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    {hasReviewedThisDog ? '⭐ 리뷰 작성 완료' : (showReviewForm ? '리뷰 폼 접기' : '⭐ 방문/분양 리뷰 남기기')}
+                  </button>
+                  <button 
+                    onClick={() => setShowReportModal(true)}
+                    style={{ 
+                      padding: '10px 12px', border: '1px solid #f87171', borderRadius: '8px',
+                      backgroundColor: 'white', color: '#ef4444', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer'
+                    }}
+                  >
+                    🚨 신고
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-
-          <div className="detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start' }}>
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h1 style={{ fontSize: '1.45rem', marginBottom: '5px', flex: 1 }}>{dog.nickname} ({dog.breed})</h1>
-                <button 
-                  onClick={toggleLike}
-                  style={{ 
-                    background: isLiked ? '#fff1f2' : '#f8f9fa', 
-                    border: isLiked ? '1px solid #ff4757' : '1px solid #ddd', 
-                    fontSize: '0.85rem', 
-                    cursor: 'pointer',
-                    padding: '6px 12px', 
-                    borderRadius: '25px',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    color: isLiked ? '#ff4757' : '#666',
-                    fontWeight: '700',
-                    transition: 'all 0.3s'
-                  }}
-                >
-                  {isLiked ? '❤️ 관심중' : '🤍 관심등록'}
-                </button>
-              </div>
-              
-              
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.85rem', color: '#888', gap: '5px' }}>
-                <span>관심 {engagement.likes}명</span>
-                <span>{" / "}</span>
-                <span>조회 {engagement.views}회</span>
+        ) : (
+          // ==================== 데스크탑 레이아웃 (기존 유지) ====================
+          <div className="detail-main-grid" style={{ width: '100%' }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ borderRadius: 'var(--border-radius)', overflow: 'hidden', marginBottom: '15px', boxShadow: 'var(--shadow)' }}>
+                <img src={selectedImage} alt="Dog" style={{ width: '100%', height: 'auto', maxHeight: '400px', aspectRatio: '4/3', objectFit: 'cover' }} />
               </div>
 
-              <div style={{ fontSize: '0.95rem', color: '#666', marginBottom: '10px' }}>
-                판매자: <b>{sellerInfo?.business_name || sellerInfo?.nickname || '불러오는 중...'}</b>
-              </div>
-              <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
-                <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 10px', borderRadius: '15px', fontWeight: 'bold' }}>
-                  현재 분양중 {activeDogCount} {" / "} 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
-                </span>
-              </div>
-              <div style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
-                {renderPrice(dog)}
+              <div style={{ 
+                marginBottom: '15px', 
+                padding: '12px', 
+                backgroundColor: '#f1f3f5', 
+                borderRadius: '10px', 
+                fontSize: '0.85rem', 
+                color: '#495057', 
+                textAlign: 'center',
+                lineHeight: '1.5'
+              }}>
+                문의하실 때는 <b style={{ color: 'var(--primary)' }}>'다잇독에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
               </div>
               
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>최초 등록일</span>
-                  <span style={{ fontWeight: '500' }}>{new Date(dog.created_at).toLocaleDateString()}</span>
+              {allImages.length > 1 && (
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '8px' }}>
+                  {allImages.map((img, idx) => (
+                    <img 
+                      key={idx} 
+                      src={img} 
+                      alt={`썸네일 ${idx + 1}`} 
+                      onClick={() => setSelectedImage(img)}
+                      style={{ 
+                        width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
+                        border: selectedImage === img ? '3px solid var(--primary)' : '1px solid #ddd',
+                        opacity: selectedImage === img ? 1 : 0.6,
+                        transition: 'all 0.2s'
+                      }} 
+                    />
+                  ))}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>분양지역</span>
-                  <span>{dog.region}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>생일 {" / "} 개월</span>
-                  <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} {" / "} {calculateAge(dog.birthday, dog.age)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>성별 {" / "} 접종</span>
-                  <span>{dog.gender} {" / "} {dog.vaccine || '미등록'}</span>
-                </div>
-                {sellerInfo && (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted-text)' }}>스토어 연락처</span>
-                      <span style={{ fontWeight: '500' }}>{sellerInfo.store_contact || '미등록'}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted-text)' }}>매장 위치</span>
-                      <span style={{ fontWeight: '500' }}>{getRegionName(sellerInfo.store_address)}</span>
-                    </div>
-                    {sellerInfo.biz_no && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--muted-text)' }}>사업자번호</span>
-                        <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{sellerInfo.biz_no}</span>
-                      </div>
-                    )}
-                    {sellerInfo.animal_sale_no && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--muted-text)' }}>동물판매번호</span>
-                        <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{sellerInfo.animal_sale_no}</span>
-                      </div>
-                    )}
-                  </>
+              )}
+              
+              <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
+                <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
+                <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
+                  {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                </p>
+                
+                {dog.video_url && (
+                  <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'var(--primary-dark)' }}>🎥 생생한 영상 확인</h3>
+                    {renderVideoEmbed(dog.video_url)}
+                  </div>
                 )}
-                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                   <span style={{ color: 'var(--muted-text)' }}>고객평점</span>
-                   <span style={{ color: '#FFD54F' }}>
-                     {totalReviews > 0 ? (
-                       <>
-                         {'★'.repeat(Math.round(parseFloat(avgRating)))}
-                         {'☆'.repeat(5 - Math.round(parseFloat(avgRating)))}
-                         {` (${avgRating})`}
-                       </>
-                     ) : (
-                       <span style={{ color: 'var(--muted-text)', fontSize: '0.85rem' }}>평가 없음</span>
-                     )}
-                   </span>
-                 </div>
               </div>
+
+              <div className="glass-card" style={{ padding: '20px' }}>
+                <h2 style={{ marginBottom: '25px' }}>판매자 신뢰 평가</h2>
+                <div className="info-grid-2">
+                  <div>
+                    {reviewStats.map((stat, i) => (
+                      <div key={i} style={{ marginBottom: '15px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
+                          <span>{stat.label}</span>
+                          <span style={{ fontWeight: '700' }}>{stat.count}</span>
+                        </div>
+                        <div style={{ height: '8px', backgroundColor: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ width: `${(stat.count / maxCount) * 100}%`, height: '100%', backgroundColor: stat.color }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="info-grid-child-border">
+                    <h4 style={{ marginBottom: '15px' }}>최근 리뷰</h4>
+                    <div style={{ fontSize: '0.9rem', color: '#666' }}>최근 등록된 리뷰가 {totalReviews}건 있습니다.</div>
+                    
+                    <div style={{ marginTop: '15px' }}>
+                      {storeReviews.slice(-3).reverse().map((r, idx) => (
+                        <div key={idx} style={{ marginBottom: '15px', fontSize: '0.85rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <img src={r.reviewer_image} alt="프로필" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <span style={{ fontWeight: 'bold', color: '#333' }}>{r.reviewer_nickname}</span>
+                            <span style={{ color: '#FFD54F', marginLeft: 'auto' }}>{'★'.repeat(r.rating)}</span>
+                          </div>
+                          <div style={{ color: '#444', lineHeight: '1.4' }}>{r.content || '텍스트 리뷰가 없습니다.'}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start' }}>
+              <div className="glass-card" style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <h1 style={{ fontSize: '1.45rem', marginBottom: '5px', flex: 1 }}>{dog.nickname} ({dog.breed})</h1>
+                  <button 
+                    onClick={toggleLike}
+                    style={{ 
+                      background: isLiked ? '#fff1f2' : '#f8f9fa', 
+                      border: isLiked ? '1px solid #ff4757' : '1px solid #ddd', 
+                      fontSize: '0.85rem', 
+                      cursor: 'pointer',
+                      padding: '6px 12px', 
+                      borderRadius: '25px',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      color: isLiked ? '#ff4757' : '#666',
+                      fontWeight: '700',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    {isLiked ? '❤️ 관심중' : '🤍 관심등록'}
+                  </button>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.85rem', color: '#888', gap: '5px' }}>
+                  <span>관심 {engagement.likes}명</span>
+                  <span> / </span>
+                  <span>조회 {engagement.views}회</span>
+                </div>
+
+                <div style={{ fontSize: '0.95rem', color: '#666', marginBottom: '10px' }}>
+                  판매자: <b>{sellerInfo?.business_name || sellerInfo?.nickname || '불러오는 중...'}</b>
+                </div>
+                <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
+                  <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 10px', borderRadius: '15px', fontWeight: 'bold' }}>
+                    현재 분양중 {activeDogCount} / 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
+                  </span>
+                </div>
+                <div style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
+                  {renderPrice(dog)}
+                </div>
+                
+                <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--muted-text)' }}>최초 등록일</span>
+                    <span style={{ fontWeight: '500' }}>{new Date(dog.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--muted-text)' }}>분양지역</span>
+                    <span>{dog.region}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--muted-text)' }}>생일 / 개월</span>
+                    <span>{dog.birthday ? new Date(dog.birthday).toLocaleDateString() : '미등록'} / {calculateAge(dog.birthday, dog.age)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--muted-text)' }}>성별 / 접종</span>
+                    <span>{dog.gender} / {dog.vaccine || '미등록'}</span>
+                  </div>
+                  {sellerInfo && (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--muted-text)' }}>스토어 연락처</span>
+                        <span style={{ fontWeight: '500' }}>{sellerInfo.store_contact || '미등록'}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--muted-text)' }}>매장 위치</span>
+                        <span style={{ fontWeight: '500' }}>{getRegionName(sellerInfo.store_address)}</span>
+                      </div>
+                      {sellerInfo.biz_no && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: 'var(--muted-text)' }}>사업자번호</span>
+                          <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{sellerInfo.biz_no}</span>
+                        </div>
+                      )}
+                      {sellerInfo.animal_sale_no && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: 'var(--muted-text)' }}>동물판매번호</span>
+                          <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{sellerInfo.animal_sale_no}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                     <span style={{ color: 'var(--muted-text)' }}>고객평점</span>
+                     <span style={{ color: '#FFD54F' }}>
+                       {totalReviews > 0 ? (
+                         <>
+                           {'★'.repeat(Math.round(parseFloat(avgRating)))}
+                           {'☆'.repeat(5 - Math.round(parseFloat(avgRating)))}
+                           {` (${avgRating})`}
+                         </>
+                       ) : (
+                         <span style={{ color: 'var(--muted-text)', fontSize: '0.85rem' }}>평가 없음</span>
+                       )}
+                     </span>
+                   </div>
+                </div>
 
                 <div className="desktop-only" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <button onClick={handleStartChat} style={chatBtnStyle}>
@@ -709,10 +976,11 @@ const DetailPage = () => {
                       </div>
                     </>
                   )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
 
         {/* 유사한 댕댕이 추천 섹션 */}
         {recommendDogs.length > 0 && (
@@ -742,21 +1010,21 @@ const DetailPage = () => {
           </div>
         )}
 
-        <div className="mobile-bottom-bar">
+        {isMobile && <div className="mobile-bottom-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '64px', backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0', boxShadow: '0 -4px 12px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 15px', gap: '10px', zIndex: 1000 }}>
                <button 
                  onClick={() => {
                     const phone = sellerInfo?.store_contact || sellerInfo?.phone;
                     if(phone) window.location.href = `tel:${phone}`;
                     else alert('등록된 연락처가 없습니다.');
                  }} 
-                 style={{ ...chatBtnStyle, backgroundColor: 'var(--white)', color: 'var(--primary-dark)', border: '1px solid var(--primary)' }}
+                 style={{ flex: 1, height: '46px', borderRadius: '10px', backgroundColor: 'white', color: 'var(--primary-dark)', border: '1px solid var(--primary)', fontWeight: '700', fontSize: '0.92rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                >
                  📞 전화 문의
                </button>
-               <button onClick={handleStartChat} style={chatBtnStyle}>
+               <button onClick={handleStartChat} style={{ flex: 1.5, height: '46px', borderRadius: '10px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: '700', fontSize: '0.92rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                  💬 다잇톡 상담
                </button>
-            </div>
+            </div>}
 
             
             {showReportModal && currentUser?.id !== dog?.seller_id && (
@@ -841,7 +1109,7 @@ const DetailPage = () => {
                 
                 <div style={{ marginBottom: '15px' }}>
                   <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '8px' }}>
-                     상세 후기 <span style={{ fontSize: '0.8rem', float: 'right' }}>{reviewData.content.length} {" / "} 200자</span>
+                     상세 후기 <span style={{ fontSize: '0.8rem', float: 'right' }}>{reviewData.content.length} / 200자</span>
                   </div>
                   <textarea 
                     placeholder="매장 방문이나 상담 후기를 자유롭게 적어주세요!" 

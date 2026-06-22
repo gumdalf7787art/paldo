@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../lib/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '../components/Card';
+import { useMobile } from '../context/MobileContext';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer 
 } from 'recharts';
@@ -47,6 +48,7 @@ const resizeImage = (file, maxWidth = 1024, maxHeight = 1024) => {
 };
 
 const MyPage = () => {
+  const { isMobile } = useMobile();
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -606,6 +608,607 @@ const MyPage = () => {
     { id: 'bookmarks', label: '💝 관심아이' },
     { id: 'notifications', label: '🔔 알림' },
   ];
+
+  if (isMobile) {
+    return (
+      <div className="mobile-mypage-container" style={{ padding: '15px 15px 80px', backgroundColor: '#fdfdfd', minHeight: '100vh', position: 'relative' }}>
+        {/* 결제 결과 커스텀 토스트 알림 */}
+        {paymentResultMsg && (
+          <div style={{
+            position: 'fixed', top: '15px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+            backgroundColor: paymentResultMsg.type === 'success' ? '#e6fffa' : '#fff5f5',
+            borderLeft: `6px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
+            padding: '16px 20px', borderRadius: '10px', boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            display: 'flex', alignItems: 'center', gap: '12px', width: 'calc(100% - 30px)', maxWidth: '450px',
+            boxSizing: 'border-box'
+          }}>
+            <div style={{ fontSize: '24px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: '900', fontSize: '1rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
+                {paymentResultMsg.type === 'success' ? '결제 성공' : '결제 실패'}
+              </div>
+              <div style={{ color: '#4a5568', fontSize: '0.85rem', marginTop: '6px', wordBreak: 'keep-all', lineHeight: '1.4' }}>{paymentResultMsg.text}</div>
+            </div>
+            <button 
+              onClick={() => setPaymentResultMsg(null)} 
+              style={{ 
+                background: '#edf2f7', border: '1px solid #cbd5e0', fontSize: '0.8rem', fontWeight: 'bold',
+                color: '#4a5568', cursor: 'pointer', padding: '6px 12px', borderRadius: '6px', flexShrink: 0
+              }}
+            >
+              닫기
+            </button>
+          </div>
+        )}
+
+        {/* 1. 모바일 상단 프로필 영역 */}
+        {!selectedRoom && (
+          <div className="glass-card" style={{ marginBottom: '15px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {profile?.profile_image ? (
+              <img src={profile.profile_image} alt="프사" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+            ) : (
+              <div style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>🐶</div>
+            )}
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontWeight: '800', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.nickname}</div>
+              <div style={{ color: '#999', fontSize: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session?.user?.email}</div>
+              {isSeller && <span style={{ display: 'inline-block', marginTop: '2px', padding: '1px 6px', backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 'bold' }}>⭐ 인증 사업자</span>}
+            </div>
+            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+              <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}>⚙️</button>
+              <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #eee', backgroundColor: 'transparent', fontSize: '0.75rem', fontWeight: '700', color: '#ff4757', cursor: 'pointer' }}>로그아웃</button>
+            </div>
+          </div>
+        )}
+
+        {/* 1.1 프로필 편집 폼 (모바일 대응) */}
+        {isEditingProfile && !selectedRoom && (
+          <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: '#fcfcfc', borderRadius: '15px', border: '1px solid #eee' }}>
+            <h3 style={{ marginBottom: '15px', fontSize: '1rem', fontWeight: '800' }}>프로필 설정</h3>
+
+            <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#eee', overflow: 'hidden', flexShrink: 0 }}>
+                {profileImagePreview || profileImage ? (
+                  <img src={profileImagePreview || profileImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="미리보기" />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>🐶</div>
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <label style={{ ...labelStyle, fontSize: '0.75rem', marginBottom: '4px' }}>프로필 사진 변경</label>
+                <input type="file" accept="image/*" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setProfileImage(file);
+                    setProfileImagePreview(URL.createObjectURL(file));
+                  }
+                }} style={{ ...inputStyle, padding: '6px', fontSize: '0.8rem' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gap: '12px' }}>
+              <div>
+                <label style={labelStyle}>닉네임</label>
+                <input value={nickname} onChange={e => setNickname(e.target.value)} style={inputStyle}/>
+              </div>
+              <div>
+                <label style={labelStyle}>연락처</label>
+                <input value={phone} onChange={handlePhoneChange} placeholder="010-0000-0000" style={inputStyle}/>
+              </div>
+              <div>
+                <label style={labelStyle}>지역</label>
+                <select value={address} onChange={e => setAddress(e.target.value)} style={inputStyle}>
+                  <option value="">지역 선택</option>
+                  {regions.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+            </div>
+            
+            <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+              <button onClick={handleUpdateProfile} style={{ ...miniBtnStyle, flex: 1, padding: '10px' }}>저장하기</button>
+              <button onClick={() => setIsEditingProfile(false)} style={{ ...miniBtnStyle, flex: 1, padding: '10px', backgroundColor: '#eee', color: '#666' }}>취소</button>
+            </div>
+
+            {/* 비밀번호 변경 */}
+            <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+              {!isChangingPassword ? (
+                 <button onClick={() => setIsChangingPassword(true)} style={{ ...actionBtnStyle, padding: '8px 12px', fontSize: '0.8rem' }}>비밀번호 변경하기</button>
+              ) : (
+                <div style={{ display: 'grid', gap: '10px' }}>
+                  <input type="password" placeholder="새 비밀번호" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle} />
+                  <input type="password" placeholder="비밀번호 확인" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ ...inputStyle, borderColor: passwordMatch === false ? '#FF5252' : (passwordMatch ? 'var(--primary)' : '#eee') }} />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={handleUpdatePassword} style={{ ...miniBtnStyle, flex: 1 }}>변경 완료</button>
+                    <button onClick={() => setIsChangingPassword(false)} style={{ ...miniBtnStyle, flex: 1, backgroundColor: '#eee', color: '#666' }}>취소</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 2. 모바일 가로 탭 바 */}
+        {!selectedRoom && (
+          <div style={{
+            display: 'flex', overflowX: 'auto', gap: '8px', padding: '10px 0',
+            scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch',
+            marginBottom: '15px'
+          }}>
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                style={{
+                  flexShrink: 0, whiteSpace: 'nowrap', padding: '8px 16px', borderRadius: '20px',
+                  border: activeTab === item.id ? 'none' : '1.5px solid #eee',
+                  backgroundColor: activeTab === item.id ? 'var(--primary-dark)' : 'white',
+                  color: activeTab === item.id ? 'white' : '#555',
+                  fontSize: '0.8rem', fontWeight: '800', cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (item.action) item.action();
+                  else setActiveTab(item.id);
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* 3. 모바일 내부 컨텐츠 영역 */}
+        {!selectedRoom && activeTab === 'dashboard' && (
+          <div style={{ display: 'grid', gap: '15px' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '5px 0' }}>🏠 {profile?.nickname}님의 대시보드</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {isSeller ? (
+                <>
+                  <div onClick={() => setActiveTab('stats')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
+                    <span style={{ fontSize: '1.2rem' }}>👀</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>방문자 분석</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{totalViews.toLocaleString()}명</span>
+                  </div>
+                  <div onClick={() => setActiveTab('posts')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🐶</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>전체 게시물</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{myDogs.length}건</span>
+                  </div>
+                  <div onClick={() => setActiveTab('chats')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer', gridColumn: 'span 2' }}>
+                    <span style={{ fontSize: '1.2rem' }}>💬</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 다잇톡 상담</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{chatRooms.length}건</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div onClick={() => setActiveTab('bookmarks')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
+                    <span style={{ fontSize: '1.2rem' }}>💝</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>관심아이</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{bookmarks.length}마리</span>
+                  </div>
+                  <div onClick={() => setActiveTab('chats')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
+                    <span style={{ fontSize: '1.2rem' }}>💬</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 다잇톡</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{chatRooms.length}건</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid #eee', marginTop: '5px' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', marginBottom: '12px', color: '#333' }}>최근 다잇톡 상담</h4>
+              {chatRooms.slice(0, 3).map(room => (
+                <div 
+                  key={room.id} 
+                  onClick={() => {
+                    setSelectedRoom(room);
+                    setActiveTab('chats');
+                  }} 
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f5f5f5', cursor: 'pointer' }}
+                >
+                  <div style={{ minWidth: 0, flex: 1, paddingRight: '10px' }}>
+                    <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#333' }}>{room.dogs?.nickname || '강아지'} 문의</div>
+                    <div style={{ fontSize: '0.75rem', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>{room.last_message}</div>
+                  </div>
+                  <div style={{ color: '#999', fontSize: '0.7rem', flexShrink: 0 }}>{new Date(room.updated_at).toLocaleDateString()}</div>
+                </div>
+              ))}
+              {chatRooms.length === 0 && <div style={{ color: '#bbb', fontSize: '0.8rem', padding: '15px 0', textAlign: 'center' }}>진행 중인 대화가 없습니다.</div>}
+            </div>
+
+            {!isSeller && (
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                {(!businessApp || businessApp.status === 'rejected') ? (
+                  <button onClick={() => setIsApplyModalOpen(true)} style={{ background: 'none', border: 'none', color: '#777', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer' }}>
+                    인증 분양 사업자로 등록하여 혜택 받기
+                  </button>
+                ) : (
+                  businessApp.status === 'pending' ? <div style={{ fontSize:'0.8rem', color:'var(--primary)', fontWeight: 'bold' }}>⏳ 사업자 심사 진행 중입니다.</div> : null
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'posts' && isSeller && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>🐶 게시물 관리</h3>
+              <button onClick={() => navigate('/upload')} style={{ ...miniBtnStyle, fontSize: '0.75rem', padding: '6px 12px' }}>+ 새 분양등록</button>
+            </div>
+            
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {myDogs.map(dog => (
+                <div key={dog.id} style={{ backgroundColor: 'white', padding: '12px', borderRadius: '12px', border: '1px solid #eee', display: 'flex', gap: '12px' }}>
+                  <img src={dog.image_url} alt="dog" style={{ width: '70px', height: '70px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <span style={{ fontWeight: '800', fontSize: '0.9rem', color: '#333' }}>{dog.breed}</span>
+                        <span style={{ fontSize: '0.65rem', padding: '2px 6px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '6px', fontWeight: 'bold' }}>분양중</span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>
+                        {dog.nickname} ({dog.gender}) · {dog.region}
+                      </div>
+                      <div style={{ fontWeight: '700', fontSize: '0.8rem', color: 'var(--primary-dark)', marginTop: '2px' }}>
+                        {dog.price === 0 ? '무료분양' : `${dog.price}만원`}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', borderTop: '1px dashed #f5f5f5', paddingTop: '6px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#888' }}>
+                        👀 {dogStats[dog.id]?.views || 0}  💝 {dogStats[dog.id]?.likes || 0}
+                      </span>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button onClick={() => handleCompleteAdoption(dog.id)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>분양완료</button>
+                        <button onClick={() => handleEditPost(dog)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#edf2f7', color: '#333', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>수정</button>
+                        <button onClick={() => handleDeletePost(dog.id)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#fff5f5', color: '#ff4757', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>삭제</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {myDogs.length === 0 && <div style={{ textAlign: 'center', color: '#aaa', padding: '40px 0', fontSize: '0.85rem' }}>등록된 게시물이 없습니다.</div>}
+            </div>
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'store' && isSeller && (
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>🏪 내 스토어 관리</h3>
+            <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '14px', border: '1px solid #eee', display: 'grid', gap: '15px' }}>
+              <div>
+                <label style={labelStyle}>상단 배너 이미지 (16:9 비율 권장)</label>
+                {storeHeaderPreview || storeHeader ? (
+                  <div style={{ position: 'relative', marginBottom: '8px' }}>
+                    <img src={storeHeaderPreview || storeHeader} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', display: 'block' }} alt="배너 미리보기" />
+                    <button onClick={() => { setStoreHeader(null); setStoreHeaderPreview(null); }} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem' }}>삭제</button>
+                  </div>
+                ) : null}
+                <input type="file" accept="image/*" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setStoreHeader(file);
+                    setStoreHeaderPreview(URL.createObjectURL(file));
+                  }
+                }} style={{ ...inputStyle, fontSize: '0.8rem', padding: '8px' }} />
+              </div>
+
+              <div style={{ display: 'grid', gap: '12px' }}>
+                <div>
+                  <label style={labelStyle}>상호명</label>
+                  <input value={businessApp?.business_name || '등록된 상호명 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
+                </div>
+                <div>
+                   <label style={labelStyle}>사업자등록번호</label>
+                   <input value={businessApp?.biz_no || bizNo || '등록된 번호 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
+                </div>
+                <div>
+                   <label style={labelStyle}>동물판매등록번호</label>
+                   <input value={businessApp?.animal_sale_no || animalSaleNo || '등록된 번호 없음'} disabled style={{ ...inputStyle, backgroundColor: '#f5f5f5', color: '#888' }} />
+                </div>
+                <div>
+                   <label style={labelStyle}>스토어 문의 연락처</label>
+                   <input value={storeContact} onChange={e => setStoreContact(e.target.value)} placeholder="010-0000-0000" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ ...labelStyle, display: 'flex', justifyContent: 'space-between' }}>
+                    <span>스토어 소개글</span>
+                    <span style={{ color: storeDescription.length > 500 ? 'red' : '#999', fontSize: '0.75rem' }}>{storeDescription.length}/500</span>
+                  </label>
+                  <textarea value={storeDescription} onChange={e => setStoreDescription(e.target.value)} maxLength={500} rows={4} placeholder="스토어를 멋지게 소개해 주세요." style={{ ...inputStyle, resize: 'vertical' }} />
+                </div>
+                <div>
+                  <label style={labelStyle}>스토어 실 주소</label>
+                  <input value={storeAddress} onChange={e => setStoreAddress(e.target.value)} placeholder="오프라인 매장 주소를 입력해 주세요." style={inputStyle} />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ ...labelStyle, display: 'flex', justifyContent: 'space-between' }}>
+                  <span>스토어 사진첩</span>
+                  <span>{storeImages.length}/10장</span>
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '10px' }}>
+                  {storeImagePreviews.map((src, idx) => (
+                    <div key={idx} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '8px', overflow: 'hidden', border: '1px solid #eee' }}>
+                      <img src={src} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                      <button 
+                        onClick={() => removeStoreImage(idx)} 
+                        style={{ position: 'absolute', top: '3px', right: '3px', background: 'rgba(255,107,107,0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '9px' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  {storeImages.length < 10 && (
+                    <label style={{ width: '100%', paddingTop: '100%', position: 'relative', border: '1.5px dashed #ddd', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}>
+                       <input type="file" accept="image/*" multiple onChange={handleStoreImagesChange} style={{ display: 'none' }} />
+                       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                         <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>+</span>
+                         <span style={{ fontSize: '0.65rem' }}>추가</span>
+                       </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              <button onClick={handleUpdateStore} disabled={storeUploading} style={{ ...miniBtnStyle, width: '100%', padding: '12px', fontSize: '0.9rem', marginTop: '5px' }}>
+                {storeUploading ? '저장 중...' : '스토어 정보 저장하기'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'ads' && isSeller && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>📢 비즈니스 서비스</h3>
+              <button onClick={() => navigate('/ad-store')} style={{ ...miniBtnStyle, fontSize: '0.75rem', padding: '6px 12px' }}>🛒 스토어 가기</button>
+            </div>
+
+            <div style={{ display: 'grid', gap: '12px', marginBottom: '25px' }}>
+              {myDogs.map(dog => {
+                const adInfo = getAdInfo(dog.id);
+                return (
+                  <div key={dog.id} style={{ backgroundColor: 'white', padding: '12px', borderRadius: '12px', border: '1px solid #eee', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <img src={dog.image_url} alt="dog" style={{ width: '55px', height: '55px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: '800', fontSize: '0.85rem' }}>{dog.breed} ({dog.nickname})</div>
+                      {adInfo ? (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', fontWeight: 'bold' }}>{adInfo.type} 적용 중</span>
+                          <span style={{ fontSize: '0.7rem', color: '#ff4757', fontWeight: 'bold' }}>{adInfo.remainDays}일 남음</span>
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '2px' }}>적용 중인 프리미엄 서비스 없음</div>
+                      )}
+                    </div>
+                    <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '6px 10px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}>설정</button>
+                  </div>
+                );
+              })}
+              {myDogs.length === 0 && <div style={{ textAlign: 'center', color: '#aaa', padding: '30px 0', fontSize: '0.85rem' }}>등록된 게시물이 없습니다.</div>}
+            </div>
+
+            <h4 style={{ fontSize: '0.95rem', fontWeight: '800', marginBottom: '10px' }}>보유 멤버십 이용권</h4>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {userCoupons.map(coupon => (
+                <div key={coupon.user_coupon_id} style={{ padding: '14px', border: '1px solid #eee', borderRadius: '12px', backgroundColor: '#fffbf0', position: 'relative' }}>
+                  <h5 style={{ margin: '0 0 4px 0', fontSize: '0.85rem', color: '#e6a800', fontWeight: '800' }}>🎁 {coupon.name}</h5>
+                  <div style={{ fontSize: '0.7rem', color: '#e67e22', fontWeight: 'bold', marginBottom: '4px' }}>
+                    기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '제한 없음'}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#666' }}>{coupon.description}</div>
+                </div>
+              ))}
+              {userCoupons.length === 0 && <div style={{ color: '#aaa', fontSize: '0.8rem', padding: '15px 0', textAlign: 'center' }}>보유한 이용권이 없습니다.</div>}
+            </div>
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'stats' && isSeller && (
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>📊 통계 확인</h3>
+            <div style={{ backgroundColor: 'white', padding: '14px', borderRadius: '14px', border: '1px solid #eee', marginBottom: '15px' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '12px', color: '#333' }}>📈 조회수 트렌드 (최근 7일)</h4>
+              <div style={{ height: '180px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis dataKey="date" fontSize={9} stroke="#aaa" />
+                    <YAxis fontSize={9} stroke="#aaa" />
+                    <RechartsTooltip />
+                    <Line type="monotone" dataKey="views" name="방문자" stroke="var(--primary)" strokeWidth={2.5} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: 'white', padding: '14px', borderRadius: '14px', border: '1px solid #eee' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '12px', color: '#333' }}>🔥 인기 게시물 (찜 기준)</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {myDogs.sort((a,b) => (dogStats[b.id]?.likes || 0) - (dogStats[a.id]?.likes || 0)).slice(0, 4).map((dog, idx) => (
+                  <div key={dog.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '22px', height: '22px', backgroundColor: idx === 0 ? 'var(--primary)' : '#f0f0f0', color: idx === 0 ? 'white' : '#555', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '0.75rem' }}>{idx + 1}</div>
+                    <img src={dog.image_url} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} alt=""/>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 'bold', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{dog.nickname} ({dog.breed})</div>
+                      <div style={{ color: '#888', fontSize: '0.7rem' }}>찜 {dogStats[dog.id]?.likes || 0}개</div>
+                    </div>
+                  </div>
+                ))}
+                {myDogs.length === 0 && <div style={{ color: '#ccc', fontSize: '0.8rem', textAlign: 'center' }}>데이터가 없습니다.</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'payments' && isSeller && (
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '5px' }}>💳 결제 내역 관리</h3>
+            <p style={{ color: '#777', fontSize: '0.75rem', marginBottom: '15px' }}>멤버십 서비스 및 이용권 결제 목록입니다. 클릭 시 취소가 가능합니다.</p>
+
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {paymentHistory.map(payment => (
+                <div key={payment.id} style={{ backgroundColor: 'white', padding: '14px', borderRadius: '12px', border: '1px solid #eee' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#999' }}>
+                      {new Date(payment.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    <div>
+                      {payment.status === 'paid' && <span style={{ padding: '2px 6px', backgroundColor: '#e6fffa', color: '#319795', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>결제완료</span>}
+                      {payment.status === 'ready' && <span style={{ padding: '2px 6px', backgroundColor: '#fffaf0', color: '#dd6b20', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>입금대기</span>}
+                      {payment.status === 'cancel_requested' && <span style={{ padding: '2px 6px', backgroundColor: '#edf2f7', color: '#4a5568', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>취소 대기</span>}
+                      {payment.status === 'cancelled' && <span style={{ padding: '2px 6px', backgroundColor: '#fff5f5', color: '#e53e3e', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>취소완료</span>}
+                      {payment.status === 'failed' && <span style={{ padding: '2px 6px', backgroundColor: '#fff5f5', color: '#c53030', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>결제실패</span>}
+                    </div>
+                  </div>
+
+                  <div style={{ fontWeight: '800', fontSize: '0.85rem', color: '#333', marginTop: '6px' }}>{payment.item_name}</div>
+                  <div style={{ fontSize: '0.7rem', color: '#bbb', marginTop: '2px' }}>주문번호: {payment.merchant_uid}</div>
+                  
+                  {payment.status === 'ready' && payment.vbank_num && (
+                    <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#f9f9f9', borderRadius: '6px', fontSize: '0.75rem', border: '1px solid #f0f0f0' }}>
+                      <div style={{ color: '#e67e22', fontWeight: 'bold' }}>가상계좌: {payment.vbank_name} {payment.vbank_num}</div>
+                      <div style={{ color: '#666', marginTop: '2px' }}>예금주: {payment.vbank_holder}</div>
+                      <div style={{ color: '#e53e3e', marginTop: '2px' }}>기한: {payment.vbank_date ? new Date(payment.vbank_date).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'} 까지</div>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', borderTop: '1px solid #f9f9f9', paddingTop: '8px' }}>
+                    <span style={{ fontWeight: '800', fontSize: '0.9rem', color: '#e67e22' }}>{payment.amount.toLocaleString()}원</span>
+                    {payment.status === 'paid' && (
+                      <button
+                        onClick={() => handleCancelPayment(payment.id)}
+                        style={{ padding: '4px 10px', borderRadius: '6px', border: '1px solid #ffd2d2', backgroundColor: '#fff5f5', color: '#e53e3e', fontSize: '0.7rem', fontWeight: 'bold', cursor: 'pointer' }}
+                      >
+                        취소 요청
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {paymentHistory.length === 0 && <div style={{ textAlign: 'center', color: '#aaa', padding: '30px 0', fontSize: '0.85rem' }}>결제 내역이 없습니다.</div>}
+            </div>
+          </div>
+        )}
+
+        {/* 톡 목록 및 톡방 렌더링 (모바일 전용 최적화) */}
+        {activeTab === 'chats' && (
+          <div style={{ height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column' }}>
+            {!selectedRoom ? (
+              // 톡방 목록
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: 'white', borderRadius: '14px', border: '1px solid #eee', overflow: 'hidden' }}>
+                <div style={{ padding: '15px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: 0 }}>💬 다잇톡 상담 목록</h3>
+                </div>
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  {chatRooms.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: '#aaa', padding: '50px 0', fontSize: '0.85rem' }}>진행 중인 대화가 없습니다.</div>
+                  ) : (
+                    chatRooms.map(room => {
+                      const hasUnread = session.user.id === room.buyer_id ? !!room.buyer_has_unread : !!room.seller_has_unread;
+                      const opponentName = session.user.id === room.buyer_id ? (room.seller_nickname || '판매자') : (room.buyer_nickname || '구매자');
+                      return (
+                        <div
+                          key={room.id}
+                          onClick={() => {
+                            setSelectedRoom(room);
+                            if (hasUnread) {
+                              api.chat.markRead(room.id).then(() => {
+                                setChatRooms(prev => prev.map(r => r.id === room.id ? { ...r, buyer_has_unread: session.user.id === r.buyer_id ? 0 : r.buyer_has_unread, seller_has_unread: session.user.id === r.seller_id ? 0 : r.seller_has_unread } : r));
+                              });
+                            }
+                          }}
+                          style={{
+                            display: 'flex', gap: '10px', padding: '12px 15px', borderBottom: '1px solid #f9f9f9',
+                            backgroundColor: hasUnread ? '#fffaf0' : 'white', cursor: 'pointer', alignItems: 'center'
+                          }}
+                        >
+                          {room.dog_image_url ? (
+                            <img src={room.dog_image_url} alt="dog" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                          ) : (
+                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>🐶</div>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {opponentName} <span style={{ color: '#999', fontWeight: '400', fontSize: '0.75rem' }}>· {room.dog_nickname || '강아지'}</span>
+                              </div>
+                              {hasUnread && <span style={{ padding: '1px 5px', backgroundColor: '#e63946', color: 'white', borderRadius: '8px', fontSize: '0.6rem', fontWeight: '900' }}>NEW</span>}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                              {room.last_message || '대화를 시작해 보세요.'}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            ) : (
+              // 톡방 디테일 (모바일 화면을 채움)
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: 'white', borderRadius: '14px', border: '1px solid #eee', overflow: 'hidden' }}>
+                <ChatWindow 
+                  room={selectedRoom} 
+                  userId={session.user.id} 
+                  onClose={() => { 
+                    setSelectedRoom(null); 
+                    fetchChatRooms(session.user.id); 
+                  }} 
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'bookmarks' && (
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px' }}>💝 관심아이</h3>
+            {bookmarks.length === 0 ? (
+              <div style={{ textAlign: 'center', color: '#aaa', padding: '40px 0', fontSize: '0.85rem' }}>찜한 아이가 없습니다.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {bookmarks.map(dog => (
+                  <Card key={dog.id} type="small" data={{ ...dog, image: dog.image_url, date: new Date(dog.created_at).toLocaleDateString() }} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!selectedRoom && activeTab === 'notifications' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>🔔 알림 내역</h3>
+              {myNotifications.length > 0 && (
+                <button onClick={handleReadAllNotifications} style={{ ...miniBtnStyle, fontSize: '0.7rem', padding: '5px 10px', backgroundColor: '#edf2f7', color: '#4a5568', border: '1px solid #cbd5e0' }}>모두 읽음</button>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {myNotifications.map(n => (
+                <div key={n.id} onClick={() => handleMarkAsRead(n.id, n.is_read)} style={{ backgroundColor: 'white', padding: '12px', borderRadius: '10px', border: '1px solid #eee', borderLeft: n.is_read ? '1px solid #eee' : '4px solid var(--primary-dark)', opacity: n.is_read ? 0.7 : 1, cursor: 'pointer' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--primary-dark)', fontWeight: 'bold' }}>
+                    {n.type === 'chat' && '💬 다잇톡'}
+                    {n.type === 'bookmark' && '💝 관심등록'}
+                    {n.type === 'coupon' && '🎁 쿠폰'}
+                    {n.type === 'system' && '📢 공지'}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#333', marginTop: '4px', fontWeight: n.is_read ? 'normal' : 'bold' }}>{n.message}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#999', marginTop: '6px' }}>{new Date(n.created_at).toLocaleDateString()}</div>
+                </div>
+              ))}
+              {myNotifications.length === 0 && <div style={{ textAlign: 'center', color: '#aaa', padding: '30px 0', fontSize: '0.85rem' }}>받은 알림이 없습니다.</div>}
+            </div>
+          </div>
+        )}
+
+        {isApplyModalOpen && <BusinessApplyModal onClose={() => setIsApplyModalOpen(false)} onSuccess={setBusinessApp} />}
+      </div>
+    );
+  }
 
   return (
     <div className="container" style={{ padding: '60px 0', position: 'relative' }}>

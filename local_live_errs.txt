@@ -1,0 +1,211 @@
+{
+  "wallTime": 3,
+  "cpuTime": 3,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "99771836-7cbc-48c5-84a5-3b8b6d86f599"
+  },
+  "scriptName": "pages-worker--14806519-production",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [
+    {
+      "message": [
+        "Error: No such module \"__next-on-pages-dist__/functions/api/async_hooks\".\n  imported from \"__next-on-pages-dist__/functions/api/test.func.js\""
+      ],
+      "level": "error",
+      "timestamp": 1782016135266
+    }
+  ],
+  "eventTimestamp": 1782016135264,
+  "event": {
+    "request": {
+      "url": "https://paldo-dog.pages.dev/api/test",
+      "method": "GET",
+      "headers": {
+        "accept-encoding": "gzip, br",
+        "cf-connecting-ip": "112.151.208.22",
+        "cf-ipcountry": "KR",
+        "cf-ray": "a0f044ed5c188b58",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "host": "paldo-dog.pages.dev",
+        "user-agent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; ko-KR) WindowsPowerShell/5.1.19041.6456",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "112.151.208.22"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 5,
+        "clientQuicRtt": 0,
+        "colo": "ICN",
+        "asn": 17858,
+        "asOrganization": "LG POWERCOMM",
+        "country": "KR",
+        "isEUCountry": false,
+        "city": "Seoul",
+        "continent": "AS",
+        "region": "Seoul",
+        "regionCode": "11",
+        "timezone": "Asia/Seoul",
+        "longitude": "126.9784",
+        "latitude": "37.566",
+        "postalCode": "03141",
+        "tlsVersion": "TLSv1.2",
+        "tlsCipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+        "tlsClientRandom": "ajdoh1gVaageqAUYq1ZUBPeWwepQTnuOJnhRo9BuMqQ=",
+        "tlsClientCiphersSha1": "OeQPcEYDgqo1GMKGYd0qWuAiHW8=",
+        "tlsClientExtensionsSha1": "6kBUVzKUeutcGF96Axo8gSUFzcE=",
+        "tlsClientExtensionsSha1Le": "xXglYOV7AUOfP4++EBiPE5G23v8=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "54952819034111e998224910583bc384304bc0c2df89d6ed76a108622bb7c896",
+          "serverHandshake": "b879cda1b34568fb4f37aa07aa1ab3794d66e17765a0ad1d5f0c081fea81d80b",
+          "clientFinished": "4256e020d10c0bbc56960a1d7c4625b4f8feb70820260bee8575796c0ecabd9a",
+          "serverFinished": "eeb167ee46d6f2086ec718701d19afe2da681178b6ff2424eb66ab2336e3315d"
+        },
+        "tlsClientHelloLength": "172",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 976588
+        },
+        "pagesHostName": "paldo-dog.pages.dev",
+        "botManagement": {
+          "corporateProxy": false,
+          "verifiedBot": false,
+          "jsDetection": {
+            "passed": false
+          },
+          "staticResource": false,
+          "detectionIds": {},
+          "score": 99
+        }
+      }
+    },
+    "response": {
+      "status": 500
+    }
+  }
+}
+{
+  "wallTime": 32,
+  "cpuTime": 4,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "99771836-7cbc-48c5-84a5-3b8b6d86f599"
+  },
+  "scriptName": "pages-worker--14806519-production",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1782016509483,
+  "event": {
+    "request": {
+      "url": "https://paldo-dog.pages.dev/",
+      "method": "GET",
+      "headers": {
+        "accept-encoding": "gzip, br",
+        "cf-connecting-ip": "2a06:98c0:3600::103",
+        "cf-ipcountry": "US",
+        "cf-ray": "a0f04e100564d44d",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-worker": "cfone.cfdata.org",
+        "connection": "Keep-Alive",
+        "host": "paldo-dog.pages.dev",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "2a06:98c0:3600::103"
+      },
+      "cf": {
+        "requestHeaderNames": {},
+        "httpProtocol": "HTTP/1.1",
+        "tlsCipher": "",
+        "verifiedBotCategory": "",
+        "continent": "NA",
+        "asn": 13335,
+        "clientAcceptEncoding": "identity",
+        "tlsClientExtensionsSha1": "",
+        "isEUCountry": false,
+        "longitude": "-122.33207",
+        "tlsClientCiphersSha1": "",
+        "tlsClientHelloLength": "",
+        "tlsClientAuth": {
+          "certIssuerDNLegacy": "",
+          "certIssuerSKI": "",
+          "certSubjectDNRFC2253": "",
+          "certSubjectDNLegacy": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certSKI": "",
+          "certSerial": "",
+          "certIssuerDN": "",
+          "certVerified": "NONE",
+          "certNotAfter": "",
+          "certSubjectDN": "",
+          "certPresented": "0",
+          "certRevoked": "0",
+          "certIssuerSerial": "",
+          "certIssuerDNRFC2253": "",
+          "certFingerprintSHA1": ""
+        },
+        "region": "Washington",
+        "tlsVersion": "",
+        "colo": "SEA",
+        "timezone": "America/Los_Angeles",
+        "latitude": "47.60621",
+        "postalCode": "98101",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestPriority": "",
+        "city": "Seattle",
+        "country": "US",
+        "tlsClientRandom": "",
+        "regionCode": "WA",
+        "asOrganization": "Cloudflare, Inc.",
+        "metroCode": "819",
+        "tlsClientExtensionsSha1Le": "",
+        "pagesHostName": "paldo-dog.pages.dev",
+        "botManagement": {
+          "corporateProxy": false,
+          "verifiedBot": false,
+          "jsDetection": {
+            "passed": false
+          },
+          "staticResource": false,
+          "detectionIds": {},
+          "score": 99
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}

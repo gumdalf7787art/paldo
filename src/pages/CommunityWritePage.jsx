@@ -58,6 +58,32 @@ const CommunityWritePage = () => {
     checkAuth();
   }, [editPostData, navigate]);
 
+  const lastRangeRef = useRef(null);
+
+  // 커서 위치(Selection Range)를 실시간 저장하는 헬퍼
+  const saveSelectionRange = () => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+        lastRangeRef.current = range.cloneRange();
+      }
+    }
+  };
+
+  // 에디터의 맨 끝으로 포커스 및 커서 이동 헬퍼
+  const focusEditorAtEnd = () => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorRef.current);
+    range.collapse(false); // 끝으로 축소
+    selection.removeAllRanges();
+    selection.addRange(range);
+    lastRangeRef.current = range.cloneRange();
+  };
+
   // 에디터에 로드하는 마운트 시점 재점검 및 초기 포커스 설정
   useEffect(() => {
     if (editorRef.current && currentUser) {
@@ -87,32 +113,6 @@ const CommunityWritePage = () => {
   // 폰트 색상 변경
   const handleColorChange = (e) => {
     executeCommand('foreColor', e.target.value);
-  };
-
-  const lastRangeRef = useRef(null);
-
-  // 커서 위치(Selection Range)를 실시간 저장하는 헬퍼
-  const saveSelectionRange = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
-        lastRangeRef.current = range.cloneRange();
-      }
-    }
-  };
-
-  // 에디터의 맨 끝으로 포커스 및 커서 이동 헬퍼
-  const focusEditorAtEnd = () => {
-    if (!editorRef.current) return;
-    editorRef.current.focus();
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(editorRef.current);
-    range.collapse(false); // 끝으로 축소
-    selection.removeAllRanges();
-    selection.addRange(range);
-    lastRangeRef.current = range.cloneRange();
   };
 
   // 커서 위치에 엘리먼트 삽입 헬퍼
@@ -237,7 +237,7 @@ const CommunityWritePage = () => {
 
   // 유튜브 비디오 ID 추출 헬퍼
   const getYoutubeId = (url) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };

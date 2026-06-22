@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { api } from '../lib/api';
+import { useMobile } from '../context/MobileContext';
 
 const Header = () => {
   const [session, setSession] = useState(null);
@@ -11,6 +12,7 @@ const Header = () => {
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const { isMobile } = useMobile();
 
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
@@ -122,123 +124,131 @@ const Header = () => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          height: '80px',
+          height: isMobile ? '60px' : '80px',
+          padding: isMobile ? '0 12px' : '0 20px',
           position: 'relative'
         }}>
-          <Link to="/"><Logo /></Link>
+          <Link to="/"><Logo style={{ transform: isMobile ? 'scale(0.85)' : 'none', transformOrigin: 'left center' }} /></Link>
           
-          {/* 헤더 중앙 리브랜딩 슬로건 (2개 카피 배치) */}
-          <div className="header-slogans-container" style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '20px',
-            pointerEvents: 'none'
-          }}>
-            {/* 왼쪽 카피 */}
-            <div style={{
+          {/* 헤더 중앙 리브랜딩 슬로건 - 모바일에서는 미노출 */}
+          {!isMobile && (
+            <div className="header-slogans-container" style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
-              textAlign: 'center',
-              gap: '3px'
+              justifyContent: 'center',
+              gap: '20px',
+              pointerEvents: 'none'
             }}>
-              <span style={{ 
-                fontSize: '0.92rem', 
-                fontWeight: '700', 
-                color: 'var(--primary)', 
-                letterSpacing: '-0.3px',
-                lineHeight: '1.2'
+              {/* 왼쪽 카피 */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: '3px'
               }}>
-                세상의 모든 강아지
-              </span>
-              <span style={{ 
-                fontSize: '0.8rem', 
-                fontWeight: '500', 
-                color: '#64748b', 
-                letterSpacing: '-0.3px',
-                lineHeight: '1.2'
+                <span style={{ 
+                  fontSize: '0.92rem', 
+                  fontWeight: '700', 
+                  color: 'var(--primary)', 
+                  letterSpacing: '-0.3px',
+                  lineHeight: '1.2'
+                }}>
+                  세상의 모든 강아지
+                </span>
+                <span style={{ 
+                  fontSize: '0.8rem', 
+                  fontWeight: '500', 
+                  color: '#64748b', 
+                  letterSpacing: '-0.3px',
+                  lineHeight: '1.2'
+                }}>
+                  여기 다 있다. 다잇독.
+                </span>
+              </div>
+
+              {/* 구분 세로선 */}
+              <div style={{
+                width: '1px',
+                height: '24px',
+                backgroundColor: '#e2e8f0'
+              }} />
+
+              {/* 오른쪽 카피 */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: '3px'
               }}>
-                여기 다 있다. 다잇독.
-              </span>
+                <span style={{ 
+                  fontSize: '0.92rem', 
+                  fontWeight: '700', 
+                  color: 'var(--primary)', 
+                  letterSpacing: '-0.3px',
+                  lineHeight: '1.2'
+                }}>
+                  허위매물 없는 클린분양
+                </span>
+                <span style={{ 
+                  fontSize: '0.8rem', 
+                  fontWeight: '500', 
+                  color: '#64748b', 
+                  letterSpacing: '-0.3px',
+                  lineHeight: '1.2'
+                }}>
+                  다잇독이 만들어갑니다.
+                </span>
+              </div>
             </div>
+          )}
 
-            {/* 구분 세로선 */}
-            <div style={{
-              width: '1px',
-              height: '24px',
-              backgroundColor: '#e2e8f0'
-            }} />
-
-            {/* 오른쪽 카피 */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: '3px'
-            }}>
-              <span style={{ 
-                fontSize: '0.92rem', 
-                fontWeight: '700', 
-                color: 'var(--primary)', 
-                letterSpacing: '-0.3px',
-                lineHeight: '1.2'
-              }}>
-                허위매물 없는 클린분양
-              </span>
-              <span style={{ 
-                fontSize: '0.8rem', 
-                fontWeight: '500', 
-                color: '#64748b', 
-                letterSpacing: '-0.3px',
-                lineHeight: '1.2'
-              }}>
-                다잇독이 만들어갑니다.
-              </span>
-            </div>
-          </div>
-
-          <div className="nav-group" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <Link to="/community" style={{ ...navLinkStyle, marginRight: '10px' }} className="nav-link">🐾 커뮤니티</Link>
+          <div className="nav-group" style={{ display: 'flex', gap: isMobile ? '8px' : '15px', alignItems: 'center' }}>
+            {!isMobile && (
+              <Link to="/community" style={{ ...navLinkStyle, marginRight: '10px' }} className="nav-link">🐾 커뮤니티</Link>
+            )}
+            
             {!session ? (
               <>
-                <Link to="/login" style={navLinkStyle} className="nav-link">로그인</Link>
-                <Link to="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
+                <Link to="/login" style={isMobile ? { ...navLinkStyle, fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 'bold' } : navLinkStyle} className="nav-link">로그인</Link>
+                {!isMobile && (
+                  <Link to="/signup" style={navBtnStyle} className="nav-btn">회원가입</Link>
+                )}
               </>
             ) : (
               <>
                 <div style={{ position: 'relative' }} ref={dropdownRef}>
-                  <button onClick={() => setShowDropdown(!showDropdown)} style={bellBtnStyle}>
+                  <button onClick={() => setShowDropdown(!showDropdown)} style={isMobile ? { ...bellBtnStyle, fontSize: '1.2rem', width: '32px', height: '32px' } : bellBtnStyle}>
                     🔔
-                    {totalUnreadCount > 0 && <span style={badgeStyle}>{totalUnreadCount > 9 ? '9+' : totalUnreadCount}</span>}
+                    {totalUnreadCount > 0 && <span style={isMobile ? { ...badgeStyle, padding: '1px 4px', fontSize: '0.6rem' } : badgeStyle}>{totalUnreadCount > 9 ? '9+' : totalUnreadCount}</span>}
                   </button>
 
                   {showDropdown && (
-                    <div style={dropdownStyle}>
-                      <div style={{ padding: '15px', borderBottom: '1px solid #eee', fontWeight: '800', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ ...dropdownStyle, width: isMobile ? '280px' : '300px', right: isMobile ? '-50px' : '-80px', top: isMobile ? '40px' : '50px' }}>
+                      <div style={{ padding: '12px 15px', borderBottom: '1px solid #eee', fontWeight: '800', display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                         <span>새로운 알림</span>
-                        <Link to="/mypage" state={{ tab: 'notifications' }} onClick={() => setShowDropdown(false)} style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'underline' }}>모두 보기</Link>
+                        <Link to="/mypage" state={{ tab: 'notifications' }} onClick={() => setShowDropdown(false)} style={{ fontSize: '0.75rem', color: 'var(--primary)', textDecoration: 'underline' }}>모두 보기</Link>
                       </div>
-                      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                      <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
                         {notifications.slice(0, 5).map(n => (
-                          <div key={n.id} onClick={() => markAsRead(n.id, n.link_url)} style={{ ...notiItemStyle, backgroundColor: n.is_read ? 'white' : '#f0fdf4' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '4px' }}>
+                          <div key={n.id} onClick={() => markAsRead(n.id, n.link_url)} style={{ ...notiItemStyle, padding: '12px 15px', backgroundColor: n.is_read ? 'white' : '#f0fdf4' }}>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '4px' }}>
                               {n.type === 'chat' && '💬 다잇톡 메시지'}
                               {n.type === 'bookmark' && '💝 새로운 찜'}
                               {n.type === 'coupon' && '🎁 쿠폰 도착'}
                               {n.type === 'system' && '📢 전체 공지'}
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: '#333' }}>{n.message}</div>
-                            <div style={{ fontSize: '0.7rem', color: '#999', marginTop: '5px' }}>{new Date(n.created_at).toLocaleString()}</div>
+                            <div style={{ fontSize: '0.8rem', color: '#333', lineHeight: '1.4' }}>{n.message}</div>
+                            <div style={{ fontSize: '0.65rem', color: '#999', marginTop: '5px' }}>{new Date(n.created_at).toLocaleString()}</div>
                           </div>
                         ))}
-                        {notifications.length === 0 && <div style={{ padding: '30px', textAlign: 'center', color: '#999', fontSize: '0.9rem' }}>알림이 없습니다.</div>}
+                        {notifications.length === 0 && <div style={{ padding: '20px', textAlign: 'center', color: '#999', fontSize: '0.8rem' }}>알림이 없습니다.</div>}
                       </div>
                     </div>
                   )}
@@ -251,13 +261,13 @@ const Header = () => {
                       background: 'none',
                       border: 'none',
                       color: 'var(--body-text)',
-                      fontSize: '0.9rem',
+                      fontSize: isMobile ? '0.8rem' : '0.9rem',
                       fontWeight: '700',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
-                      padding: '6px 12px',
+                      padding: isMobile ? '4px 8px' : '6px 12px',
                       borderRadius: '20px',
                       backgroundColor: 'rgba(0,0,0,0.02)',
                       transition: 'all 0.2s'

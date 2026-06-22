@@ -95,7 +95,7 @@ const LatestCommunityWidget = () => {
     <div style={{
       backgroundColor: '#ffffff',
       borderRadius: '12px',
-      border: '1px solid #edf2f7',
+      border: '1px solid #e2e8f0',
       padding: '20px',
       marginTop: '15px',
       marginBottom: '15px',
@@ -124,10 +124,11 @@ const LatestCommunityWidget = () => {
                 borderBottom: idx === posts.length - 1 ? 'none' : '1px solid #cbd5e1',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease',
-                borderRadius: '6px'
+                borderRadius: '6px',
+                backgroundColor: '#ffffff'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', flex: 1, marginRight: '15px' }}>
                 <span style={{

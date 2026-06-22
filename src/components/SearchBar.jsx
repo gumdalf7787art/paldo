@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BREEDS, REGIONS, GENDERS, PRICES } from '../utils/constants';
+import { useMobile } from '../context/MobileContext';
 
 const SearchBar = ({ hideBreed, defaultBreed }) => {
   const navigate = useNavigate();
+  const { isMobile } = useMobile();
   const [selectedBreed, setSelectedBreed] = useState(defaultBreed || '');
   const [selectedRegion, setSelectedRegion] = useState('전국');
   const [selectedGender, setSelectedGender] = useState('모두선택');
@@ -65,7 +67,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
   return (
     <section className="fade-in search-bar-section" style={{ padding: '5px 0' }}>
       <div className="glass-card search-bar-container" style={{ 
-        padding: hideBreed ? '16px 24px' : '10px 16px', 
+        padding: isMobile ? '12px 14px' : (hideBreed ? '16px 24px' : '10px 16px'), 
         display: 'flex', 
         flexDirection: 'column', 
         gap: '10px',
@@ -78,169 +80,294 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
         {/* 상단 인기 견종 칩 영역 (hideBreed가 아닐 때만 노출) */}
         {!hideBreed && (
           <>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
-              {/* 인기견종 레이블 */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '2px',
-                whiteSpace: 'nowrap',
-                fontSize: '0.78rem',
-                fontWeight: '800',
-                color: '#475569',
-                backgroundColor: '#e2e8f0',
-                padding: '0 10px',
-                borderRadius: '6px',
-                flexShrink: 0
-              }}>
-                <span>🔥 인기견종</span>
-                <span>바로가기</span>
-              </div>
-
-              {/* 칩 목록 (2줄로 나누어 배치) */}
-              <div className="breed-chips-rows-container" style={{ 
-                display: 'flex', 
-                flexDirection: 'column',
-                gap: '6px', 
-                flexGrow: 1,
-                minWidth: 0
-              }}>
-                {/* 1행 */}
-                <div className="breed-chips-row" style={{
-                  display: 'flex',
-                  gap: '6px',
-                  overflowX: 'auto',
-                  scrollbarWidth: 'none'
-                }}>
-                  {row1.map((breed, i) => (
-                    <div 
-                      key={i} 
-                      className="breed-chip"
-                      onClick={() => navigate(`/breed/${breed.name}`)}
-                      style={chipStyle}
-                    >
-                      <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
-                      <span>{breed.name}</span>
-                    </div>
-                  ))}
+            {isMobile ? (
+              /* 📱 모바일 인기견종 스크롤 칩 태그 */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span>🔥 인기견종 바로가기</span>
                 </div>
-
-                {/* 2행 */}
-                <div className="breed-chips-row" style={{
-                  display: 'flex',
-                  gap: '6px',
-                  overflowX: 'auto',
-                  scrollbarWidth: 'none'
-                }}>
-                  {row2.map((breed, i) => (
+                <div 
+                  className="mobile-scroll-container" 
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    padding: '2px 0 6px 0',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
+                >
+                  {[...row1, ...row2].map((breed, i) => (
                     <div 
                       key={i} 
                       className="breed-chip"
                       onClick={() => navigate(`/breed/${breed.name}`)}
-                      style={chipStyle}
+                      style={{
+                        ...chipStyle,
+                        flex: '0 0 auto',
+                        minWidth: '85px',
+                        height: '28px',
+                        borderRadius: '20px',
+                        border: '1px solid #cbd5e1',
+                        padding: '0 10px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
+                      }}
                     >
-                      <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                      <span style={{ fontSize: '0.9rem', marginRight: '3px' }}>{breed.icon}</span>
                       <span>{breed.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
+            ) : (
+              /* 💻 PC 인기견종 바둑판 칩 */
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', width: '100%' }}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                  whiteSpace: 'nowrap',
+                  fontSize: '0.78rem',
+                  fontWeight: '800',
+                  color: '#475569',
+                  backgroundColor: '#e2e8f0',
+                  padding: '0 10px',
+                  borderRadius: '6px',
+                  flexShrink: 0
+                }}>
+                  <span>🔥 인기견종</span>
+                  <span>바로가기</span>
+                </div>
+
+                <div className="breed-chips-rows-container" style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '6px', 
+                  flexGrow: 1,
+                  minWidth: 0
+                }}>
+                  <div className="breed-chips-row" style={{
+                    display: 'flex',
+                    gap: '6px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none'
+                  }}>
+                    {row1.map((breed, i) => (
+                      <div 
+                        key={i} 
+                        className="breed-chip"
+                        onClick={() => navigate(`/breed/${breed.name}`)}
+                        style={chipStyle}
+                      >
+                        <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                        <span>{breed.name}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="breed-chips-row" style={{
+                    display: 'flex',
+                    gap: '6px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none'
+                  }}>
+                    {row2.map((breed, i) => (
+                      <div 
+                        key={i} 
+                        className="breed-chip"
+                        onClick={() => navigate(`/breed/${breed.name}`)}
+                        style={chipStyle}
+                      >
+                        <span style={{ fontSize: '0.85rem' }}>{breed.icon}</span>
+                        <span>{breed.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 구분선 */}
-            <div style={{ borderTop: '1px solid #cbd5e1', width: '100%' }} />
+            <div style={{ borderTop: '1px solid #cbd5e1', width: '100%', margin: '2px 0' }} />
           </>
         )}
 
         {/* 하단 검색 필터 영역 */}
-        <div style={{
-          display: 'flex', 
-          flexDirection: 'row', 
-          flexWrap: 'nowrap',
-          gap: '8px',
-          alignItems: 'center',
-          width: '100%'
-        }}>
-          {/* 1. 품종 선택 (hideBreed가 아닐 때만 노출) */}
-          {!hideBreed && (
-            <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
-              <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+        {isMobile ? (
+          /* 📱 모바일 상세검색 (2x2 그리드 + 하단 와이드 버튼) */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '8px 10px',
+              width: '100%'
+            }}>
+              {/* 1. 품종선택 (hideBreed가 아닐 때만) */}
+              {!hideBreed && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+                  <select 
+                    style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }} 
+                    value={selectedBreed}
+                    onChange={(e) => setSelectedBreed(e.target.value)}
+                  >
+                    <option value="">전체 품종</option>
+                    {BREEDS.map(breed => <option key={breed} value={breed}>{breed}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {/* 2. 분양지역 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>지역</label>
+                <select 
+                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  {REGIONS.map(region => <option key={region} value={region}>{region}</option>)}
+                </select>
+              </div>
+
+              {/* 3. 성별 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>성별</label>
+                <select 
+                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  value={selectedGender}
+                  onChange={(e) => setSelectedGender(e.target.value)}
+                >
+                  {GENDERS.map(gender => <option key={gender} value={gender}>{gender}</option>)}
+                </select>
+              </div>
+
+              {/* 4. 가격 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>가격</label>
+                <select 
+                  style={{ ...selectStyle, height: '32px', fontSize: '0.78rem' }}
+                  value={selectedPrice}
+                  onChange={(e) => setSelectedPrice(e.target.value)}
+                >
+                  {PRICES.map(price => <option key={price} value={price}>{price}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* 하단 풀와이드 검색하기 버튼 */}
+            <button 
+              onClick={handleSearch}
+              style={{
+                width: '100%',
+                backgroundColor: 'var(--primary)',
+                color: 'var(--white)',
+                padding: '8px 0',
+                height: '36px',
+                borderRadius: '8px',
+                fontWeight: '700',
+                fontSize: '0.8rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(38, 166, 154, 0.15)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '4px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-dark, #00796b)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--primary)'}
+            >
+              🔍 조건으로 입양 정보 찾기
+            </button>
+          </div>
+        ) : (
+          /* 💻 PC버전 상세검색 (기존의 1줄 가로형 레이아웃) */
+          <div style={{
+            display: 'flex', 
+            flexDirection: 'row', 
+            flexWrap: 'nowrap',
+            gap: '8px',
+            alignItems: 'center',
+            width: '100%'
+          }}>
+            {!hideBreed && (
+              <div className="filter-item" style={{ flex: '1.2 1 130px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px' }}>
+                <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>품종</label>
+                <select 
+                  style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }} 
+                  value={selectedBreed}
+                  onChange={(e) => setSelectedBreed(e.target.value)}
+                >
+                  <option value="">전체 품종</option>
+                  {BREEDS.map(breed => <option key={breed} value={breed}>{breed}</option>)}
+                </select>
+              </div>
+            )}
+
+            <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+              <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
               <select 
-                style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }} 
-                value={selectedBreed}
-                onChange={(e) => setSelectedBreed(e.target.value)}
+                style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
               >
-                <option value="">전체 품종</option>
-                {BREEDS.map(breed => <option key={breed} value={breed}>{breed}</option>)}
+                {REGIONS.map(region => <option key={region} value={region}>{region}</option>)}
               </select>
             </div>
-          )}
 
-          {/* 2. 분양지역 선택 */}
-          <div className="filter-item" style={{ flex: '1 1 105px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>지역</label>
-            <select 
-              style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
+            <div className="filter-item" style={{ flex: '0.9 1 95px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+              <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
+              <select 
+                style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
+                value={selectedGender}
+                onChange={(e) => setSelectedGender(e.target.value)}
+              >
+                {GENDERS.map(gender => <option key={gender} value={gender}>{gender}</option>)}
+              </select>
+            </div>
+
+            <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+              <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
+              <select 
+                style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
+                value={selectedPrice}
+                onChange={(e) => setSelectedPrice(e.target.value)}
+              >
+                {PRICES.map(price => <option key={price} value={price}>{price}</option>)}
+              </select>
+            </div>
+
+            <button 
+              onClick={handleSearch}
+              style={{
+                flexShrink: 0,
+                backgroundColor: 'var(--primary)',
+                color: 'var(--white)',
+                padding: hideBreed ? '0 24px' : '0 16px',
+                height: hideBreed ? '31px' : '27px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                fontSize: hideBreed ? '0.85rem' : '0.72rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 10px rgba(38, 166, 154, 0.15)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: '1'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-dark, #00796b)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--primary)'}
             >
-              {REGIONS.map(region => <option key={region} value={region}>{region}</option>)}
-            </select>
+              검색하기
+            </button>
           </div>
-
-          {/* 3. 성별 선택 */}
-          <div className="filter-item" style={{ flex: '0.9 1 95px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>성별</label>
-            <select 
-              style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
-              value={selectedGender}
-              onChange={(e) => setSelectedGender(e.target.value)}
-            >
-              {GENDERS.map(gender => <option key={gender} value={gender}>{gender}</option>)}
-            </select>
-          </div>
-
-          {/* 4. 분양가격 */}
-          <div className="filter-item" style={{ flex: '1.1 1 120px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-            <label style={{ whiteSpace: 'nowrap', fontSize: hideBreed ? '0.85rem' : '0.72rem', fontWeight: '700', color: '#64748b' }}>가격</label>
-            <select 
-              style={{ ...selectStyle, height: hideBreed ? '31px' : '27px', fontSize: hideBreed ? '0.85rem' : '0.72rem' }}
-              value={selectedPrice}
-              onChange={(e) => setSelectedPrice(e.target.value)}
-            >
-              {PRICES.map(price => <option key={price} value={price}>{price}</option>)}
-            </select>
-          </div>
-
-          {/* 5. 검색하기 버튼 */}
-          <button 
-            onClick={handleSearch}
-            style={{
-              flexShrink: 0,
-              backgroundColor: 'var(--primary)',
-              color: 'var(--white)',
-              padding: hideBreed ? '0 24px' : '0 16px',
-              height: hideBreed ? '31px' : '27px',
-              borderRadius: '6px',
-              fontWeight: '700',
-              fontSize: hideBreed ? '0.85rem' : '0.72rem',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 4px 10px rgba(38, 166, 154, 0.15)',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: '1'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-dark, #00796b)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--primary)'}
-          >
-            검색하기
-          </button>
-        </div>
+        )}
       </div>
     </section>
   );

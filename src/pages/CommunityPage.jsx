@@ -12,9 +12,19 @@ const CommunityPage = () => {
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const navigate = useNavigate();
   const limit = 10;
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -79,18 +89,30 @@ const CommunityPage = () => {
   };
 
   return (
-    <div className="container fade-in" style={{ padding: '40px 20px', minHeight: '80vh' }}>
+    <div className="container fade-in" style={{ padding: isMobile ? '20px 10px' : '40px 20px', minHeight: '80vh' }}>
       
       {/* 히어로 헤더 섹션 */}
-      <div style={heroHeaderStyle}>
-        <h1 style={titleStyle}>🐾 다잇독 커뮤니티</h1>
-        <p style={subtitleStyle}>
+      <div style={{ ...heroHeaderStyle, ...(isMobile && { padding: '25px 15px', marginBottom: '20px' }) }}>
+        <h1 style={{ ...titleStyle, ...(isMobile && { fontSize: '1.6rem' }) }}>🐾 다잇독 커뮤니티</h1>
+        <p style={{ ...subtitleStyle, ...(isMobile && { fontSize: '0.88rem' }) }}>
           전국의 반려인들과 따뜻한 일상을 나누고 다양한 지식과 생생한 소식을 공유해보세요.
         </p>
       </div>
 
       {/* 카테고리 필터 영역 */}
-      <div style={categoryContainerStyle}>
+      <div style={{
+        ...categoryContainerStyle,
+        ...(isMobile && {
+          display: 'flex',
+          flexWrap: 'nowrap',
+          gap: '8px',
+          overflowX: 'auto',
+          padding: '10px 5px',
+          marginBottom: '20px',
+          WebkitOverflowScrolling: 'touch',
+          justifyContent: 'flex-start'
+        })
+      }}>
         {categories.map((cat) => (
           <button
             key={cat.key}
@@ -101,6 +123,7 @@ const CommunityPage = () => {
               color: category === cat.key ? 'white' : '#4a5568',
               border: category === cat.key ? '1px solid var(--primary)' : '1px solid #e2e8f0',
               boxShadow: category === cat.key ? '0 4px 12px rgba(38, 166, 154, 0.2)' : 'none',
+              ...(isMobile && { padding: '8px 14px', fontSize: '0.85rem', flexShrink: 0 })
             }}
           >
             {cat.label}
@@ -129,6 +152,7 @@ const CommunityPage = () => {
                 onMouseLeave={() => setHoveredId(null)}
                 style={{
                   ...postCardStyle,
+                  ...(isMobile && { padding: '16px 10px' }),
                   backgroundColor: isNotice 
                     ? '#f8fafc' 
                     : (hoveredId === post.id ? '#f1f5f9' : 'white'),
@@ -146,6 +170,7 @@ const CommunityPage = () => {
                   </div>
                   <h3 style={{
                     ...postTitleStyle,
+                    ...(isMobile && { fontSize: '1.08rem', marginBottom: '8px' }),
                     fontWeight: isNotice ? '800' : '700',
                     display: 'flex',
                     alignItems: 'center',
@@ -176,7 +201,7 @@ const CommunityPage = () => {
 
                 {/* 오른쪽 썸네일 이미지 (있을 경우) */}
                 {hasImages && (
-                  <div style={thumbnailContainerStyle}>
+                  <div style={{ ...thumbnailContainerStyle, ...(isMobile && { width: '50px', height: '50px' }) }}>
                     <img src={images[0]} alt="" style={thumbnailStyle} />
                   </div>
                 )}
@@ -221,8 +246,8 @@ const CommunityPage = () => {
       )}
 
       {/* 액션바 (검색창 + 글쓰기 버튼) */}
-      <div style={actionRowStyle}>
-        <form onSubmit={handleSearchSubmit} style={searchFormStyle}>
+      <div style={{ ...actionRowStyle, ...(isMobile && { flexDirection: 'column', gap: '12px', width: '100%' }) }}>
+        <form onSubmit={handleSearchSubmit} style={{ ...searchFormStyle, ...(isMobile && { maxWidth: '100%', width: '100%' }) }}>
           <input
             type="text"
             placeholder="제목, 내용 검색..."
@@ -233,7 +258,7 @@ const CommunityPage = () => {
           <button type="submit" style={searchButtonStyle}>🔍 검색</button>
         </form>
 
-        <button onClick={handleWriteClick} style={writeButtonStyle}>
+        <button onClick={handleWriteClick} style={{ ...writeButtonStyle, ...(isMobile && { width: '100%', padding: '12px 24px', fontSize: '1.05rem' }) }}>
           ✏️ 글쓰기
         </button>
       </div>

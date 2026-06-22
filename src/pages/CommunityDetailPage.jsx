@@ -11,6 +11,17 @@ const CommunityDetailPage = () => {
   const [commentInput, setCommentInput] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 화면 크기 리사이즈 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // 현재 로그인한 사용자 정보 가져오기
   useEffect(() => {
@@ -105,23 +116,23 @@ const CommunityDetailPage = () => {
   const images = post.images ? JSON.parse(post.images) : [];
 
   return (
-    <div className="container fade-in" style={{ padding: '40px 20px', maxWidth: '800px' }}>
+    <div className="container fade-in" style={{ padding: isMobile ? '20px 12px' : '40px 20px', maxWidth: '800px' }}>
       
       {/* 뒤로가기 버튼 */}
-      <button onClick={() => navigate('/community')} style={backButtonStyle}>
+      <button onClick={() => navigate('/community')} style={{ ...backButtonStyle, ...(isMobile && { padding: '8px 12px', fontSize: '0.85rem', marginBottom: '15px' }) }}>
         ← 목록으로 돌아가기
       </button>
 
       {/* 게시글 영역 */}
-      <article style={articleStyle}>
+      <article style={{ ...articleStyle, ...(isMobile && { padding: '20px 15px' }) }}>
         {/* 상단 정보 */}
         <div style={headerStyle}>
           <span style={categoryBadgeStyle(post.category)}>
             {categoryLabels[post.category] || post.category}
           </span>
-          <h1 style={titleStyle}>{post.title}</h1>
+          <h1 style={{ ...titleStyle, ...(isMobile && { fontSize: '1.6rem', lineHeight: '1.3', marginTop: '10px' }) }}>{post.title}</h1>
           
-          <div style={metaRowStyle}>
+          <div style={{ ...metaRowStyle, ...(isMobile && { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }) }}>
             <div style={authorColStyle}>
               {post.profile_image ? (
                 <img src={post.profile_image} alt="" style={avatarStyle} />
@@ -162,7 +173,7 @@ const CommunityDetailPage = () => {
 
         {/* 게시글 본문 (Rich HTML 지원) */}
         <div 
-          style={bodyContentStyle} 
+          style={{ ...bodyContentStyle, ...(isMobile && { fontSize: '1rem', lineHeight: '1.7' }), overflowWrap: 'break-word', wordBreak: 'break-all' }} 
           dangerouslySetInnerHTML={{ __html: post.content }} 
         />
 
@@ -176,7 +187,7 @@ const CommunityDetailPage = () => {
       </article>
 
       {/* 댓글 스레드 영역 */}
-      <section style={commentSectionStyle}>
+      <section style={{ ...commentSectionStyle, ...(isMobile && { padding: '20px 10px', marginTop: '25px' }) }}>
         <h3 style={commentTitleStyle}>💬 댓글 ({comments.length})</h3>
 
         {/* 댓글 목록 */}
@@ -186,9 +197,9 @@ const CommunityDetailPage = () => {
             const canDeleteComment = isCommentOwner || isAdmin;
 
             return (
-              <div key={comment.id} style={commentItemStyle}>
+              <div key={comment.id} style={{ ...commentItemStyle, ...(isMobile && { padding: '12px 4px' }) }}>
                 <div style={commentHeaderStyle}>
-                  <div style={commentAuthorRowStyle}>
+                  <div style={{ ...commentAuthorRowStyle, ...(isMobile && { flexWrap: 'wrap', gap: '6px' }) }}>
                     {comment.profile_image ? (
                       <img src={comment.profile_image} alt="" style={commentAvatarStyle} />
                     ) : (
@@ -199,7 +210,7 @@ const CommunityDetailPage = () => {
                       {comment.role === 'admin' && <span style={roleBadgeStyle('admin')}>관리자</span>}
                       {comment.role === 'seller' && <span style={roleBadgeStyle('seller')}>파트너스</span>}
                     </span>
-                    <span style={commentDateStyle}>
+                    <span style={{ ...commentDateStyle, ...(isMobile && { fontSize: '0.75rem', width: '100%', marginTop: '2px' }) }}>
                       {new Date(comment.created_at).toLocaleString()}
                     </span>
                   </div>
@@ -213,7 +224,7 @@ const CommunityDetailPage = () => {
                     </button>
                   )}
                 </div>
-                <div style={commentContentStyle}>
+                <div style={{ ...commentContentStyle, ...(isMobile && { fontSize: '0.95rem', paddingLeft: '0', marginTop: '8px' }) }}>
                   {comment.content}
                 </div>
               </div>
@@ -227,16 +238,16 @@ const CommunityDetailPage = () => {
 
         {/* 댓글 작성 폼 */}
         {currentUser ? (
-          <form onSubmit={handleCommentSubmit} style={commentFormStyle}>
+          <form onSubmit={handleCommentSubmit} style={{ ...commentFormStyle, ...(isMobile && { padding: '12px' }) }}>
             <textarea
               placeholder="따뜻한 응원이나 유익한 피드백의 댓글을 남겨주세요."
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
-              style={commentTextareaStyle}
+              style={{ ...commentTextareaStyle, ...(isMobile && { fontSize: '0.95rem', padding: '10px' }) }}
               rows="3"
             />
-            <div style={commentSubmitRowStyle}>
-              <button type="submit" style={commentSubmitButtonStyle}>
+            <div style={{ ...commentSubmitRowStyle, ...(isMobile && { justifyContent: 'stretch' }) }}>
+              <button type="submit" style={{ ...commentSubmitButtonStyle, ...(isMobile && { width: '100%', padding: '12px 0' }) }}>
                 댓글 등록
               </button>
             </div>
@@ -244,7 +255,7 @@ const CommunityDetailPage = () => {
         ) : (
           <div style={commentLoginBoxStyle}>
             <p style={{ margin: '0 0 10px 0', color: '#718096' }}>댓글을 작성하려면 로그인이 필요합니다.</p>
-            <button onClick={() => navigate('/login')} style={commentLoginButtonStyle}>
+            <button onClick={() => navigate('/login')} style={{ ...commentLoginButtonStyle, ...(isMobile && { width: '100%' }) }}>
               로그인하러 가기
             </button>
           </div>

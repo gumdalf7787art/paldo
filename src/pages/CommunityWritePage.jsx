@@ -12,8 +12,19 @@ const CommunityWritePage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const editorRef = useRef(null);
+
+  // 화면 크기 리사이즈 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -356,15 +367,15 @@ const CommunityWritePage = () => {
   const categories = getAvailableCategories();
 
   return (
-    <div className="container fade-in" style={{ padding: '40px 20px', maxWidth: '850px' }}>
+    <div className="container fade-in" style={{ padding: isMobile ? '20px 10px' : '40px 20px', maxWidth: '850px' }}>
       
       {/* 뒤로가기 */}
       <button onClick={() => navigate(-1)} style={backButtonStyle}>
         ← 취소하고 돌아가기
       </button>
 
-      <div style={formCardStyle}>
-        <h1 style={formTitleStyle}>
+      <div style={{ ...formCardStyle, ...(isMobile && { padding: '20px 15px' }) }}>
+        <h1 style={{ ...formTitleStyle, ...(isMobile && { fontSize: '1.35rem', marginBottom: '20px', paddingBottom: '10px' }) }}>
           {editPostData ? '✏️ 게시글 수정하기' : '✍️ 새로운 글 작성하기'}
         </h1>
 
@@ -409,7 +420,17 @@ const CommunityWritePage = () => {
             </label>
 
             {/* 에디터 툴바 */}
-            <div style={toolbarStyle}>
+            <div style={{
+              ...toolbarStyle,
+              ...(isMobile && {
+                display: 'flex',
+                flexWrap: 'nowrap',
+                overflowX: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                gap: '8px',
+                padding: '10px'
+              })
+            }}>
               {/* 글자 크기 */}
               <select onChange={(e) => handleBlockFormat(e.target.value)} defaultValue="p" style={toolSelectStyle} title="글자 크기 및 서식">
                 <option value="p">기본 본문</option>
@@ -421,22 +442,22 @@ const CommunityWritePage = () => {
               <div style={dividerStyle} />
 
               {/* 글자 스타일 */}
-              <button type="button" onClick={() => executeCommand('bold')} style={toolBtnStyle} title="굵게"><b>B</b></button>
-              <button type="button" onClick={() => executeCommand('italic')} style={toolBtnStyle} title="기울임"><i>I</i></button>
-              <button type="button" onClick={() => executeCommand('underline')} style={toolBtnStyle} title="밑줄"><u>U</u></button>
-              <button type="button" onClick={() => executeCommand('strikeThrough')} style={toolBtnStyle} title="취소선"><s>S</s></button>
+              <button type="button" onClick={() => executeCommand('bold')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="굵게"><b>B</b></button>
+              <button type="button" onClick={() => executeCommand('italic')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="기울임"><i>I</i></button>
+              <button type="button" onClick={() => executeCommand('underline')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="밑줄"><u>U</u></button>
+              <button type="button" onClick={() => executeCommand('strikeThrough')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="취소선"><s>S</s></button>
 
               <div style={dividerStyle} />
 
               {/* 정렬 */}
-              <button type="button" onClick={() => executeCommand('justifyLeft')} style={toolBtnStyle} title="왼쪽 정렬">Align L</button>
-              <button type="button" onClick={() => executeCommand('justifyCenter')} style={toolBtnStyle} title="가운데 정렬">Align C</button>
-              <button type="button" onClick={() => executeCommand('justifyRight')} style={toolBtnStyle} title="오른쪽 정렬">Align R</button>
+              <button type="button" onClick={() => executeCommand('justifyLeft')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="왼쪽 정렬">Align L</button>
+              <button type="button" onClick={() => executeCommand('justifyCenter')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="가운데 정렬">Align C</button>
+              <button type="button" onClick={() => executeCommand('justifyRight')} style={{ ...toolBtnStyle, flexShrink: 0 }} title="오른쪽 정렬">Align R</button>
 
               <div style={dividerStyle} />
 
               {/* 글자 색상 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
                 <span style={{ fontSize: '0.8rem', color: '#718096', fontWeight: 'bold' }}>Color:</span>
                 <input type="color" onChange={handleColorChange} defaultValue="#2d3748" style={toolColorStyle} title="글자 색상" />
               </div>
@@ -444,7 +465,7 @@ const CommunityWritePage = () => {
               <div style={dividerStyle} />
 
               {/* 미디어 업로드 */}
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                 <label style={mediaBtnStyle} title="사진 삽입">
                   📷 사진 추가
                   <input
@@ -488,12 +509,12 @@ const CommunityWritePage = () => {
               onInput={saveSelectionRange}
               onBlur={saveSelectionRange}
               placeholder="여기에 반려동물과 관련된 유익하고 따뜻한 스토리를 작성해 주세요. 툴바를 이용해 텍스트 크기와 굵기를 변경하고, 사진과 영상을 본문 중간 원하는 위치에 마음껏 추가할 수 있습니다."
-              style={editorAreaStyle}
+              style={{ ...editorAreaStyle, ...(isMobile && { minHeight: '280px', padding: '12px' }) }}
             />
           </div>
 
           {/* 전송 버튼 */}
-          <button type="submit" disabled={loading || uploadingMedia} style={submitButtonStyle}>
+          <button type="submit" disabled={loading || uploadingMedia} style={{ ...submitButtonStyle, ...(isMobile && { padding: '12px 14px', fontSize: '0.95rem' }) }}>
             {loading ? '처리 중...' : editPostData ? '수정 완료' : '게시글 등록'}
           </button>
         </form>

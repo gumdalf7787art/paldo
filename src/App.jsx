@@ -170,22 +170,22 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ marginBottom: '15px' }}>
+        <div style={{ marginBottom: '5px' }}>
           <SearchBar />
         </div>
-
-        {/* 3. 로그인 위젯 */}
-        <div style={{ marginBottom: '15px' }}>
-          <LoginWidget />
-        </div>
-
-        {/* 4. 최신 입양 리스트 (분양 광고 섹션) */}
-        <div style={{ padding: '5px 0', marginBottom: '15px' }}>
+        
+        {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
+        <div style={{ padding: '0', marginBottom: '5px' }}>
           <AdSections />
         </div>
 
-        {/* 5. 일반 분양 리스트 */}
-        <div style={{ padding: '5px 0', marginBottom: '15px' }}>
+        {/* 4. 로그인 위젯 (사이드 1번 광고 배너) */}
+        <div style={{ marginBottom: '10px' }}>
+          <LoginWidget />
+        </div>
+
+        {/* 5. 일반 분양 리스트 (전체 분양 리스트) */}
+        <div style={{ padding: '0', marginBottom: '15px' }}>
           <AdoptionList />
         </div>
 

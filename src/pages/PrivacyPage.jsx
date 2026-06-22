@@ -61,12 +61,12 @@ const PrivacyPage = () => {
               <tr>
                 <td style={{ padding: '10px', border: '1px solid #eee' }}>입점 매장 (사업자)</td>
                 <td style={{ padding: '10px', border: '1px solid #eee' }}>사업자명, 대표자명, 주소, 연락처, 동물판매업 등록번호, 사업자등록번호</td>
-                <td style={{ padding: '10px', border: '1px solid #eee' }}>신원 확인, 분양 중개 정보 명시, 광고 정산 처리 및 파트너 관리</td>
+                <td style={{ padding: '10px', border: '1px solid #eee' }}>신원 확인, 분양 매장 정보 명시, 멤버십 결제 처리 및 파트너 관리</td>
               </tr>
               <tr>
                 <td style={{ padding: '10px', border: '1px solid #eee' }}>결제 진행 시</td>
                 <td style={{ padding: '10px', border: '1px solid #eee' }}>카드사 정보, 은행명, 환불용 본인명의 계좌번호 정보 등 (PG사 처리)</td>
-                <td style={{ padding: '10px', border: '1px solid #eee' }}>예약금/에스크로 분양대금 및 유료 광고 결제/환불 처리</td>
+                <td style={{ padding: '10px', border: '1px solid #eee' }}>비즈니스 멤버십 및 플랫폼 서비스 이용료 결제/환불 처리</td>
               </tr>
             </tbody>
           </table>
@@ -89,7 +89,7 @@ const PrivacyPage = () => {
         <section>
           <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제3조 (개인정보의 제3자 제공 및 공유)</h2>
           <p style={{ margin: 0 }}>
-            회사는 회원의 동의 없이 수집된 개인정보를 다른 제3자에게 임의로 제공하지 않습니다. 단, <strong>'분양 매칭 서비스'를 정상적으로 수행하기 위한 당사자 간의 정보 교환(소비자가 특정 입점 매장에 상담 신청 시 해당 매장에 소비자 정보 제공)</strong>과 같이 거래 목적상 불가피하거나 관계 법령에 따른 요구가 있을 경우에만 제한적으로 제공됩니다.
+            회사는 회원의 동의 없이 수집된 개인정보를 다른 제3자에게 임의로 제공하지 않습니다. 단, <strong>'분양 매장 정보 제공 및 상담 서비스'를 정상적으로 수행하기 위한 당사자 간의 정보 교환(소비자가 특정 입점 매장에 상담 신청 시 해당 매장에 소비자 정보 제공)</strong>과 같이 서비스 제공 목적상 불가피하거나 관계 법령에 따른 요구가 있을 경우에만 제한적으로 제공됩니다.
           </p>
         </section>
 

@@ -74,7 +74,7 @@ const SubscriptionPage = () => {
       pg: 'html5_inicis.INIBillTst', // 이니시스 정기결제(빌링) 데모
       pay_method: 'card',
       merchant_uid: merchantUid,
-      name: `다잇독 월 정기구독 (${plan.name})`,
+      name: `다잇독 비즈니스 멤버십 (${plan.name})`,
       amount: 0, // 정기결제 빌링키 발급용
       customer_uid: customerUid, // ❗빌링키 발급을 위한 필수 파라미터
       buyer_email: currentUser.email || '',
@@ -93,11 +93,11 @@ const SubscriptionPage = () => {
         setIsSubmitting(false);
 
         if (error) {
-          alert('구독 등록 실패: ' + error);
+          alert('멤버십 등록 실패: ' + error);
           return;
         }
 
-        alert(`✅ ${plan.name} 요금제 정기결제 카드가 성공적으로 등록되었습니다!\n(월 정기결제가 시작됩니다)`);
+        alert(`✅ ${plan.name} 비즈니스 멤버십 정기 이용 요금이 성공적으로 등록되었습니다!`);
         navigate('/mypage');
       } else {
         setIsSubmitting(false);
@@ -110,10 +110,10 @@ const SubscriptionPage = () => {
     <div className="container fade-in" style={{ padding: '60px 20px', minHeight: '80vh' }}>
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '15px' }}>
-          다잇독 파트너스 구독 플랜
+          다잇독 파트너스 비즈니스 멤버십
         </h1>
         <p style={{ color: '#666', fontSize: '1.1rem', lineHeight: '1.6' }}>
-          매월 자동 결제되는 정기구독으로 다잇독의 프리미엄 혜택을 끊김없이 누리세요.<br/>
+          매월 정기적으로 이용하는 비즈니스 멤버십 서비스를 통해 다잇독의 프리미엄 혜택을 지속적으로 누리세요.<br/>
           카드를 한 번만 등록하면 매월 편안하게 결제가 진행됩니다.
         </p>
       </div>
@@ -200,7 +200,7 @@ const SubscriptionPage = () => {
         ))}
       </div>
       <div style={{ textAlign: 'center', marginTop: '50px', color: '#888', fontSize: '0.85rem' }}>
-        * 카드를 등록하시면 매월 선택하신 결제일에 자동으로 요금이 청구됩니다. 언제든지 마이페이지에서 해지할 수 있습니다.
+        * 정기 요금 결제를 등록하시면 매월 선택하신 결제일에 서비스 이용료가 자동으로 청구됩니다. 언제든지 마이페이지에서 해지(비활성화)할 수 있습니다.
       </div>
     </div>
   );

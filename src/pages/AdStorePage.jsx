@@ -40,31 +40,31 @@ const AdStorePage = () => {
     },
     {
       id: 1,
-      name: '메인페이지 메인배너',
+      name: '메인페이지 프리미엄 소개 서비스',
       price: 50000,
-      description: '메인페이지 최상단 슬라이드 배너에 노출됩니다.',
+      description: '메인페이지 최상단 슬라이드 영역에 비즈니스 회원의 매장 및 콘텐츠가 우선 소개됩니다.',
       type: 'main',
       image: '/images/ads/ad_main.jpg'
     },
     {
       id: 2,
-      name: '품종별페이지 메인배너',
+      name: '목록페이지 프리미엄 소개 서비스',
       price: 50000,
-      description: '견종별 리스트 페이지 상단 1순위로 노출됩니다.',
+      description: '견종별 리스트 페이지 상단 영역에 비즈니스 회원의 콘텐츠가 우선 소개됩니다.',
       type: 'breed',
       image: '/images/ads/ad_breed.jpg'
     },
     {
       id: 3,
-      name: '메인페이지 안심/인기/스페셜 광고',
+      name: '메인페이지 프리미엄 매장 소개 서비스',
       price: 30000,
-      description: '메인페이지의 안심/인기/스페셜 3개 섹션 중 무작위 위치에 섞여서 번갈아 노출됩니다. (위치 공정성 보장)',
+      description: '메인페이지의 안심/인기/스페셜 추천 섹션 중 무작위 위치에 소개됩니다. (위치 공정성 보장)',
       type: 'section',
       image: '/images/ads/ad_safe.jpg'
     },
     {
       id: 6,
-      name: '게시물 5개 추가 아이템',
+      name: '게시물 5개 추가 멤버십 이용권',
       price: 30000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 5개 증가합니다.',
       type: 'post_limit_5',
@@ -72,7 +72,7 @@ const AdStorePage = () => {
     },
     {
       id: 7,
-      name: '게시물 10개 추가 아이템',
+      name: '게시물 10개 추가 멤버십 이용권',
       price: 50000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 10개 증가합니다.',
       type: 'post_limit_10',
@@ -80,7 +80,7 @@ const AdStorePage = () => {
     },
     {
       id: 8,
-      name: '게시물 20개 추가 아이템',
+      name: '게시물 20개 추가 멤버십 이용권',
       price: 70000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 20개 증가합니다.',
       type: 'post_limit_20',
@@ -109,11 +109,11 @@ const AdStorePage = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            🛒 다잇독 광고 스토어
+            🛒 다잇독 비즈니스 멤버십 스토어
           </h1>
           <p style={{ color: '#666', fontSize: '1.05rem', lineHeight: '1.6' }}>
-            판매율을 극대화하는 다양한 맞춤형 광고 아이템을 만나보세요.<br/>
-            결제하신 광고 아이템은 관리자 확인 후 즉시 <b style={{color: 'var(--primary-dark)'}}>보유 아이템 현황</b>으로 지급됩니다.
+            비즈니스 회원을 위한 다양한 맞춤형 프리미엄 멤버십 및 이용권을 만나보세요.<br/>
+            결제하신 멤버십 이용권은 즉시 <b style={{color: 'var(--primary-dark)'}}>보유 이용권 현황</b>으로 지급됩니다.
           </p>
         </div>
         <button onClick={() => navigate('/mypage')} style={{ padding: '12px 24px', borderRadius: '12px', backgroundColor: '#f0f0f0', color: '#333', border: 'none', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -174,7 +174,7 @@ const AdStorePage = () => {
                 onMouseEnter={(e) => e.target.style.backgroundColor = item.type === 'test_100' ? '#57606f' : (item.type.startsWith('post_limit') ? '#2980b9' : 'var(--primary-dark)')}
                 onMouseLeave={(e) => e.target.style.backgroundColor = item.type === 'test_100' ? '#2f3542' : (item.type.startsWith('post_limit') ? '#3498db' : 'var(--primary)')}
               >
-                {item.type === 'test_100' ? '테스트 결제 진행' : (item.type.startsWith('post_limit') ? '구독(추가) 혜택 안내' : '광고 위치 및 결제 안내')}
+                {item.type === 'test_100' ? '테스트 결제 진행' : (item.type.startsWith('post_limit') ? '멤버십 혜택 안내 및 결제' : '서비스 이용 안내 및 결제')}
               </button>
             </div>
           </div>
@@ -189,7 +189,7 @@ const AdStorePage = () => {
             {/* 왼쪽: 아이템 미리보기 */}
             <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px', display: 'flex', flexDirection: 'column' }}>
               <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#333', marginBottom: '15px' }}>
-                {selectedItem.type.startsWith('post_limit') ? '📦 정기구독 혜택 상세' : (selectedItem.type === 'test_100' ? '🛠️ 테스트 결제 상세' : '📺 광고 노출 위치 미리보기')}
+                {selectedItem.type.startsWith('post_limit') ? '📦 비즈니스 멤버십 혜택 상세' : (selectedItem.type === 'test_100' ? '🛠️ 테스트 결제 상세' : '📺 프리미엄 서비스 노출 예시')}
               </h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
               <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>
@@ -208,8 +208,8 @@ const AdStorePage = () => {
                   💳 결제 수단 선택
                 </h3>
                 <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.9rem', marginBottom: '20px' }}>
-                  편리하고 안전한 결제 방식을 선택하여 광고를 신청하세요.<br/>
-                  가상계좌 입금의 경우, 입금이 완료되면 광고가 즉시 시작됩니다.
+                  편리하고 안전한 결제 방식을 선택하여 서비스를 신청하세요.<br/>
+                  가상계좌 입금의 경우, 입금이 완료되면 서비스 이용권이 즉시 지급됩니다.
                 </p>
 
                 {/* 결제 수단 선택 라디오/버튼 그룹 */}
@@ -310,7 +310,7 @@ const AdStorePage = () => {
                       return;
                     }
 
-                    // 1. 다잇독 백엔드에 임시 광고 신청 생성
+                    // 1. 다잇독 백엔드에 임시 서비스 신청 생성
                     const { data: requestData, error: requestError } = await api.ads.requestAdPurchase({
                       ad_type: selectedItem.type,
                       title: selectedItem.name,
@@ -319,7 +319,7 @@ const AdStorePage = () => {
                     });
 
                     if (requestError || !requestData || !requestData.adId) {
-                      alert('광고 신청 도중 오류가 발생했습니다: ' + (requestError || '알 수 없는 오류'));
+                      alert('서비스 신청 도중 오류가 발생했습니다: ' + (requestError || '알 수 없는 오류'));
                       setIsSubmitting(false);
                       return;
                     }

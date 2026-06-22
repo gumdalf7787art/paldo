@@ -53,7 +53,7 @@ const AdminPage = () => {
     }
 
     setIsAdmin(true);
-    // 진입 시 광고 만료 처리
+    // 진입 시 이용권 만료 처리
     await api.admin.expireAds();
     fetchAdminData();
   }
@@ -101,7 +101,7 @@ const AdminPage = () => {
       const { data: reportList } = await api.admin.getReports();
       setReports(reportList || []);
 
-      // 7. 광고 신청 내역
+      // 7. 서비스 신청 내역
       const { data: adReqList } = await api.admin.getAdRequests();
       setAdRequests(adReqList || []);
 
@@ -173,7 +173,7 @@ const AdminPage = () => {
     if (error) {
       alert('생성 실패: ' + error);
     } else {
-      alert('광고 아이템이 생성되었습니다.');
+      alert('서비스 이용권이 생성되었습니다.');
       setNewCoupon({ code: '', name: '', amount: 0, benefit_type: 'ad_exemption', auto_issue_type: 'none', valid_until: '', ad_type: 'all' });
       fetchAdminData();
     }
@@ -268,7 +268,7 @@ const AdminPage = () => {
 
   const handleUpdateAdRequestStatus = async (id, status) => {
     let confirmMsg = '상태를 변경하시겠습니까?';
-    if (status === 'active') confirmMsg = '승인 처리하시겠습니까?\n세금계산서가 자동 발행되며 광고 쿠폰이 발급됩니다.';
+    if (status === 'active') confirmMsg = '승인 처리하시겠습니까?\n세금계산서가 자동 발행되며 서비스 이용권 쿠폰이 발급됩니다.';
     if (status === 'rejected') confirmMsg = '정말 취소(반려) 처리하시겠습니까?';
 
     if (!window.confirm(confirmMsg)) return;
@@ -347,9 +347,9 @@ const AdminPage = () => {
             { id: 'users', icon: '👥', label: '회원 관리' },
             { id: 'dogs', icon: '🐶', label: '게시물 관리' },
             { id: 'reports', icon: '🚨', label: '신고 관리' },
-            { id: 'adRequests', icon: '🛒', label: '광고 구매 신청' },
-            { id: 'adUsages', icon: '🎯', label: '광고 사용 내역' },
-            { id: 'banners', icon: '🖼️', label: '광고배너 관리' },
+            { id: 'adRequests', icon: '🛒', label: '서비스 구매 신청' },
+            { id: 'adUsages', icon: '🎯', label: '서비스 사용 내역' },
+            { id: 'banners', icon: '🖼️', label: '배너 이미지 관리' },
             { id: 'coupons', icon: '🎫', label: '쿠폰 시스템' }
           ].map(item => (
             <div 
@@ -372,7 +372,7 @@ const AdminPage = () => {
             { activeTab === 'users' && '전체 회원 관리' }
             { activeTab === 'dogs' && '분양 게시물 관리' }
             { activeTab === 'reports' && '🚨 신고 내역 관리' }
-            { activeTab === 'adRequests' && '🛒 광고 신청 관리' }
+            { activeTab === 'adRequests' && '🛒 서비스 신청 관리' }
             { activeTab === 'coupons' && '쿠폰 시스템 관리' }
           </h1>
           <div style={{ backgroundColor: 'white', padding: '10px 20px', borderRadius: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', fontSize: '0.9rem' }}>
@@ -668,12 +668,12 @@ const AdminPage = () => {
 
         {activeTab === 'adRequests' && (
           <div className="fade-in glass-card" style={{ padding: '30px' }}>
-            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🛒 광고 아이템 구매 신청 내역</h3>
+            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🛒 서비스 이용권 구매 신청 내역</h3>
             <table style={tableStyle}>
               <thead>
                 <tr>
                   <th style={thStyle}>신청일시</th>
-                  <th style={thStyle}>광고 구역</th>
+                  <th style={thStyle}>노출 영역</th>
                   <th style={thStyle}>상점/신청자</th>
                   <th style={thStyle}>사업자정보</th>
                   <th style={thStyle}>결제금액</th>
@@ -711,7 +711,7 @@ const AdminPage = () => {
                   </tr>
                 ))}
                 {adRequests.filter(req => req.price > 0).length === 0 && (
-                  <tr><td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>접수된 광고 구매 신청 내역이 없습니다.</td></tr>
+                  <tr><td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>접수된 서비스 구매 신청 내역이 없습니다.</td></tr>
                 )}
               </tbody>
             </table>
@@ -720,12 +720,12 @@ const AdminPage = () => {
 
         {activeTab === 'adUsages' && (
           <div className="fade-in glass-card" style={{ padding: '30px' }}>
-            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🎯 광고 아이템 사용(적용) 내역</h3>
+            <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>🎯 서비스 이용권 사용(적용) 내역</h3>
             <table style={tableStyle}>
               <thead>
                 <tr>
                   <th style={thStyle}>사용일시</th>
-                  <th style={thStyle}>광고 구역</th>
+                  <th style={thStyle}>노출 영역</th>
                   <th style={thStyle}>사용자</th>
                   <th style={thStyle}>상태</th>
                 </tr>
@@ -749,7 +749,7 @@ const AdminPage = () => {
                   </tr>
                 ))}
                 {adRequests.filter(req => !req.price || req.price === 0).length === 0 && (
-                  <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>광고 아이템 사용 내역이 없습니다.</td></tr>
+                  <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>서비스 이용권 사용 내역이 없습니다.</td></tr>
                 )}
               </tbody>
             </table>
@@ -771,7 +771,7 @@ const AdminPage = () => {
                   <input required style={adminInput} value={newCoupon.code} onChange={e => setNewCoupon({...newCoupon, code: e.target.value})} placeholder="WELCOME2024" />
                 </div>
                 <div>
-                  <label style={smallLabel}>광고 보장 기간 (일수)</label>
+                  <label style={smallLabel}>서비스 보장 기간 (일수)</label>
                   <input required type="number" style={adminInput} value={newCoupon.amount} onChange={e => setNewCoupon({...newCoupon, amount: e.target.value})} />
                 </div>
                 <div>
@@ -795,11 +795,11 @@ const AdminPage = () => {
                       amount: val.startsWith('post_reg') ? 20 : newCoupon.amount
                     });
                   }}>
-                    <option value="ad_exemption">일반 광고비 면제권</option>
-                    <option value="ad_main">메인 페이지 광고권</option>
-                    <option value="ad_safe_1m">안심분양 광고 (1개월)</option>
-                    <option value="ad_popular_1m">인기분양 광고 (1개월)</option>
-                    <option value="ad_special_1m">스페셜분양 광고 (1개월)</option>
+                    <option value="ad_exemption">일반 서비스 이용료 면제권</option>
+                    <option value="ad_main">메인 페이지 프리미엄 노출권</option>
+                    <option value="ad_safe_1m">안심분양 프리미엄 (1개월)</option>
+                    <option value="ad_popular_1m">인기분양 프리미엄 (1개월)</option>
+                    <option value="ad_special_1m">스페셜분양 프리미엄 (1개월)</option>
                     <option value="post_reg_1m">게시물 등록 1개월 쿠폰 (1달 20개)</option>
                     <option value="post_reg_2m">게시물 등록 2개월 쿠폰 (1달 20개)</option>
                     <option value="post_reg_3m">게시물 등록 3개월 쿠폰 (1달 20개)</option>
@@ -916,7 +916,7 @@ const AdminPage = () => {
         {activeTab === 'banners' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>🖼️ 광고배너 관리</h2>
+              <h2>🖼️ 배너 이미지 관리</h2>
             </div>
             
             <div className="glass-card" style={{ padding: '25px', marginBottom: '30px' }}>

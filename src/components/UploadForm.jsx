@@ -409,10 +409,10 @@ const UploadForm = () => {
             <textarea placeholder="아이의 성격, 접종 상태, 특징 등을 자유롭게 적어주세요!" style={{...inputStyle, height: '150px', resize: 'vertical'}} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
           </div>
 
-          {/* 광고/게시권 쿠폰 적용 */}
+          {/* 프리미엄 혜택 쿠폰 적용 */}
           <div style={{ padding: '15px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba' }}>
             <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '800', color: '#e6a800', marginBottom: '10px' }}>
-              📢 광고 설정 (선택)
+              📢 프리미엄 서비스 설정 (선택)
             </label>
             <select 
               style={inputStyle} 
@@ -427,7 +427,7 @@ const UploadForm = () => {
               ))}
             </select>
             <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px', marginBottom: 0 }}>
-              * 광고 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 광고가 등록됩니다.
+              * 이용 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 노출 서비스가 제공됩니다.
             </p>
           </div>
 

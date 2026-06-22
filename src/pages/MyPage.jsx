@@ -119,11 +119,11 @@ const MyPage = () => {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
         setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` });
       } else {
-        setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
+        setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       }
       navigate('/mypage', { replace: true });
     } else if (location.state?.paymentSuccess) {
-      setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 광고 아이템이 지급되었습니다.' });
+      setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       navigate('/mypage', { replace: true, state: newState });
@@ -596,10 +596,10 @@ const MyPage = () => {
       { id: 'upload', label: '➕ 분양등록', action: () => navigate('/upload') },
       { id: 'posts', label: '🐶 게시물' },
       { id: 'store', label: '🏪 스토어' },
-      { id: 'ads', label: '📢 광고' },
+      { id: 'ads', label: '📢 비즈니스 서비스' },
       { id: 'payments', label: '💳 결제 관리' },
-      { id: 'adStore', label: '🛒 광고 스토어', action: () => navigate('/ad-store') },
-      { id: 'subscription', label: '💎 파트너스 구독', action: () => navigate('/subscription') },
+      { id: 'adStore', label: '🛒 멤버십 스토어', action: () => navigate('/ad-store') },
+      { id: 'subscription', label: '💎 파트너스 멤버십', action: () => navigate('/subscription') },
       { id: 'stats', label: '📊 통계' },
     ] : []),
     { id: 'chats', label: '💬 다잇톡' },
@@ -717,10 +717,10 @@ const MyPage = () => {
                     <button onClick={() => navigate('/upload')} style={{ ...navBtnStyle('upload'), color: 'var(--primary)', fontWeight: '900' }}>➕ 분양등록</button>
                     <button onClick={() => setActiveTab('posts')} style={navBtnStyle('posts')}>🐶 게시물관리</button>
                     <button onClick={() => setActiveTab('store')} style={navBtnStyle('store')}>🏪 내 스토어 관리</button>
-                    <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 광고관리</button>
+                    <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 비즈니스 서비스 관리</button>
                     <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
-                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 광고 스토어</button>
-                    <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 구독</button>
+                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 멤버십 스토어</button>
+                    <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 멤버십</button>
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}
@@ -1035,14 +1035,14 @@ const MyPage = () => {
               {activeTab === 'ads' && isSeller && (
                 <div className="fade-in">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>광고 관리</h2>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>비즈니스 서비스 관리</h2>
                     <button 
                       onClick={() => navigate('/ad-store')}
                       style={{ padding: '10px 20px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.2)' }}
                       onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary-dark)'; e.target.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.transform = 'translateY(0)'; }}
                     >
-                      🛒 스토어 가기
+                      🛒 멤버십 스토어 가기
                     </button>
                   </div>
 
@@ -1054,8 +1054,8 @@ const MyPage = () => {
                           <th style={thStyle}>사진</th>
                           <th style={thStyle}>견종/이름</th>
                           <th style={thStyle}>상태</th>
-                          <th style={thStyle}>진행중인 광고</th>
-                          <th style={{ ...thStyle, textAlign: 'center' }}>광고 설정</th>
+                          <th style={thStyle}>이용 중인 서비스</th>
+                          <th style={{ ...thStyle, textAlign: 'center' }}>서비스 설정</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1078,11 +1078,11 @@ const MyPage = () => {
                                   <div style={{ fontSize: '0.75rem', color: '#ff4757', marginTop: '3px' }}>{adInfo.remainDays}일 남음</div>
                                 </div>
                               ) : (
-                                <span style={{ color: '#aaa', fontSize: '0.8rem' }}>진행중인 광고 없음</span>
+                                <span style={{ color: '#aaa', fontSize: '0.8rem' }}>이용 중인 서비스 없음</span>
                               )}
                             </td>
                             <td style={{ ...tdStyle, textAlign: 'center' }}>
-                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', padding: '10px 15px' }}>📢 광고 설정하기</button>
+                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', padding: '10px 15px' }}>📢 서비스 설정하기</button>
                             </td>
                           </tr>
                           );
@@ -1106,12 +1106,12 @@ const MyPage = () => {
                             
                             {adInfo && (
                               <div style={{ backgroundColor: '#fffbf0', padding: '8px 12px', borderRadius: '8px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--primary-dark)' }}>{adInfo.type} 진행중</span>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--primary-dark)' }}>{adInfo.type} 이용 중</span>
                                 <span style={{ fontSize: '0.75rem', color: '#ff4757', fontWeight: 'bold' }}>{adInfo.remainDays}일 남음</span>
                               </div>
                             )}
 
-                            <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 광고 설정하기</button>
+                            <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: 'var(--primary-dark)', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>📢 서비스 설정하기</button>
                           </div>
                         </div>
                       );
@@ -1119,14 +1119,14 @@ const MyPage = () => {
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 광고 아이템 현황</h3>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 멤버십 이용권 현황</h3>
                     <button 
                       onClick={() => navigate('/ad-store')}
                       style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                       onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
                       onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}
                     >
-                      💳 광고 아이템 구매
+                      💳 멤버십 이용권 구매
                     </button>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
@@ -1138,12 +1138,12 @@ const MyPage = () => {
                           사용 가능 기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '제한 없음 (무제한)'}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>
-                          {coupon.ad_type !== 'all' && coupon.ad_type ? `광고 적용 시 ${coupon.discount_rate}일간 진행됩니다.` : coupon.description}
+                          {coupon.ad_type !== 'all' && coupon.ad_type ? `프리미엄 서비스 적용 시 ${coupon.discount_rate}일간 진행됩니다.` : coupon.description}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: coupon.is_used ? '#aaa' : 'var(--primary)', fontWeight: 'bold' }}>{coupon.is_used ? '사용 완료' : '사용 가능'}</div>
                       </div>
                     )) : (
-                      <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center' }}>보유한 광고 아이템이 없습니다.</div>
+                      <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center' }}>보유한 이용권이 없습니다.</div>
                     )}
                   </div>
                 </div>
@@ -1192,7 +1192,7 @@ const MyPage = () => {
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '10px' }}>결제 내역 관리</h2>
                   <p style={{ color: '#666', marginBottom: '30px', fontSize: '0.95rem' }}>
-                    신청하신 광고 및 구독의 결제 내역을 확인하고 취소를 요청하실 수 있습니다.
+                    신청하신 멤버십 서비스 및 이용권의 결제 내역을 확인하고 취소를 요청하실 수 있습니다.
                   </p>
                   
                   <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>

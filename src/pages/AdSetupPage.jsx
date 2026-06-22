@@ -10,8 +10,8 @@ const AdSetupPage = () => {
   const [dog, setDog] = useState(null);
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeMainAds, setActiveMainAds] = useState(0); // 현재 활성 메인광고 수
-  const maxMainAds = 10; // 메인광고 최대 슬롯 수
+  const [activeMainAds, setActiveMainAds] = useState(0); // 현재 활성 프리미엄 수
+  const maxMainAds = 10; // 최대 슬롯 수
 
   // 폼 상태
   const [adType, setAdType] = useState('main'); // main, breed, safe, popular, special
@@ -39,7 +39,7 @@ const AdSetupPage = () => {
     
     if (dogData) {
       if (dogData.seller_id !== currentSession.user.id && currentSession.user.role !== 'admin') {
-        alert('본인의 게시물만 광고 설정이 가능합니다.');
+        alert('본인의 게시물만 서비스 설정이 가능합니다.');
         navigate('/mypage');
         return;
       }
@@ -61,9 +61,9 @@ const AdSetupPage = () => {
   };
 
   const adTypeDisplay = {
-    'main': '메인페이지 메인배너 (메인페이지 최상단 노출)',
-    'breed': '품종별페이지 메인배너 (품종별페이지 메인배너 및 상위노출)',
-    'section': '메인페이지 안심/인기/스페셜 광고 (안심/인기/스페셜 랜덤 배치)'
+    'main': '메인페이지 프리미엄 소개 서비스 (최상단 영역 노출)',
+    'breed': '목록페이지 프리미엄 소개 서비스 (상단 영역 노출)',
+    'section': '메인페이지 프리미엄 매장 소개 서비스 (추천 섹션 무작위 배치)'
   };
 
   const formatAdLabel = (label) => {
@@ -78,21 +78,21 @@ const AdSetupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedCoupon) {
-      alert('광고를 진행하시려면 사용할 광고 아이템을 먼저 선택해 주세요.');
+      alert('서비스를 진행하시려면 사용할 이용권을 먼저 선택해 주세요.');
       return;
     }
     if (adType === 'main' && activeMainAds >= maxMainAds) {
-      alert('메인배너 잔여 슬롯이 없습니다. 다른 광고 구역을 선택해주세요.');
+      alert('프리미엄 노출 잔여 슬롯이 없습니다. 다른 서비스 구역을 선택해주세요.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // REST API: 광고 생성 및 쿠폰 소모 동시 처리
+      // REST API: 서비스 생성 및 쿠폰 소모 동시 처리
       const { data, error } = await api.ads.create({
         dog_id: parseInt(dogId),
         ad_type: adType,
-        title: `${dog.nickname} 분양 광고 (${adTypeDisplay[adType]})`,
+        title: `${dog.nickname} 프리미엄 서비스 (${adTypeDisplay[adType]})`,
         used_coupon_id: parseInt(selectedCoupon)
       });
 
@@ -100,12 +100,12 @@ const AdSetupPage = () => {
 
       const endDate = data?.endDate ? new Date(data.endDate) : new Date();
 
-      alert(`광고 설정이 완료되었습니다!\n(${endDate.toLocaleDateString()} 까지)\n내 게시물이 즉시 홍보됩니다.`);
+      alert(`서비스 설정이 완료되었습니다!\n(${endDate.toLocaleDateString()} 까지)\n내 게시물에 프리미엄 혜택이 적용됩니다.`);
       navigate('/mypage');
       
     } catch (error) {
       console.error(error);
-      alert('광고 설정 중 오류가 발생했습니다: ' + error.message);
+      alert('서비스 설정 중 오류가 발생했습니다: ' + error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,21 +126,21 @@ const AdSetupPage = () => {
       </button>
 
       <div className="glass-card" style={{ padding: '40px' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px', textAlign: 'center' }}>광고 설정하기 📢</h1>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px', textAlign: 'center' }}>서비스 설정하기 📢</h1>
         
         <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #eee', borderRadius: '15px', padding: '20px', display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '40px' }}>
           <img src={dog.image_url} alt={dog.nickname} style={{ width: '80px', height: '80px', borderRadius: '10px', objectFit: 'cover' }} />
           <div>
-            <div style={{ color: '#888', fontSize: '0.85rem' }}>광고 대상 강아지</div>
+            <div style={{ color: '#888', fontSize: '0.85rem' }}>대상 게시물</div>
             <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{dog.nickname} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#666' }}>({dog.breed})</span></div>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '25px' }}>
           
-          {/* 광고 종류 */}
+          {/* 서비스 종류 */}
           <div>
-            <label style={labelStyle}>광고 구역 선택</label>
+            <label style={labelStyle}>서비스 노출 영역 선택</label>
             <div style={{ display: 'grid', gap: '10px' }}>
               {Object.entries(adTypeDisplay).map(([val, label]) => {
                 const isMainFull = val === 'main' && activeMainAds >= maxMainAds;
@@ -184,26 +184,26 @@ const AdSetupPage = () => {
 
           {/* 결제 및 아이템 */}
           <div style={{ borderTop: '2px dashed #eee', paddingTop: '25px' }}>
-            <label style={labelStyle}>사용할 광고 아이템 선택</label>
+            <label style={labelStyle}>사용할 이용권 선택</label>
             <div style={{ backgroundColor: '#fffbf0', padding: '20px', borderRadius: '15px', border: '1px solid #ffeeba' }}>
               <select 
                 value={selectedCoupon} 
                 onChange={(e) => setSelectedCoupon(e.target.value)}
                 style={{ width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #ffd700', outline: 'none', backgroundColor: 'white', color: '#333', fontSize: '0.95rem', fontWeight: 'bold' }}
               >
-                <option value="">🎁 사용할 광고 아이템을 선택해 주세요</option>
+                <option value="">🎁 사용할 이용권을 선택해 주세요</option>
                 {coupons
                   .filter(c => c.ad_type === 'all' || c.ad_type === adType)
                   .map(c => (
                     <option key={c.id} value={c.id}>
-                      {c.name || '무명 아이템'} (기한: {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '무제한'})
+                      {c.name || '이용권'} (기한: {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '무제한'})
                     </option>
                 ))}
               </select>
               {coupons.filter(c => c.ad_type === 'all' || c.ad_type === adType).length === 0 && (
                 <div style={{ marginTop: '15px', backgroundColor: '#fff', padding: '15px', borderRadius: '10px', border: '1px dashed #ff4757', textAlign: 'center' }}>
                   <p style={{ color: '#ff4757', fontSize: '0.9rem', marginBottom: '10px', fontWeight: 'bold' }}>
-                    현재 선택한 구역에 사용 가능한 광고 아이템이 없습니다.
+                    현재 선택한 구역에 사용 가능한 이용권이 없습니다.
                   </p>
                   <button 
                     type="button"
@@ -212,7 +212,7 @@ const AdSetupPage = () => {
                     onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
                     onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}
                   >
-                    💳 광고 아이템 구매하러 가기
+                    💳 멤버십 이용권 구매하러 가기
                   </button>
                 </div>
               )}
@@ -235,7 +235,7 @@ const AdSetupPage = () => {
               color: 'white', fontWeight: '900', fontSize: '1.1rem', cursor: coupons.length === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', marginTop: '10px'
             }}
           >
-            {isSubmitting ? '처리 중...' : '확인 및 광고 시작하기'}
+            {isSubmitting ? '처리 중...' : '확인 및 서비스 적용하기'}
           </button>
         </form>
       </div>

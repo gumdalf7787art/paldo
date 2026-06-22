@@ -318,7 +318,7 @@ const Header = () => {
                           className="header-dropdown-item"
                           style={{ color: '#9b59b6', fontWeight: 'bold' }}
                         >
-                          💎 파트너스 구독
+                          💎 파트너스 멤버십
                         </Link>
                       )}
 

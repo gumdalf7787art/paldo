@@ -248,7 +248,7 @@ const HeroCarousel = ({ breedName }) => {
           position: 'relative'
         }}
       >
-        {/* 상단 우측 AD 뱃지 (박스 전체가 광고임을 명시) */}
+        {/* 상단 우측 PREMIUM 뱃지 */}
         <div style={{
           position: 'absolute',
           top: '0',
@@ -264,7 +264,7 @@ const HeroCarousel = ({ breedName }) => {
           borderBottom: '1px solid #f1f5f9',
           letterSpacing: '0.5px'
         }}>
-          AD
+          PREMIUM
         </div>
         {/* 좌측 화살표 버튼 */}
         <button 
@@ -402,7 +402,7 @@ const SectionTitle = ({ title, sub, isAd }) => (
         letterSpacing: '0.5px',
         flexShrink: 0
       }}>
-        AD
+        PREMIUM
       </span>
     )}
   </div>

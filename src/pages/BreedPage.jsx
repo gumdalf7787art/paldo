@@ -33,7 +33,7 @@ const BreedPage = () => {
       // Currently API might not support gender/price, but we pass region.
       
       try {
-        // 1. 유료 광고 데이터 가져오기 및 배너 가져오기 병렬 실행
+        // 1. 프리미엄 서비스 데이터 가져오기 및 배너 가져오기 병렬 실행
         const [adResponse, bannerResponse] = await Promise.all([
           api.ads.getList({
             status: 'active',
@@ -52,7 +52,7 @@ const BreedPage = () => {
           ...ad,
           isAd: true,
           image: ad.image_url,
-          badgeText: 'AD'
+          badgeText: 'PREMIUM'
         }));
         setAdDogs(ads.slice(0, 4)); // 상단 프리미엄은 최대 4개 (1줄)만 노출
 
@@ -169,7 +169,7 @@ const BreedPage = () => {
                         border: '1px solid #fef3c7',
                         letterSpacing: '0.5px'
                       }}>
-                        AD
+                        PREMIUM
                       </span>
                     </div>
                     <div className="adoption-grid">

@@ -224,6 +224,52 @@ const CommunityWritePage = () => {
     e.target.value = ''; // input 리셋
   };
 
+  // 유튜브 비디오 ID 추출 헬퍼
+  const getYoutubeId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // 유튜브 동영상 인라인 본문 삽입
+  const handleYoutubeInsert = () => {
+    const url = prompt('유튜브 동영상 주소(URL)를 입력해 주세요.\n예시: https://www.youtube.com/watch?v=... 또는 https://youtu.be/...');
+    if (!url) return;
+
+    const videoId = getYoutubeId(url.trim());
+    if (!videoId) {
+      alert('유효한 유튜브 동영상 주소가 아닙니다. 주소를 확인해 주세요.');
+      return;
+    }
+
+    // 반응형 16:9 컨테이너 생성
+    const container = document.createElement('div');
+    container.className = 'youtube-embed-container';
+    container.style.position = 'relative';
+    container.style.paddingBottom = '56.25%'; // 16:9 비율
+    container.style.height = '0';
+    container.style.overflow = 'hidden';
+    container.style.maxWidth = '100%';
+    container.style.borderRadius = '12px';
+    container.style.margin = '15px 0';
+    container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+
+    // iframe 생성
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+
+    container.appendChild(iframe);
+    insertElementAtCursor(container);
+  };
+
   // 등록/수정 전송
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -421,6 +467,15 @@ const CommunityWritePage = () => {
                     disabled={uploadingMedia}
                   />
                 </label>
+
+                <button
+                  type="button"
+                  onClick={handleYoutubeInsert}
+                  style={{ ...mediaBtnStyle, backgroundColor: '#fff5f5', color: '#e53e3e', border: '1px solid #fed7d7' }}
+                  title="유튜브 동영상 삽입"
+                >
+                  ❤️ YouTube 추가
+                </button>
               </div>
             </div>
 

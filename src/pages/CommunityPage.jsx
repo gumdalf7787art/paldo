@@ -147,8 +147,16 @@ const CommunityPage = () => {
                   <h3 style={{
                     ...postTitleStyle,
                     fontWeight: isNotice ? '800' : '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}>
-                    {post.title}
+                    <span>{post.title}</span>
+                    {post.comment_count > 0 && (
+                      <span style={{ color: '#e53e3e', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                        [{post.comment_count}]
+                      </span>
+                    )}
                   </h3>
                   <div style={authorRowStyle}>
                     {post.profile_image ? (

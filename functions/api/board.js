@@ -108,7 +108,8 @@ export async function onRequestGet(context) {
 
     try {
       let query = `
-        SELECT p.id, p.user_id, p.category, p.title, p.images, p.views, p.created_at, u.nickname, u.profile_image, u.role
+        SELECT p.id, p.user_id, p.category, p.title, p.images, p.views, p.created_at, u.nickname, u.profile_image, u.role,
+               (SELECT COUNT(*) FROM board_comments c WHERE c.post_id = p.id) as comment_count
         FROM board_posts p
         LEFT JOIN profiles u ON p.user_id = u.id
         WHERE 1=1

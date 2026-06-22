@@ -252,18 +252,11 @@ const HeroCarousel = ({ breedName }) => {
             <div 
               key={`hero-slide-mobile-${dog.id}-${i}`}
               style={{
-                flex: '0 0 70%',
-                height: '210px',
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                display: 'flex',
-                scrollSnapAlign: 'start',
-                boxShadow: 'var(--shadow-sm)',
-                border: '1px solid #f1f5f9'
+                flex: '0 0 calc(33.333% - 8px)',
+                scrollSnapAlign: 'start'
               }}
             >
               <Card 
-                type="small" 
                 badgeText={dog.badgeText || '추천'} 
                 data={{
                   ...dog,
@@ -812,8 +805,8 @@ const AdoptionList = () => {
         style={
           isMobile ? {
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px'
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px'
           } : undefined
         }
       >

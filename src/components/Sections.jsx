@@ -431,29 +431,37 @@ const HeroCarousel = ({ breedName }) => {
   );
 };
 
-const SectionTitle = ({ title, sub, isAd }) => (
-  <div className="section-title-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '15px' }}>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
-      <h2 style={{ fontSize: '1.4rem', margin: 0 }}>{title}</h2>
-      <span style={{ fontSize: '0.85rem' }}>{sub}</span>
+const SectionTitle = ({ title, sub, isAd }) => {
+  const { isMobile } = useMobile();
+  return (
+    <div className="section-title-wrap" style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'flex-end', 
+      marginBottom: isMobile ? '4px' : '15px' 
+    }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', margin: 0 }}>{title}</h2>
+        <span style={{ fontSize: '0.85rem' }}>{sub}</span>
+      </div>
+      {!isMobile && isAd && (
+        <span style={{ 
+          fontSize: '0.65rem', 
+          fontWeight: '500', 
+          backgroundColor: '#f8fafc', 
+          color: '#94a3b8', 
+          padding: '2px 6px', 
+          borderRadius: '4px', 
+          border: '1px solid #f1f5f9',
+          letterSpacing: '0.5px',
+          flexShrink: 0
+        }}>
+          PREMIUM
+        </span>
+      )}
     </div>
-    {isAd && (
-      <span style={{ 
-        fontSize: '0.65rem', 
-        fontWeight: '500', 
-        backgroundColor: '#f8fafc', 
-        color: '#94a3b8', 
-        padding: '2px 6px', 
-        borderRadius: '4px', 
-        border: '1px solid #f1f5f9',
-        letterSpacing: '0.5px',
-        flexShrink: 0
-      }}>
-        PREMIUM
-      </span>
-    )}
-  </div>
-);
+  );
+};
 
 
 const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
@@ -547,7 +555,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
     const isSafeAd = title.includes("안심");
     return (
       <section style={{ 
-        padding: isSafeAd ? '2px 10px 10px 10px' : '10px 10px 10px 10px', 
+        padding: isSafeAd ? '0px 10px 10px 10px' : '10px 10px 10px 10px', 
         backgroundColor: 'transparent', 
         borderRadius: 0, 
         border: 'none', 
@@ -555,7 +563,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
         marginBottom: '10px',
         position: 'relative'
       }}>
-        <SectionTitle title={title} sub={sub} isAd={true} />
+        <SectionTitle title={title} sub={sub} isAd={!isSafeAd} />
         
         {loading && dogs.length === 0 ? (
           <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>

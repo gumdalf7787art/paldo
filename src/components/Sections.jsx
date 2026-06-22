@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMobile } from '../context/MobileContext';
 import Card from './Card';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
@@ -129,6 +130,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
 const timeoutPromise = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
 const HeroCarousel = ({ breedName }) => {
+  const { isMobile } = useMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ads, setAds] = useState([]);
   const [isTransitionActive, setIsTransitionActive] = useState(true);
@@ -160,6 +162,7 @@ const HeroCarousel = ({ breedName }) => {
 
   // 자동 롤링 타이머 (isPaused 또는 currentIndex 변경 시 갱신하여 수동클릭과 꼬임 방지)
   useEffect(() => {
+    if (isMobile) return; // 모바일에서는 자동 롤링 정지
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -187,7 +190,7 @@ const HeroCarousel = ({ breedName }) => {
         clearTimeout(timerRef.current);
       }
     };
-  }, [currentIndex, ads.length, isPaused]);
+  }, [currentIndex, ads.length, isPaused, isMobile]);
 
   const handlePrev = () => {
     if (ads.length === 0) return;
@@ -228,6 +231,57 @@ const HeroCarousel = ({ breedName }) => {
   };
 
   if (ads.length === 0) return null;
+
+  if (isMobile) {
+    return (
+      <section style={{ padding: '8px 0 5px 0', position: 'relative' }}>
+        <div 
+          style={{ 
+            overflowX: 'auto', 
+            display: 'flex',
+            gap: '10px',
+            padding: '4px 10px',
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none'
+          }}
+          className="mobile-scroll-container"
+        >
+          {ads.map((dog, i) => (
+            <div 
+              key={`hero-slide-mobile-${dog.id}-${i}`}
+              style={{
+                flex: '0 0 70%',
+                height: '210px',
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                display: 'flex',
+                scrollSnapAlign: 'start',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid #f1f5f9'
+              }}
+            >
+              <Card 
+                type="small" 
+                badgeText={dog.badgeText || '추천'} 
+                data={{
+                  ...dog,
+                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
+                  breed: dog.breed || '견종 미상',
+                  nickname: dog.nickname || '이름 없음',
+                  gender: dog.gender || '-',
+                  region: dog.region || '지역 미지정',
+                  age: calculateAge(dog.birthday, dog.age),
+                  price: dog.price
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   const extendedAds = [...ads, ...ads.slice(0, 5)];
 
@@ -410,6 +464,7 @@ const SectionTitle = ({ title, sub, isAd }) => (
 
 
 const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
+  const { isMobile } = useMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitionActive, setIsTransitionActive] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -431,6 +486,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 
   // 자동 롤링 타이머
   useEffect(() => {
+    if (isMobile) return; // 모바일에서는 자동 롤링 비활성화
     if (!showSlider || isPaused) {
       if (timerRef.current) clearTimeout(timerRef.current);
       return;
@@ -455,7 +511,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [currentIndex, pairs.length, isPaused, showSlider]);
+  }, [currentIndex, pairs.length, isPaused, showSlider, isMobile]);
 
   const handlePrev = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -493,6 +549,63 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 
   // extendedPairs 구성 (뒤에 처음 4개 pair 복제)
   const extendedPairs = showSlider ? [...pairs, ...pairs.slice(0, 4)] : pairs;
+
+  if (isMobile) {
+    return (
+      <section style={{ 
+        padding: '15px 10px 10px 10px', 
+        backgroundColor: 'transparent', 
+        borderRadius: 0, 
+        border: 'none', 
+        boxShadow: 'none',
+        marginBottom: '10px',
+        position: 'relative'
+      }}>
+        <SectionTitle title={title} sub={sub} isAd={true} />
+        
+        {loading && dogs.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
+            매물을 불러오는 중입니다...
+          </p>
+        ) : dogs.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
+            등록된 분양 매물이 없습니다.
+          </p>
+        ) : (
+          <div 
+            style={{ 
+              overflowX: 'auto', 
+              display: 'flex',
+              gap: '10px',
+              padding: '4px 0',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none'
+            }}
+            className="mobile-scroll-container"
+          >
+            {dogs.map((dog, i) => (
+              <div 
+                key={`mobile-ad-${badge}-${dog.id}-${i}`} 
+                style={{ 
+                  flex: '0 0 calc(65% - 10px)',
+                  height: '195px',
+                  scrollSnapAlign: 'start'
+                }}
+              >
+                <Card 
+                  type="middle" 
+                  badgeText={dog.badgeText || badge} 
+                  data={dog} 
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
 
   return (
     <section style={{ 
@@ -657,6 +770,7 @@ const AdSections = () => {
 };
 
 const AdoptionList = () => {
+  const { isMobile } = useMobile();
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -677,9 +791,32 @@ const AdoptionList = () => {
   }, []);
 
   return (
-    <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
+    <section style={
+      isMobile ? {
+        padding: '15px 10px 10px 10px',
+        backgroundColor: 'transparent',
+        borderRadius: 0,
+        border: 'none',
+        boxShadow: 'none'
+      } : {
+        padding: '24px',
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        border: '1px solid #cbd5e1',
+        boxShadow: 'var(--shadow)'
+      }
+    }>
       <SectionTitle title="전체 분양 리스트" sub="실시간 등록 정보" />
-      <div className="adoption-grid">
+      <div 
+        className={isMobile ? "" : "adoption-grid"}
+        style={
+          isMobile ? {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '12px'
+          } : undefined
+        }
+      >
         {loading ? (
            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>리스트를 불러오는 중입니다...</p>
         ) : dogs.length === 0 ? (

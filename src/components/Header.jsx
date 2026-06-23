@@ -159,7 +159,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  세상의 모든 강아지
+                  전국 파트너 매장 정보
                 </span>
                 <span style={{ 
                   fontSize: '0.8rem', 
@@ -168,7 +168,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  여기 다 있다. 다잇독.
+                  반려 생활의 든든한 동반자, 다잇독
                 </span>
               </div>
 
@@ -194,7 +194,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  허위매물 없는 클린분양
+                  투명한 매장 검색 및 홍보 제휴
                 </span>
                 <span style={{ 
                   fontSize: '0.8rem', 
@@ -203,7 +203,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  다잇독이 만들어갑니다.
+                  클린 펫샵 파트너를 소개합니다.
                 </span>
               </div>
             </div>

@@ -226,10 +226,10 @@ const PartnerBanner = () => {
               올바른 반려문화의 시작
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 강아지 분양 홍보를 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'순수 마케팅 플랫폼'</strong>입니다.
+              다잇독은 반려동물 매장 홍보 및 정보를 제공하는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'순수 정보 제공 마케팅 플랫폼'</strong>입니다.
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 동물보호법을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>강아지 분양대금 결제는 일절 이루어지지 않습니다.</strong>
+              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>반려동물 분양대금이나 개체 결제는 일절 이루어지지 않습니다.</strong>
             </p>
             <p style={{ margin: '4px 0' }}>
               다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'브랜드 광고 등록 및 상위 노출 광고 상품 결제'용 B2B 무형 서비스</strong>입니다.

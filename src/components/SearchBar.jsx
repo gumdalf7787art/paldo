@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BREEDS, REGIONS, GENDERS, PRICES } from '../utils/constants';
 import { useMobile } from '../context/MobileContext';
@@ -14,6 +14,18 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
   // 모바일 바텀 시트 상태 변수
   const [isBreedSheetOpen, setIsBreedSheetOpen] = useState(false);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+
+  // 바텀 시트가 열려있을 때 뒷배경 스크롤 방지
+  useEffect(() => {
+    if (isMobile && (isBreedSheetOpen || isFilterSheetOpen)) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isBreedSheetOpen, isFilterSheetOpen, isMobile]);
 
   const handleSearch = () => {
     const breed = hideBreed ? defaultBreed : (selectedBreed || '전체');

@@ -80,7 +80,7 @@ const LatestCommunityWidget = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: '20px' }}>
+      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: isMobile ? '-36px' : '20px' }}>
         불러오는 중...
       </div>
     );
@@ -96,7 +96,7 @@ const LatestCommunityWidget = () => {
       borderRadius: '12px',
       border: '1px solid #e2e8f0',
       padding: isMobile ? '12px 14px' : '20px',
-      marginTop: isMobile ? '-6px' : '15px',
+      marginTop: isMobile ? '-36px' : '15px',
       marginBottom: isMobile ? '6px' : '15px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
     }}>
@@ -291,9 +291,7 @@ const Home = () => {
         </div>
         
         {/* 6. 커뮤니티 최신 이야기 (검색 섹션 아래로 이동) */}
-        <div>
-          <LatestCommunityWidget />
-        </div>
+        <LatestCommunityWidget />
         
         {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
         <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>

@@ -229,7 +229,7 @@ const PartnerBanner = () => {
               다잇독은 반려동물 매장의 효율적인 정보 관리와 디지털 전환을 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'B2B 매장 통합 관리(SaaS) 플랫폼'</strong>입니다.
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>반려동물 분양대금이나 개체 결제 등 커머스 결제는 일절 지원하지 않습니다.</strong>
+              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>플랫폼 내 상품 거래 및 소비자 대상 결제 기능은 제공하지 않습니다.</strong>
             </p>
             <p style={{ margin: '4px 0' }}>
               다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'매장 관리 ERP 솔루션 사용료 및 프리미엄 파트너스 멤버십 구독료' 결제용 무형 소프트웨어 서비스</strong>입니다.

@@ -77,7 +77,7 @@ const DetailPage = () => {
     reason: '',
     details: ''
   });
-  const reportReasons = ['허위매물', '내용이 다름', '추가요금', '분양완료', '기타입력'];
+  const reportReasons = ['허위매물', '내용이 다름', '추가요금', '완료', '기타입력'];
 
   // 리뷰 폼 state 추가
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -270,7 +270,7 @@ const DetailPage = () => {
     }
 
     if (currentUser.id === dog?.seller_id) {
-      alert('본인의 분양글에는 상담할 수 없습니다.');
+      alert('본인의 등록글에는 상담할 수 없습니다.');
       return;
     }
 
@@ -451,7 +451,7 @@ const DetailPage = () => {
         
         {!isMobile && (
           <div style={{ padding: '20px 0', fontSize: '0.9rem', color: 'var(--muted-text)' }}>
-             홈 &gt; 강아지 분양 &gt; <b>{dog.breed}</b>
+             홈 &gt; 반려견 정보 &gt; <b>{dog.breed}</b>
           </div>
         )}
 
@@ -475,7 +475,7 @@ const DetailPage = () => {
                 fontWeight: 'bold',
                 backdropFilter: 'blur(4px)'
               }}>
-                {dog.status === 'available' ? '🔥 분양중' : '🎉 분양완료'}
+                {dog.status === 'available' ? '🔥 등록됨' : '🎉 완료'}
               </div>
             </div>
 
@@ -567,7 +567,7 @@ const DetailPage = () => {
                   <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{dog.vaccine || '미등록'}</div>
                 </div>
                 <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>분양 지역</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>등록 지역</div>
                   <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>{dog.region}</div>
                 </div>
               </div>
@@ -576,7 +576,7 @@ const DetailPage = () => {
             {/* 판매 스토어 정보 */}
             {sellerInfo && (
               <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#1e293b' }}>🏪 안심 분양 매장 정보</h3>
+                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#1e293b' }}>🏪 안심 파트너 매장 정보</h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '15px' }}>
                   <div style={{ 
                     width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', 
@@ -589,7 +589,7 @@ const DetailPage = () => {
                       {sellerInfo.business_name || sellerInfo.nickname || '인증 스토어'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
-                      현재 분양 중 {activeDogCount}건 &nbsp;|&nbsp; 완료 건수 {sellerInfo.completed_adoption_count || 0}건
+                      현재 등록 {activeDogCount}건 &nbsp;|&nbsp; 완료 건수 {sellerInfo.completed_adoption_count || 0}건
                     </div>
                   </div>
                 </div>
@@ -619,7 +619,7 @@ const DetailPage = () => {
                     cursor: 'pointer', marginTop: '15px'
                   }}
                 >
-                  🏪 이 매장의 분양글 전체 보기
+                  🏪 이 매장의 등록글 전체 보기
                 </button>
               </div>
             )}
@@ -628,7 +628,7 @@ const DetailPage = () => {
             <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '12px', color: '#1e293b' }}>📄 상세 설명</h3>
               <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.98rem', lineHeight: '1.6', margin: 0 }}>
-                {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
 
               {dog.video_url && (
@@ -703,7 +703,7 @@ const DetailPage = () => {
                       fontSize: '0.82rem', fontWeight: '700', cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    {hasReviewedThisDog ? '⭐ 리뷰 작성 완료' : (showReviewForm ? '리뷰 폼 접기' : '⭐ 방문/분양 리뷰 남기기')}
+                    {hasReviewedThisDog ? '⭐ 리뷰 작성 완료' : (showReviewForm ? '리뷰 폼 접기' : '⭐ 매장 방문/상담 리뷰 남기기')}
                   </button>
                   <button 
                     onClick={() => setShowReportModal(true)}
@@ -761,7 +761,7 @@ const DetailPage = () => {
               <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
                 <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
                 <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', fontSize: '1.02rem', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
-                  {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                  {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
                 </p>
                 
                 {dog.video_url && (
@@ -845,7 +845,7 @@ const DetailPage = () => {
                 </div>
                 <div style={{ fontSize: '0.85rem', marginBottom: '15px' }}>
                   <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 10px', borderRadius: '15px', fontWeight: 'bold' }}>
-                    현재 분양중 {activeDogCount} / 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
+                    현재 등록 {activeDogCount} / 완료 {sellerInfo?.completed_adoption_count || 0}
                   </span>
                 </div>
 
@@ -856,7 +856,7 @@ const DetailPage = () => {
                     <span style={{ fontWeight: '500' }}>{new Date(dog.created_at).toLocaleDateString()}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--muted-text)' }}>분양지역</span>
+                    <span style={{ color: 'var(--muted-text)' }}>등록지역</span>
                     <span>{dog.region}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>

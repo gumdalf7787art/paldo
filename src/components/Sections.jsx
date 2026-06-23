@@ -916,7 +916,7 @@ const AdSections = () => {
         
         // 가져온 전체 광고를 3등분하여 안심, 인기, 스페셜 구역에 무작위 배치합니다.
         // 현재 fetchAdsAndFill 내부에서 shuffleArray가 동작하므로 이미 섞여 있습니다.
-        setSafeDogs(ads.slice(0, 20).map(d => ({...d, badgeText: '안심'})));
+        setSafeDogs(ads.slice(0, 20).map(d => ({...d, badgeText: '추천'})));
         setPopularDogs(ads.slice(20, 40).map(d => ({...d, badgeText: '인기'})));
         setSpecialDogs(ads.slice(40, 60).map(d => ({...d, badgeText: '스페셜'})));
       } catch (err) {
@@ -933,7 +933,7 @@ const AdSections = () => {
 
   return (
     <>
-      <AdSectionItem title="🛡️ 안심 파트너 매물" sub="다잇독 안심 회원 매장이 등록한 신뢰할 수 있는 매물" dogs={safeDogs} badge="안심" loading={loading} />
+      <AdSectionItem title="🛡️ 추천 파트너 정보" sub="다잇독 추천 회원 매장이 등록한 신뢰할 수 있는 정보" dogs={safeDogs} badge="추천" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_a} 

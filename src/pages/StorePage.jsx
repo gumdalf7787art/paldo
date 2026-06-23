@@ -164,15 +164,15 @@ const StorePage = () => {
           </div>
         )}
 
-        {/* 4. 스토어 전체 분양 게시물 */}
+        {/* 4. 스토어 전체 등록 게시물 */}
         <div className="fade-in" style={{ marginTop: '50px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>분양중인 아이들</span>
-            <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 12px', borderRadius: '20px', fontSize: '0.9rem' }}>분양중 {storeDogs.length} / 누적 분양완료 {storeInfo.completed_adoption_count || 0}</span>
+            <span>등록된 아이들</span>
+            <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '4px 12px', borderRadius: '20px', fontSize: '0.9rem' }}>등록 {storeDogs.length} / 완료 {storeInfo.completed_adoption_count || 0}</span>
           </h2>
 
           {storeDogs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '100px 0', color: '#aaa', fontSize: '1.1rem' }}>이 스토어에 등록된 강아지가 없습니다.</div>
+            <div style={{ textAlign: 'center', padding: '100px 0', color: '#aaa', fontSize: '1.1rem' }}>이 스토어에 등록된 반려견 정보가 없습니다.</div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '30px' }}>
                {storeDogs.map(dog => (

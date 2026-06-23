@@ -179,13 +179,7 @@ const MyPage = () => {
     }
   }, [location.state, chatRooms, navigate, location.pathname, activeTab]);
 
-  useEffect(() => {
-    if (activeTab === 'chats' && !selectedRoom && chatRooms.length > 0) {
-      if (!location.state?.openRoomId) {
-        setSelectedRoom(chatRooms[0]);
-      }
-    }
-  }, [activeTab, selectedRoom, chatRooms, location.state]);
+
 
   useEffect(() => {
     if (newPassword && confirmPassword) {
@@ -2313,6 +2307,7 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
 };
 
 const ChatWindow = ({ room, userId, onClose }) => {
+  const { isMobile } = useMobile();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const scrollRef = useRef();
@@ -2384,21 +2379,44 @@ const ChatWindow = ({ room, userId, onClose }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <div style={{ ...chatHeaderStyle }}>
-        <div><div style={{ fontWeight: '800' }}>{chatTitle} 상담</div></div>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClose();
-          }}
-          style={{
-            background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer',
-            padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}
-        >
-          &times;
-        </button>
+      <div style={{ ...chatHeaderStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '10px 15px' : '20px' }}>
+        {isMobile ? (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
+            style={{
+              background: 'none', border: 'none', color: 'white', fontSize: '0.95rem', cursor: 'pointer',
+              padding: '8px 12px 8px 0', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'bold'
+            }}
+          >
+            ← 목록
+          </button>
+        ) : (
+          <div style={{ width: '40px' }}></div>
+        )}
+        <div style={{ fontWeight: '800', fontSize: isMobile ? '1rem' : '1.1rem', textAlign: 'center', flex: 1 }}>
+          {chatTitle} 상담
+        </div>
+        {!isMobile ? (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
+            style={{
+              background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer',
+              padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            &times;
+          </button>
+        ) : (
+          <div style={{ width: '40px' }}></div>
+        )}
       </div>
       <div ref={scrollRef} style={messageAreaStyle}>
         {messages.map((msg, i) => {

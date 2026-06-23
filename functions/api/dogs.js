@@ -57,6 +57,85 @@ export async function onRequestGet(context) {
 
   // 1. 단일 매물 상세 조회
   if (id) {
+    if (id.startsWith('dummy-store-')) {
+      const parts = id.split('-dog-');
+      const seller_id = parts[0];
+      const dogIndex = parseInt(parts[1] || '1', 10) - 1;
+      
+      const storeNicknames = {
+        'dummy-store-1': '도그하우스 청담본점',
+        'dummy-store-2': '퍼피랜드 마포점',
+        'dummy-store-3': '댕댕이 하우스 송도',
+        'dummy-store-4': '해피퍼피 부산센텀',
+        'dummy-store-5': '조이펫 분당수지점',
+        'dummy-store-6': '골든퍼피 일산점',
+        'dummy-store-7': '스위트하우스 광주점',
+        'dummy-store-8': '엔젤퍼피 대구수성점'
+      };
+      const sName = storeNicknames[seller_id] || '파트너 매장';
+      const dogList = [
+        {
+          id: `${seller_id}-dog-1`,
+          breed: '말티프',
+          nickname: '코코',
+          birthday: '2026-03-15',
+          gender: '여아',
+          age: '2.5개월',
+          vaccine: '1차 접종 완료',
+          neutered: 0,
+          description: `${sName}에서 철저한 건강 관리를 받은 눈망울이 예쁜 말티프 공주님입니다.`,
+          images: JSON.stringify(['https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400']),
+          image_url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400',
+          additional_images: [],
+          status: 'available',
+          seller_id: seller_id,
+          created_at: '2026-06-01T10:00:00Z',
+          seller_nickname: sName,
+          seller_business_name: sName
+        },
+        {
+          id: `${seller_id}-dog-2`,
+          breed: '포메라니안',
+          nickname: '모카',
+          birthday: '2026-03-20',
+          gender: '남아',
+          age: '2개월',
+          vaccine: '1차 접종 완료',
+          neutered: 0,
+          description: `풍성한 모량과 애교 가득한 성격을 지닌 ${sName} 추천 꼬마 포메라니안입니다.`,
+          images: JSON.stringify(['https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=400']),
+          image_url: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=400',
+          additional_images: [],
+          status: 'available',
+          seller_id: seller_id,
+          created_at: '2026-06-02T11:00:00Z',
+          seller_nickname: sName,
+          seller_business_name: sName
+        },
+        {
+          id: `${seller_id}-dog-3`,
+          breed: '토이푸들',
+          nickname: '초코',
+          birthday: '2026-03-01',
+          gender: '남아',
+          age: '3개월',
+          vaccine: '2차 접종 완료',
+          neutered: 0,
+          description: `사교성이 좋고 털 빠짐이 없어 가정에서 키우기 아주 이상적인 스마트 토이푸들입니다.`,
+          images: JSON.stringify(['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400']),
+          image_url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400',
+          additional_images: [],
+          status: 'available',
+          seller_id: seller_id,
+          created_at: '2026-06-03T12:00:00Z',
+          seller_nickname: sName,
+          seller_business_name: sName
+        }
+      ];
+      const selectedDog = dogList[dogIndex] || dogList[0];
+      return createResponse(selectedDog);
+    }
+
     try {
       const dog = await env.DB.prepare(`
         SELECT d.*, p.nickname AS seller_nickname, b.business_name AS seller_business_name
@@ -102,6 +181,81 @@ export async function onRequestGet(context) {
   const seller_id = url.searchParams.get('seller_id');
   const exclude_id = url.searchParams.get('exclude_id');
   const limit = url.searchParams.get('limit');
+
+  if (seller_id && seller_id.startsWith('dummy-store-')) {
+    const storeNicknames = {
+      'dummy-store-1': '도그하우스 청담본점',
+      'dummy-store-2': '퍼피랜드 마포점',
+      'dummy-store-3': '댕댕이 하우스 송도',
+      'dummy-store-4': '해피퍼피 부산센텀',
+      'dummy-store-5': '조이펫 분당수지점',
+      'dummy-store-6': '골든퍼피 일산점',
+      'dummy-store-7': '스위트하우스 광주점',
+      'dummy-store-8': '엔젤퍼피 대구수성점'
+    };
+    const sName = storeNicknames[seller_id] || '파트너 매장';
+    
+    const dummyDogs = [
+      {
+        id: `${seller_id}-dog-1`,
+        breed: '말티프',
+        nickname: '코코',
+        birthday: '2026-03-15',
+        gender: '여아',
+        age: '2.5개월',
+        vaccine: '1차 접종 완료',
+        neutered: 0,
+        description: `${sName}에서 철저한 건강 관리를 받은 눈망울이 예쁜 말티프 공주님입니다.`,
+        images: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400'],
+        image_url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400',
+        additional_images: [],
+        status: 'available',
+        seller_id: seller_id,
+        created_at: '2026-06-01T10:00:00Z',
+        seller_nickname: sName,
+        seller_business_name: sName
+      },
+      {
+        id: `${seller_id}-dog-2`,
+        breed: '포메라니안',
+        nickname: '모카',
+        birthday: '2026-03-20',
+        gender: '남아',
+        age: '2개월',
+        vaccine: '1차 접종 완료',
+        neutered: 0,
+        description: `풍성한 모량과 애교 가득한 성격을 지닌 ${sName} 추천 꼬마 포메라니안입니다.`,
+        images: ['https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=400'],
+        image_url: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=400',
+        additional_images: [],
+        status: 'available',
+        seller_id: seller_id,
+        created_at: '2026-06-02T11:00:00Z',
+        seller_nickname: sName,
+        seller_business_name: sName
+      },
+      {
+        id: `${seller_id}-dog-3`,
+        breed: '토이푸들',
+        nickname: '초코',
+        birthday: '2026-03-01',
+        gender: '남아',
+        age: '3개월',
+        vaccine: '2차 접종 완료',
+        neutered: 0,
+        description: `사교성이 좋고 털 빠짐이 없어 가정에서 키우기 아주 이상적인 스마트 토이푸들입니다.`,
+        images: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400'],
+        image_url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400',
+        additional_images: [],
+        status: 'available',
+        seller_id: seller_id,
+        created_at: '2026-06-03T12:00:00Z',
+        seller_nickname: sName,
+        seller_business_name: sName
+      }
+    ];
+    return createResponse(dummyDogs);
+  }
 
   try {
     let sql = `

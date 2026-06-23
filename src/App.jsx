@@ -214,7 +214,7 @@ const PartnerBanner = () => {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🤝 다잇독 파트너 사업주(펫샵/켄넬) 모집 안내
+            🤝 다잇독 파트너스 매장 관리 솔루션(SaaS) 안내
           </h3>
           <div style={{
             fontSize: isMobile ? '0.85rem' : '1rem',
@@ -226,16 +226,16 @@ const PartnerBanner = () => {
               올바른 반려문화의 시작
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 반려동물 매장 홍보 및 정보를 제공하는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'순수 정보 제공 마케팅 플랫폼'</strong>입니다.
+              다잇독은 반려동물 매장의 효율적인 정보 관리와 디지털 전환을 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'B2B 매장 통합 관리(SaaS) 플랫폼'</strong>입니다.
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>반려동물 분양대금이나 개체 결제는 일절 이루어지지 않습니다.</strong>
+              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>반려동물 분양대금이나 개체 결제 등 커머스 결제는 일절 지원하지 않습니다.</strong>
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'브랜드 광고 등록 및 상위 노출 광고 상품 결제'용 B2B 무형 서비스</strong>입니다.
+              다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'매장 관리 ERP 솔루션 사용료 및 프리미엄 파트너스 멤버십 구독료' 결제용 무형 소프트웨어 서비스</strong>입니다.
             </p>
             <p style={{ margin: '8px 0 0 0', fontWeight: '700', color: '#00796B' }}>
-              안심하고 광고 효과를 누려보세요!
+              체계적이고 편리한 매장 관리 솔루션을 경험해보세요!
             </p>
           </div>
         </div>

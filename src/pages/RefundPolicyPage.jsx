@@ -39,7 +39,7 @@ const RefundPolicyPage = () => {
       {/* 안내 문구 */}
       <div style={{ backgroundColor: '#f9f9fb', borderLeft: '4px solid var(--primary)', padding: '20px', borderRadius: '0 12px 12px 0', marginBottom: '40px' }}>
         <p style={{ margin: 0, fontSize: '0.95rem', color: '#555', lineHeight: '1.6' }}>
-          본 약관은 주식회사 블루프라임이 운영하는 반려동물 분양 매장 정보 제공 솔루션 플랫폼 <strong>'다잇독(DAITDOG)'</strong>에서 제공하는 서비스 및 결제, 환불에 관한 조건과 절차를 규정합니다. 안전하고 신뢰할 수 있는 플랫폼 이용 서비스를 위해 이용 전에 반드시 숙지해 주시기 바랍니다.
+          본 약관은 주식회사 블루프라임이 운영하는 반려동물 매장 정보 제공 및 관리 솔루션 플랫폼 <strong>'다잇독(DAITDOG)'</strong>에서 제공하는 서비스 및 결제, 환불에 관한 조건과 절차를 규정합니다. 안전하고 신뢰할 수 있는 플랫폼 이용 서비스를 위해 이용 전에 반드시 숙지해 주시기 바랍니다.
         </p>
       </div>
 
@@ -56,15 +56,15 @@ const RefundPolicyPage = () => {
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>제1조 (목적)</h3>
               <p style={{ margin: 0, fontSize: '0.9rem', color: '#666', lineHeight: '1.6' }}>
-                본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 분양 매장 정보 제공 솔루션 플랫폼 '다잇독(DAITDOG)'(이하 '플랫폼')에서 제공하는 사업자용 유료 서비스(비즈니스 멤버십 및 플랫폼 서비스 이용권) 결제 및 환불에 관한 조건과 절차를 규정함을 목적으로 합니다.
+                본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 매장 정보 및 관리 솔루션 플랫폼 '다잇독(DAITDOG)'(이하 '플랫폼')에서 제공하는 사업자용 유료 서비스(비즈니스 멤버십 및 플랫폼 서비스 이용권) 결제 및 환불에 관한 조건과 절차를 규정함을 목적으로 합니다.
               </p>
             </div>
 
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>제2조 (비즈니스 멤버십 및 서비스 이용권의 정의)</h3>
               <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem', color: '#666', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <li><strong>[프리미엄 이용 서비스]</strong> 입점 매장(사업자)은 플랫폼 내 효율적인 매장 관리 및 홍보 효과를 높이기 위해 회사가 제공하는 추가 기능 이용 서비스를 기간제로 구매하여 사용할 수 있습니다.</li>
-                <li><strong>[정기 멤버십 서비스]</strong> 회사는 입점 매장의 편리한 매장 관리와 플랫폼 기능(게시글 등록 한도 증대 등)을 지원하기 위해 등급별 비즈니스 멤버십 서비스를 운영합니다. 본 서비스는 매월 자동으로 결제가 갱신되는 정기 결제형 서비스입니다.</li>
+                <li><strong>[프리미엄 이용 서비스]</strong> 입점 매장(사업자)은 플랫폼 내 효율적인 매장 관리 및 맞춤형 스토어 기능을 적용하기 위해 회사가 제공하는 추가 기능 이용 서비스를 기간제로 구매하여 사용할 수 있습니다.</li>
+                <li><strong>[정기 멤버십 서비스]</strong> 회사는 입점 매장의 편리한 매장 관리와 플랫폼 기능(매장 소식 및 정보 관리 한도 증대 등)을 지원하기 위해 등급별 비즈니스 멤버십(SaaS) 서비스를 운영합니다. 본 서비스는 매월 자동으로 결제가 갱신되는 정기 결제형 서비스입니다.</li>
               </ul>
             </div>
 

@@ -984,7 +984,7 @@ const DetailPage = () => {
 
         {/* 유사한 댕댕이 추천 섹션 */}
         {recommendDogs.length > 0 && (
-          <div style={{ marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '30px' }}>
+          <div style={{ marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '30px', paddingLeft: isMobile ? '15px' : '0', paddingRight: isMobile ? '15px' : '0' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               🐾 이 아이와 비슷한 다른 댕댕이들
             </h3>

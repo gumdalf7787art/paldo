@@ -70,17 +70,17 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
 
   const mobileBtnStyle = {
     flex: 1,
-    height: '42px',
+    height: '38px',
     borderRadius: '8px',
     backgroundColor: '#ffffff',
-    border: '1px solid #cbd5e1',
-    color: 'var(--body-text)',
-    fontSize: '0.85rem',
+    border: '1px solid #bfdbfe',
+    color: '#1e3a8a',
+    fontSize: '0.82rem',
     fontWeight: '700',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    boxShadow: '0 2px 6px rgba(30, 58, 138, 0.05)',
     cursor: 'pointer',
     transition: 'all 0.2s',
   };
@@ -88,9 +88,18 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
   if (isMobile) {
     return (
       <>
-        {/* 📱 모바일 최소화된 버튼 검색 섹션 */}
-        <section className="fade-in search-bar-section" style={{ padding: '4px 0', width: '100%' }}>
-          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+        {/* 📱 모바일 최소화된 버튼 검색 섹션 - 하나의 옅은 푸른색 컨테이너 안에 2개의 버튼 배치 */}
+        <section className="fade-in search-bar-section" style={{ padding: '0px', width: '100%' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            width: '100%',
+            backgroundColor: '#e6f0fa',
+            border: '1px solid #cce0f5',
+            borderRadius: '10px',
+            padding: '6px',
+            boxSizing: 'border-box'
+          }}>
             {!hideBreed && (
               <button 
                 onClick={() => setIsBreedSheetOpen(true)}

@@ -167,71 +167,27 @@ const Card = ({ data, badgeText }) => {
           </button>
         </div>
 
-        {/* 셋째줄: 가격 및 판매처 */}
+        {/* 셋째줄: 판매처 및 기본정보 */}
         <div style={{ 
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginTop: '2px',
-          lineHeight: '1.2'
+          lineHeight: '1.2',
+          fontSize: '0.75rem',
+          color: '#888'
         }}>
-          {/* 가격 */}
-          <div style={{ 
-            color: 'var(--primary)', 
-            fontWeight: '800', 
-            fontSize: '1.05rem', 
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '4px'
-          }}>
-            {(() => {
-              const mainPrice = data.price;
-              const origPrice = data.original_price;
-
-              const formatP = (p) => {
-                if (p === 0 || p === '0' || p === '무료분양' || p === '0만원') return '무료분양';
-                if (typeof p === 'number') return `${p}만원`;
-                if (typeof p === 'string' && !p.includes('만원') && p !== '무료분양') return `${p}만원`;
-                return p;
-              };
-
-              const formattedMain = formatP(mainPrice);
-
-              if (origPrice && mainPrice && origPrice > mainPrice && mainPrice !== 0 && mainPrice !== '무료분양') {
-                const discountRate = Math.round(((origPrice - mainPrice) / origPrice) * 100);
-                return (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', fontSize: '0.95rem' }}>
-                    <span style={{ fontSize: '1.05rem', fontWeight: '800' }}>{formattedMain}</span>
-                    <span style={{ fontSize: '0.75rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
-                    <span style={{ fontSize: '0.75rem', color: '#FF4757', fontWeight: '700' }}>{discountRate}%</span>
-                    {!!data.is_negotiable && <span style={{ fontSize: '0.6rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '0px 4px', borderRadius: '3px' }}>협의</span>}
-                  </div>
-                );
-              }
-
-              return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span>{formattedMain}</span>
-                  {!!data.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
-                    <span style={{ fontSize: '0.6rem', color: '#7ed321', backgroundColor: '#f0f9eb', padding: '0px 4px', borderRadius: '3px' }}>협의</span>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* 판매처 이름 */}
           <span style={{
-            fontSize: '0.75rem',
-            color: '#888',
-            maxWidth: '45%',
+            maxWidth: '60%',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             fontWeight: '500'
           }}>
-            {data.seller_business_name || data.seller_nickname || '개인분양'}
+            🏢 {data.seller_business_name || data.seller_nickname || '파트너 매장'}
+          </span>
+          <span style={{ fontWeight: '500' }}>
+            {data.gender === '남아' ? '♂️ 남' : '♀️ 여'} · {data.age || '나이 미상'}
           </span>
         </div>
       </div>

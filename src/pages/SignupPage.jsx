@@ -3,13 +3,63 @@ import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { api } from '../lib/api';
 
+// --- 이미지 리사이징 & 압축 헬퍼 함수 ---
+const resizeImageToBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.75) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 const SignupPage = () => {
+  const [tab, setTab] = useState('buyer'); // 'buyer' or 'seller'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
   
+  // 파트너 사업자 입력 항목
+  const [bizName, setBizName] = useState('');
+  const [bizNo, setBizNo] = useState('');
+  const [animalNo, setAnimalNo] = useState('');
+  const [bizAddress, setBizAddress] = useState('');
+  const [bizFile, setBizFile] = useState(null);
+  const [bizFileBase64, setBizFileBase64] = useState('');
+  const [bizFileName, setBizFileName] = useState('');
+
   const [emailStatus, setEmailStatus] = useState(''); // '', 'invalid', 'valid', 'duplicate'
   const [passwordMatch, setPasswordMatch] = useState(null); // null, true, false
   const [isTermsOpen, setIsTermsOpen] = useState(false);
@@ -25,7 +75,6 @@ const SignupPage = () => {
       setEmailStatus('invalid');
     } else {
       setEmailStatus('valid');
-      // 실제 프로젝트에서는 여기서 수강 중복 체크 API를 호출할 수 있습니다.
     }
   }, [email]);
 
@@ -77,6 +126,36 @@ const SignupPage = () => {
     });
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setBizFile(file);
+    setBizFileName(file.name);
+    
+    if (file.type.startsWith('image/')) {
+      try {
+        const base64 = await resizeImageToBase64(file, 1200, 1200, 0.75);
+        setBizFileBase64(base64);
+      } catch (err) {
+        console.error('이미지 압축 실패:', err);
+        const base64 = await fileToBase64(file);
+        setBizFileBase64(base64);
+      }
+    } else {
+      const base64 = await fileToBase64(file);
+      setBizFileBase64(base64);
+    }
+  };
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     if (!isCertified) {
@@ -86,6 +165,17 @@ const SignupPage = () => {
     if (password !== confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
+    }
+    
+    if (tab === 'seller') {
+      if (!bizName.trim() || !bizNo.trim() || !animalNo.trim() || !bizAddress.trim()) {
+        alert('파트너 사업자 정보를 모두 입력해 주세요.');
+        return;
+      }
+      if (!bizFile) {
+        alert('사업자등록증 파일을 반드시 첨부해 주세요.');
+        return;
+      }
     }
     
     setLoading(true);
@@ -103,8 +193,31 @@ const SignupPage = () => {
       }
 
       if (userData) {
-        alert('회원가입이 완료되었습니다!');
-        navigate('/login');
+        if (tab === 'seller') {
+          // 세션 토큰이 확보된 상태에서 즉시 사업자 인증 신청을 동시에 완료
+          const { error: applyError } = await api.business.apply({
+            business_name: bizName,
+            representative_name: certifiedInfo?.name || nickname,
+            phone: certifiedInfo?.phone || '',
+            address: bizAddress,
+            biz_no: bizNo,
+            animal_sale_no: animalNo,
+            file_base64: bizFileBase64,
+            file_name: bizFileName,
+          });
+
+          if (applyError) {
+            alert('회원가입은 완료되었으나, 사업자 인증 신청 중 오류가 발생했습니다: ' + applyError);
+            navigate('/mypage');
+            return;
+          }
+
+          alert('🎉 회원가입 및 사업자 등록 신청이 함께 접수되었습니다! 최대 24시간 내 심사가 완료됩니다.');
+          navigate('/mypage');
+        } else {
+          alert('회원가입이 완료되었습니다!');
+          navigate('/login');
+        }
       }
     } catch (error) {
       alert(error.message);
@@ -164,9 +277,51 @@ const SignupPage = () => {
         </div>
 
         <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--secondary)' }}>새로운 가족 찾기의 시작</h2>
-        <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '35px' }}>
+        <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '25px' }}>
           아직 가족을 찾지 못한 아이들이 기다리고 있어요
         </p>
+
+        {/* 회원 가입 구분 탭 */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', backgroundColor: '#f5f5f5', padding: '6px', borderRadius: '14px' }}>
+          <button
+            type="button"
+            onClick={() => setTab('buyer')}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '10px',
+              border: 'none',
+              backgroundColor: tab === 'buyer' ? 'white' : 'transparent',
+              color: tab === 'buyer' ? 'var(--primary-dark)' : '#777',
+              fontWeight: '800',
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              boxShadow: tab === 'buyer' ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            일반 구매자 가입
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('seller')}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '10px',
+              border: 'none',
+              backgroundColor: tab === 'seller' ? 'white' : 'transparent',
+              color: tab === 'seller' ? 'var(--primary-dark)' : '#777',
+              fontWeight: '800',
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              boxShadow: tab === 'seller' ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            파트너 사업자 가입
+          </button>
+        </div>
 
         <form onSubmit={handleSignup} style={{ display: 'grid', gap: '15px', textAlign: 'left', marginBottom: '30px' }}>
           <div>
@@ -264,6 +419,86 @@ const SignupPage = () => {
             </div>
           </div>
 
+          {/* 파트너 사업자 입력 영역 */}
+          {tab === 'seller' && (
+            <div className="fade-in" style={{
+              padding: '20px',
+              backgroundColor: '#fafafa',
+              borderRadius: '14px',
+              border: '1px solid #eee',
+              display: 'grid',
+              gap: '15px',
+              marginTop: '10px',
+              marginBottom: '10px'
+            }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--primary-dark)', margin: '0 0 5px 0' }}>Store Information (사업자 인증 정보)</h3>
+              
+              <div>
+                <label style={labelStyle}>상호명 (사업장 이름)</label>
+                <input
+                  type="text"
+                  placeholder="예: 다잇독 펫샵"
+                  style={inputStyle}
+                  value={bizName}
+                  onChange={e => setBizName(e.target.value)}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>사업자등록번호</label>
+                <input
+                  type="text"
+                  placeholder="10자리 숫자 입력 (- 제외)"
+                  style={inputStyle}
+                  value={bizNo}
+                  onChange={e => setBizNo(e.target.value.replace(/[^0-9]/g, ''))}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>동물판매업등록번호</label>
+                <input
+                  type="text"
+                  placeholder="동물판매업 등록번호 입력"
+                  style={inputStyle}
+                  value={animalNo}
+                  onChange={e => setAnimalNo(e.target.value)}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>매장 실 주소</label>
+                <input
+                  type="text"
+                  placeholder="매장의 실제 주소를 정확하게 입력해주세요."
+                  style={inputStyle}
+                  value={bizAddress}
+                  onChange={e => setBizAddress(e.target.value)}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>사업자등록증 또는 관련 증빙 서류 첨부</label>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleFileChange}
+                  required={tab === 'seller'}
+                  style={{ display: 'block', marginTop: '5px' }}
+                />
+                {bizFileName && (
+                  <p style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '5px', fontWeight: 'bold' }}>
+                    📎 첨부파일: {bizFileName}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div style={{ 
             marginTop: '10px', padding: '20px', backgroundColor: '#fcfcfc', 
             borderRadius: '12px', border: '1px solid #f0f0f0', display: 'grid', gap: '10px' 
@@ -313,7 +548,7 @@ const SignupPage = () => {
               fontWeight: '700', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(38, 166, 154, 0.3)',
               cursor: loading ? 'not-allowed' : 'pointer'
             }}>
-            {loading ? '처리 중...' : '가족이 되어주기 (회원가입)'}
+            {loading ? '처리 중...' : (tab === 'seller' ? '파트너사 가입 및 승인 신청하기' : '가족이 되어주기 (회원가입)')}
           </button>
         </form>
 

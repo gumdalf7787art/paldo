@@ -129,6 +129,128 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
 
 const timeoutPromise = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
+const StoreCard = ({ store }) => {
+  const navigate = useNavigate();
+  return (
+    <div 
+      onClick={() => navigate(`/store/${store.id}`)}
+      style={{
+        width: '100%',
+        height: '100%',
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#fff',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        transition: 'all 0.2s ease',
+        minWidth: 0
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 12px 20px rgba(0,0,0,0.06)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.05)';
+      }}
+    >
+      {/* 매장 배너/헤더 이미지 */}
+      <div style={{
+        width: '100%',
+        height: '100px',
+        backgroundImage: `url(${store.store_header_image || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=400'})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+        flexShrink: 0
+      }}>
+        {/* 프로필 이미지 (오버랩) */}
+        <div style={{
+          position: 'absolute',
+          bottom: '-16px',
+          left: '12px',
+          width: '44px',
+          height: '44px',
+          borderRadius: '50%',
+          border: '2px solid #fff',
+          backgroundImage: `url(${store.profile_image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=100'})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: '#eee',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
+        }} />
+      </div>
+      
+      {/* 매장 정보 텍스트 */}
+      <div style={{
+        padding: '24px 12px 12px 12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        minWidth: 0
+      }}>
+        <div style={{ minWidth: 0 }}>
+          <h3 style={{
+            fontSize: '0.88rem',
+            fontWeight: '800',
+            color: '#1e293b',
+            margin: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {store.nickname || '파트너 매장'}
+          </h3>
+          <p style={{
+            fontSize: '0.72rem',
+            color: '#64748b',
+            margin: '4px 0 0 0',
+            lineHeight: '1.3',
+            height: '2.6em',
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical'
+          }}>
+            {store.store_description || '전국 우수 반려동물 매장 정보 제공 및 관리 솔루션 파트너입니다.'}
+          </p>
+        </div>
+        
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderTop: '1px solid #f1f5f9',
+          paddingTop: '6px',
+          marginTop: '4px',
+          fontSize: '0.68rem',
+          color: 'var(--primary)',
+          flexShrink: 0
+        }}>
+          <span style={{ fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+            📍 {store.store_address ? store.store_address.split(' ')[0] + ' ' + (store.store_address.split(' ')[1] || '') : '지역 미지정'}
+          </span>
+          <span style={{
+            backgroundColor: '#eef2ff',
+            color: '#4f46e5',
+            padding: '1px 5px',
+            borderRadius: '4px',
+            fontWeight: 'bold',
+            flexShrink: 0
+          }}>
+            정보 보기 →
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HeroCarousel = ({ breedName }) => {
   const { isMobile } = useMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -139,14 +261,14 @@ const HeroCarousel = ({ breedName }) => {
   useEffect(() => {
     const loadHeroAds = async () => {
       try {
-        const data = await fetchAdsAndFill('main', 10, '추천', breedName);
+        const { data } = await api.store.getList();
         if (data && data.length > 0) {
           setAds(data);
         } else {
           setAds([]);
         }
       } catch (err) {
-        console.error('Failed to load main ads:', err);
+        console.error('Failed to load main stores:', err);
         setAds([]);
       }
     };
@@ -248,27 +370,16 @@ const HeroCarousel = ({ breedName }) => {
           }}
           className="mobile-scroll-container"
         >
-          {ads.map((dog, i) => (
+          {ads.map((store, i) => (
             <div 
-              key={`hero-slide-mobile-${dog.id}-${i}`}
+              key={`hero-slide-mobile-${store.id}-${i}`}
               style={{
                 flex: '0 0 calc(45% - 8px)',
-                scrollSnapAlign: 'start'
+                scrollSnapAlign: 'start',
+                height: '190px'
               }}
             >
-              <Card 
-                badgeText={dog.badgeText || '추천'} 
-                data={{
-                  ...dog,
-                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
-                  breed: dog.breed || '견종 미상',
-                  nickname: dog.nickname || '이름 없음',
-                  gender: dog.gender || '-',
-                  region: dog.region || '지역 미지정',
-                  age: calculateAge(dog.birthday, dog.age),
-                  price: dog.price
-                }}
-              />
+              <StoreCard store={store} />
             </div>
           ))}
         </div>
@@ -311,7 +422,7 @@ const HeroCarousel = ({ breedName }) => {
           borderBottom: '1px solid #f1f5f9',
           letterSpacing: '0.5px'
         }}>
-          PREMIUM
+          PREMIUM PARTNER
         </div>
         {/* 좌측 화살표 버튼 */}
         <button 
@@ -395,34 +506,20 @@ const HeroCarousel = ({ breedName }) => {
             transform: `translateX(calc(-${currentIndex} * (20% + 2px)))`
           }}
         >
-          {extendedAds.map((dog, i) => (
+          {extendedAds.map((store, i) => (
             <div 
-              key={`hero-slide-${dog.id}-${i}`}
+              key={`hero-slide-${store.id}-${i}`}
               style={{
                 flex: '0 0 calc(20% - 8px)',
-                height: '210px', /* Reduced from 250px */
+                height: '190px',
                 backgroundColor: 'white',
                 borderRadius: '12px',
                 transition: 'transform 0.2s ease',
-                display: 'flex'
+                display: 'flex',
+                minWidth: 0
               }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              <Card 
-                type="small" 
-                badgeText={dog.badgeText || '추천'} 
-                data={{
-                  ...dog,
-                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
-                  breed: dog.breed || '견종 미상',
-                  nickname: dog.nickname || '이름 없음',
-                  gender: dog.gender || '-',
-                  region: dog.region || '지역 미지정',
-                  age: calculateAge(dog.birthday, dog.age),
-                  price: dog.price
-                }}
-              />
+              <StoreCard store={store} />
             </div>
           ))}
         </div>

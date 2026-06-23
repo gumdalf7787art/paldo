@@ -249,6 +249,14 @@ export const api = {
 
   // 3. 상점 및 리뷰 (Store/Reviews)
   store: {
+    async getList() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/store?action=list`);
+        return { data: data || [], error: null };
+      } catch (err) {
+        return { data: [], error: err.message };
+      }
+    },
     async getProfile(sellerId) {
       try {
         const { data } = await request(`${BASE_URL}/api/store?seller_id=${sellerId}`);

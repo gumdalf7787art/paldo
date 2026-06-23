@@ -52,41 +52,7 @@ function renderVideoEmbed(videoUrl) {
   );
 }
 
-// 가격 표시 헬퍼
-function renderPrice(dog) {
-  const mainPrice = dog.price;
-  const origPrice = dog.original_price;
-  const formatP = (p) => {
-    if (p === 0 || p === '0' || p === '무료분양' || p === '0만원') return '무료분양';
-    if (typeof p === 'number') return p + '만원';
-    if (typeof p === 'string' && !p.includes('만원') && p !== '무료분양') return p + '만원';
-    return p;
-  };
-  const formattedMain = formatP(mainPrice);
-  if (origPrice && mainPrice && origPrice > mainPrice && mainPrice !== 0 && mainPrice !== '무료분양') {
-    const discountRate = Math.round(((origPrice - mainPrice) / origPrice) * 100);
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1rem', color: '#aaa', textDecoration: 'line-through', fontWeight: '500' }}>{formatP(origPrice)}</span>
-          <span style={{ fontSize: '1.1rem', color: '#FF4757', fontWeight: '800' }}>{discountRate}% 할인</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '2rem' }}>{formattedMain}</span>
-          {!!dog.is_negotiable && <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', fontWeight: 'bold' }}>협의가능</span>}
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      {formattedMain}
-      {!!dog.is_negotiable && mainPrice !== 0 && mainPrice !== '무료분양' && (
-        <span style={{ fontSize: '0.9rem', backgroundColor: '#eefbe7', color: '#7ed321', padding: '3px 10px', borderRadius: '15px', marginLeft: '10px', fontWeight: 'bold' }}>협의가능</span>
-      )}
-    </div>
-  );
-}
+
 
 const DetailPage = () => {
   const { isMobile } = useMobile();
@@ -557,9 +523,7 @@ const DetailPage = () => {
                 {dog.nickname}
               </h1>
 
-              <div style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
-                {renderPrice(dog)}
-              </div>
+
 
               <div style={{ display: 'flex', gap: '15px', fontSize: '0.78rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                 <span>관심 {engagement.likes}명</span>
@@ -884,9 +848,7 @@ const DetailPage = () => {
                     현재 분양중 {activeDogCount} / 누적 분양완료 {sellerInfo?.completed_adoption_count || 0}
                   </span>
                 </div>
-                <div style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', fontWeight: '800', marginBottom: '15px' }}>
-                  {renderPrice(dog)}
-                </div>
+
                 
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>

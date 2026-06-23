@@ -57,6 +57,16 @@ export async function onRequestGet(context) {
   const sellerId = url.searchParams.get('seller_id');
 
   if (!sellerId) {
+    if (action === 'list') {
+      try {
+        const { results: stores } = await env.DB.prepare(
+          'SELECT id, nickname, profile_image, store_header_image, store_description, store_address, store_contact FROM profiles WHERE role = "seller" ORDER BY created_at DESC LIMIT 10'
+        ).all();
+        return createResponse(stores);
+      } catch (err) {
+        return createResponse({ error: `매장 목록 조회 실패: ${err.message}` }, 500);
+      }
+    }
     return createResponse({ error: '판매자 ID는 필수입니다.' }, 400);
   }
 

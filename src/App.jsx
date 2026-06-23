@@ -277,12 +277,12 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ position: 'relative', zIndex: 10, marginBottom: '-42px' }}>
+        <div style={{ position: 'relative', zIndex: 10, marginBottom: '-48px' }}>
           <SearchBar />
         </div>
         
         {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
-        <div style={{ padding: '0', marginTop: '-15px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
+        <div style={{ padding: '0', marginTop: '-22px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
           <AdSections />
         </div>
 

@@ -55,10 +55,12 @@ const AnalyticsTracker = () => {
 
 
 // 메인 페이지 노출용 최신 커뮤니티 글 위젯 (소식 배지 제거, 폰트 상향)
+// 메인 페이지 노출용 최신 커뮤니티 글 위젯 (소식 배지 제거, 폰트 상향)
 const LatestCommunityWidget = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isMobile } = useMobile();
 
   useEffect(() => {
     const fetchLatestPosts = async () => {
@@ -76,11 +78,9 @@ const LatestCommunityWidget = () => {
     fetchLatestPosts();
   }, []);
 
-
-
   if (loading) {
     return (
-      <div style={{ padding: '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: '20px' }}>
+      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: '20px' }}>
         불러오는 중...
       </div>
     );
@@ -88,27 +88,29 @@ const LatestCommunityWidget = () => {
 
   if (posts.length === 0) return null;
 
+  const displayPosts = isMobile ? posts.slice(0, 3) : posts;
+
   return (
     <div style={{
       backgroundColor: '#ffffff',
       borderRadius: '12px',
       border: '1px solid #e2e8f0',
-      padding: '20px',
-      marginTop: '15px',
-      marginBottom: '15px',
+      padding: isMobile ? '12px 14px' : '20px',
+      marginTop: isMobile ? '8px' : '15px',
+      marginBottom: isMobile ? '8px' : '15px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--body-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '8px' : '15px' }}>
+        <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.25rem', fontWeight: 'bold', color: 'var(--body-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
           🐾 커뮤니티 최근 이야기
         </h3>
-        <Link to="/community" style={{ fontSize: '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
+        <Link to="/community" style={{ fontSize: isMobile ? '0.8rem' : '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
           전체보기 ➔
         </Link>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-        {posts.map((post, idx) => {
+        {displayPosts.map((post, idx) => {
           return (
             <div
               key={post.id}
@@ -117,8 +119,8 @@ const LatestCommunityWidget = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '12px 8px',
-                borderBottom: idx === posts.length - 1 ? 'none' : '1px solid #cbd5e1',
+                padding: isMobile ? '8px 4px' : '12px 8px',
+                borderBottom: idx === displayPosts.length - 1 ? 'none' : '1px solid #cbd5e1',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease',
                 borderRadius: '6px',
@@ -127,9 +129,9 @@ const LatestCommunityWidget = () => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', flex: 1, marginRight: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden', flex: 1, marginRight: '10px' }}>
                 <span style={{
-                  fontSize: '1.15rem',
+                  fontSize: isMobile ? '0.85rem' : '1.15rem',
                   color: '#2d3748',
                   fontWeight: post.category === 'notice' ? 'bold' : 'normal',
                   whiteSpace: 'nowrap',
@@ -140,12 +142,12 @@ const LatestCommunityWidget = () => {
                   {post.title}
                 </span>
                 {post.comment_count > 0 && (
-                  <span style={{ color: '#e53e3e', fontSize: '0.92rem', fontWeight: 'bold', flexShrink: 0 }}>
+                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.78rem' : '0.92rem', fontWeight: 'bold', flexShrink: 0 }}>
                     [{post.comment_count}]
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#718096', fontSize: '0.85rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#718096', fontSize: isMobile ? '0.75rem' : '0.85rem', flexShrink: 0 }}>
                 <span style={{ fontWeight: '500' }}>{post.nickname || '사용자'}</span>
               </div>
             </div>
@@ -277,12 +279,17 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '0px' : '12px' }}>
+        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '4px' : '12px' }}>
           <SearchBar />
         </div>
         
+        {/* 6. 커뮤니티 최신 이야기 (검색 섹션 아래로 이동) */}
+        <div>
+          <LatestCommunityWidget />
+        </div>
+        
         {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
-        <div style={{ padding: '0', marginTop: isMobile ? '-34px' : '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
+        <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
           <AdSections />
         </div>
 
@@ -294,11 +301,6 @@ const Home = () => {
         {/* 5. 일반 분양 리스트 (전체 분양 리스트) */}
         <div style={{ padding: '0', marginBottom: '15px' }}>
           <AdoptionList />
-        </div>
-
-        {/* 6. 커뮤니티 최신 이야기 */}
-        <div style={{ marginBottom: '15px' }}>
-          <LatestCommunityWidget />
         </div>
 
         {/* 7. 개별 추천 위젯 */}

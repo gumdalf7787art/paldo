@@ -282,8 +282,18 @@ export async function onRequestGet(context) {
     if (action === 'reviews') {
       return createResponse(dummy.reviews);
     }
+    const profileCopy = { ...dummy.profile };
+    if (profileCopy.store_additional_images) {
+      try {
+        profileCopy.store_additional_images = JSON.parse(profileCopy.store_additional_images);
+      } catch {
+        profileCopy.store_additional_images = [];
+      }
+    } else {
+      profileCopy.store_additional_images = [];
+    }
     return createResponse({
-      profile: dummy.profile,
+      profile: profileCopy,
       biz: dummy.biz,
       business: dummy.biz,
       active_count: 3,

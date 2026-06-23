@@ -158,6 +158,7 @@ const LatestCommunityWidget = () => {
 
 
 const PartnerBanner = () => {
+  const { isMobile } = useMobile();
   const [isVisible, setIsVisible] = useState(() => {
     return localStorage.getItem('daitdog_partner_banner_closed') !== 'true';
   });
@@ -172,9 +173,9 @@ const PartnerBanner = () => {
   return (
     <div style={{
       background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)',
-      borderRadius: '16px',
-      padding: '24px 30px',
-      marginBottom: '20px',
+      borderRadius: isMobile ? '12px' : '16px',
+      padding: isMobile ? '16px 20px' : '24px 30px',
+      marginBottom: isMobile ? '12px' : '20px',
       position: 'relative',
       boxShadow: '0 8px 30px rgba(38, 166, 154, 0.08)',
       border: '1px solid rgba(38, 166, 154, 0.15)',
@@ -194,12 +195,12 @@ const PartnerBanner = () => {
       }} />
 
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1, paddingRight: '40px' }}>
+        <div style={{ flex: 1, paddingRight: isMobile ? '24px' : '40px' }}>
           <h3 style={{
-            fontSize: '1.4rem',
+            fontSize: isMobile ? '1.05rem' : '1.4rem',
             fontWeight: '800',
             color: '#004D40',
-            marginBottom: '12px',
+            marginBottom: isMobile ? '8px' : '12px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
@@ -207,12 +208,12 @@ const PartnerBanner = () => {
             🤝 다잇독 파트너 사업주(펫샵/켄넬) 모집 안내
           </h3>
           <div style={{
-            fontSize: '1rem',
-            lineHeight: '1.7',
+            fontSize: isMobile ? '0.85rem' : '1rem',
+            lineHeight: '1.6',
             color: '#00695C',
             fontWeight: '500'
           }}>
-            <p style={{ fontWeight: '700', fontSize: '1.05rem', color: '#004D40', marginBottom: '8px' }}>
+            <p style={{ fontWeight: '700', fontSize: isMobile ? '0.9rem' : '1.05rem', color: '#004D40', marginBottom: '6px' }}>
               올바른 반려문화의 시작
             </p>
             <p style={{ margin: '4px 0' }}>
@@ -237,15 +238,15 @@ const PartnerBanner = () => {
             background: 'rgba(0, 0, 0, 0.05)',
             border: 'none',
             borderRadius: '50%',
-            width: '32px',
-            height: '32px',
+            width: isMobile ? '26px' : '32px',
+            height: isMobile ? '26px' : '32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             color: '#004D40',
             fontWeight: 'bold',
-            fontSize: '1.1rem',
+            fontSize: isMobile ? '0.9rem' : '1.1rem',
             transition: 'background-color 0.2s',
           }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'}
@@ -267,6 +268,9 @@ const Home = () => {
     // 📱 모바일 최적화 메인 페이지
     return (
       <main style={{ padding: '0 12px', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '40px', marginTop: '0px', paddingTop: '10px' }}>
+        {/* 모바일 메인 페이지 히어로 섹션 위에 파트너 모집 배너 추가 */}
+        <PartnerBanner />
+
         {/* 1. 가로형 배너 */}
         <div style={{ marginBottom: '15px' }}>
           <HeroCarousel />

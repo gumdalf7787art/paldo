@@ -157,6 +157,109 @@ const LatestCommunityWidget = () => {
 };
 
 
+const PartnerBanner = () => {
+  const [isVisible, setIsVisible] = useState(() => {
+    return localStorage.getItem('daitdog_partner_banner_closed') !== 'true';
+  });
+
+  if (!isVisible) return null;
+
+  const handleClose = () => {
+    localStorage.setItem('daitdog_partner_banner_closed', 'true');
+    setIsVisible(false);
+  };
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)',
+      borderRadius: '16px',
+      padding: '24px 30px',
+      marginBottom: '20px',
+      position: 'relative',
+      boxShadow: '0 8px 30px rgba(38, 166, 154, 0.08)',
+      border: '1px solid rgba(38, 166, 154, 0.15)',
+      overflow: 'hidden',
+      animation: 'fadeIn 0.6s ease forwards'
+    }}>
+      {/* 은은한 원형 데코레이션 배경 */}
+      <div style={{
+        position: 'absolute',
+        top: '-50px',
+        right: '-50px',
+        width: '180px',
+        height: '180px',
+        borderRadius: '50%',
+        background: 'rgba(255, 255, 255, 0.3)',
+        zIndex: 1
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, paddingRight: '40px' }}>
+          <h3 style={{
+            fontSize: '1.4rem',
+            fontWeight: '800',
+            color: '#004D40',
+            marginBottom: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            🤝 다잇독 파트너 사업주(펫샵/켄넬) 모집 안내
+          </h3>
+          <div style={{
+            fontSize: '1rem',
+            lineHeight: '1.7',
+            color: '#00695C',
+            fontWeight: '500'
+          }}>
+            <p style={{ fontWeight: '700', fontSize: '1.05rem', color: '#004D40', marginBottom: '8px' }}>
+              올바른 반려문화의 시작
+            </p>
+            <p style={{ margin: '4px 0' }}>
+              다잇독은 강아지 분양 홍보를 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'순수 마케팅 플랫폼'</strong>입니다.
+            </p>
+            <p style={{ margin: '4px 0' }}>
+              다잇독은 동물보호법을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>강아지 분양대금 결제는 일절 이루어지지 않습니다.</strong>
+            </p>
+            <p style={{ margin: '4px 0' }}>
+              다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'브랜드 광고 등록 및 상위 노출 광고 상품 결제'용 B2B 무형 서비스</strong>입니다.
+            </p>
+            <p style={{ margin: '8px 0 0 0', fontWeight: '700', color: '#00796B' }}>
+              안심하고 광고 효과를 누려보세요!
+            </p>
+          </div>
+        </div>
+
+        {/* 닫기 버튼 */}
+        <button
+          onClick={handleClose}
+          style={{
+            background: 'rgba(0, 0, 0, 0.05)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#004D40',
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'}
+          title="닫기"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 const Home = () => {
   const { isMobile } = useMobile();
 
@@ -205,6 +308,9 @@ const Home = () => {
   // 💻 PC버전 메인 페이지
   return (
     <main className="container" style={{ padding: '0 20px' }}>
+      {/* 메인 페이지 히어로 섹션 위에 파트너 모집 배너 추가 */}
+      <PartnerBanner />
+
       {/* 1. 최상단 가로형 대표 강아지 홍보 배너 배치 */}
       <HeroCarousel />
       

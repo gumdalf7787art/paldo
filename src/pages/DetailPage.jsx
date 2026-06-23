@@ -663,7 +663,7 @@ const DetailPage = () => {
             {/* 상세 설명 */}
             <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '12px', color: '#1e293b' }}>📄 상세 설명</h3>
-              <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.88rem', lineHeight: '1.6', margin: 0 }}>
+              <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.98rem', lineHeight: '1.6', margin: 0 }}>
                 {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
 
@@ -796,7 +796,7 @@ const DetailPage = () => {
               
               <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
                 <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
-                <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
+                <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', fontSize: '1.02rem', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
                   {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이를 분양합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
                 </p>
                 

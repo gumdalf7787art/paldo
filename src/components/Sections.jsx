@@ -251,6 +251,81 @@ const StoreCard = ({ store }) => {
   );
 };
 
+const DEFAULT_STORES = [
+  {
+    id: 'dummy-store-1',
+    nickname: '도그하우스 청담본점',
+    store_header_image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150',
+    store_description: '청담동 고품격 프리미엄 반려동물 케어 및 전문 브리딩 비즈니스 솔루션을 제공하는 플래그십 매장입니다.',
+    store_address: '서울특별시 강남구 청담동 89-4',
+    store_contact: '02-543-9876'
+  },
+  {
+    id: 'dummy-store-2',
+    nickname: '퍼피랜드 마포점',
+    store_header_image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150',
+    store_description: '안전하고 투명한 반려동물 건강 검진 솔루션과 1:1 맞춤 홈케어 컨설팅을 제공하는 안심 매장입니다.',
+    store_address: '서울특별시 마포구 도화동 173',
+    store_contact: '02-712-3456'
+  },
+  {
+    id: 'dummy-store-3',
+    nickname: '댕댕이 하우스 송도',
+    store_header_image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=150',
+    store_description: '송도 국제도시 최대 규모의 펫 아카데미 및 B2B 위생 안심 케어 서비스 인증 파트너사입니다.',
+    store_address: '인천광역시 연수구 송도동 23-3',
+    store_contact: '032-831-7788'
+  },
+  {
+    id: 'dummy-store-4',
+    nickname: '해피퍼피 부산센텀',
+    store_header_image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&q=80&w=150',
+    store_description: '부산 경남권 최고의 매장 인프라와 첨단 IoT 헬스 케어 모니터링 시스템을 도입한 혁신 매장입니다.',
+    store_address: '부산광역시 해운대구 우동 1400',
+    store_contact: '051-744-1234'
+  },
+  {
+    id: 'dummy-store-5',
+    nickname: '조이펫 분당수지점',
+    store_header_image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=150',
+    store_description: '동물 행동 전문가의 전문 컨설팅 서비스와 프리미엄 유기농 식단 분석 서비스를 상시 제공합니다.',
+    store_address: '경기도 성남시 분당구 정자동 16-2',
+    store_contact: '031-708-5678'
+  },
+  {
+    id: 'dummy-store-6',
+    nickname: '골든퍼피 일산점',
+    store_header_image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=150',
+    store_description: '자연 친화적 환경 설계와 엄격한 혈통 보존 및 독자적 위생 위탁 관리 라이선스를 보유한 정식 파트너입니다.',
+    store_address: '경기도 고양시 일산동구 장항동 740',
+    store_contact: '031-901-4321'
+  },
+  {
+    id: 'dummy-store-7',
+    nickname: '스위트하우스 광주점',
+    store_header_image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80&w=150',
+    store_description: '24시간 무중단 스마트 매니지먼트 시스템과 협업 전문 의료진의 보증 케어 네트워크를 구축하였습니다.',
+    store_address: '광주광역시 서구 치평동 1200',
+    store_contact: '062-371-9988'
+  },
+  {
+    id: 'dummy-store-8',
+    nickname: '엔젤퍼피 대구수성점',
+    store_header_image: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?auto=format&fit=crop&q=80&w=600',
+    profile_image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80&w=150',
+    store_description: '동대구 최대 규모의 안심 사후 관리 센터 운영 및 안심 펫 라이프 토탈 케어 서비스를 회원 특전으로 지원합니다.',
+    store_address: '대구광역시 수성구 범어동 45-1',
+    store_contact: '053-755-1122'
+  }
+];
+
 const HeroCarousel = ({ breedName }) => {
   const { isMobile } = useMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -263,13 +338,24 @@ const HeroCarousel = ({ breedName }) => {
       try {
         const { data } = await api.store.getList();
         if (data && data.length > 0) {
-          setAds(data);
+          // 기존 데이터와 더미 데이터를 합쳐 최대 8개 이상 채움
+          const combined = [...data, ...DEFAULT_STORES];
+          // 중복을 키(id) 기반으로 유니크화하여 8개 슬라이스로 자름
+          const uniqueStores = [];
+          const seenIds = new Set();
+          for (const s of combined) {
+            if (!seenIds.has(s.id)) {
+              seenIds.add(s.id);
+              uniqueStores.push(s);
+            }
+          }
+          setAds(uniqueStores.slice(0, 8));
         } else {
-          setAds([]);
+          setAds(DEFAULT_STORES);
         }
       } catch (err) {
         console.error('Failed to load main stores:', err);
-        setAds([]);
+        setAds(DEFAULT_STORES);
       }
     };
     loadHeroAds();

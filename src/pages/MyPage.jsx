@@ -189,19 +189,6 @@ const MyPage = () => {
     }
   }, [newPassword, confirmPassword]);
 
-  // 대화방 실시간 업데이트 감지 (폴링 방식으로 교체)
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    fetchChatRooms(session.user.id);
-    const intervalId = setInterval(() => {
-      fetchChatRooms(session.user.id);
-    }, 2000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [session?.user?.id]);
 
   const fetchInitialData = async () => {
     setLoading(true);
@@ -337,6 +324,20 @@ const MyPage = () => {
     const { data } = await api.notifications.getList();
     if (data) setMyNotifications(data);
   };
+
+  // 대화방 실시간 업데이트 감지 (폴링 방식으로 교체)
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    fetchChatRooms(session.user.id);
+    const intervalId = setInterval(() => {
+      fetchChatRooms(session.user.id);
+    }, 2000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [session?.user?.id]);
 
   const getAdInfo = (dogId) => {
     const activeAd = myAds.find(ad => ad.id === dogId && ad.ad_status === 'active');
@@ -753,6 +754,148 @@ const MyPage = () => {
         {!selectedRoom && activeTab === 'dashboard' && (
           <div style={{ display: 'grid', gap: '15px' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '5px 0' }}>🏠 {profile?.nickname}님의 대시보드</h3>
+
+            {/* 파트너 사업자 심사 상태 카드 */}
+            {!isSeller && businessApp && businessApp.status === 'pending' && (
+              <div className="fade-in" style={{
+                padding: '20px',
+                backgroundColor: '#f0f9ff',
+                border: '1.5px solid #bae6fd',
+                borderRadius: '14px',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '2rem' }}>⏳</span>
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#0369a1' }}>🔒 입점 심사가 진행 중입니다 (최대 24시간 소요)</h4>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#0a5c85', lineHeight: '1.4', wordBreak: 'keep-all' }}>
+                  제출하신 서류 및 매장 정보를 확인하고 있습니다. 심사가 완료되면 푸시 알림 및 문자로 즉시 안내해 드립니다. 조금만 기다려주세요!
+                </p>
+              </div>
+            )}
+
+            {!isSeller && businessApp && businessApp.status === 'rejected' && (
+              <div className="fade-in" style={{
+                padding: '20px',
+                backgroundColor: '#fff5f5',
+                border: '1.5px solid #feb2b2',
+                borderRadius: '14px',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '2rem' }}>⚠️</span>
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#9b1c1c' }}>입점 심사가 반려되었습니다</h4>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#c92a2a', fontWeight: 'bold' }}>
+                  반려 사유: {businessApp.rejected_reason || '사유 미기재 (고객센터에 문의해주세요)'}
+                </p>
+                <p style={{ margin: '5px 0 0', fontSize: '0.75rem', color: '#868e96', lineHeight: '1.4', wordBreak: 'keep-all' }}>
+                  정보를 수정하여 다시 신청하시면 신속히 재심사를 진행하겠습니다.
+                </p>
+                <button
+                  onClick={() => setIsApplyModalOpen(true)}
+                  style={{
+                    marginTop: '10px',
+                    padding: '10px 20px',
+                    backgroundColor: '#e53e3e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 10px rgba(229, 62, 62, 0.2)'
+                  }}
+                >
+                  정보 수정 후 재신청하기
+                </button>
+              </div>
+            )}
+
+            {/* 일반 구매자인데 신청도 안 한 경우 온보딩 유도 카드 */}
+            {!isSeller && !businessApp && (
+              <div className="fade-in" style={{
+                padding: '20px',
+                backgroundColor: '#f6f9fc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '14px',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '2rem' }}>🏪</span>
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#4a5568' }}>펫샵 사장님이신가요?</h4>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#718096', lineHeight: '1.4', wordBreak: 'keep-all' }}>
+                  다잇독에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
+                </p>
+                <button
+                  onClick={() => setIsApplyModalOpen(true)}
+                  style={{
+                    marginTop: '10px',
+                    padding: '10px 20px',
+                    backgroundColor: 'var(--primary)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 10px rgba(38, 166, 154, 0.2)'
+                  }}
+                >
+                  인증 분양 사업자 신청하기
+                </button>
+              </div>
+            )}
+
+            {/* 스토어 정보 미완성 CTA 배너 */}
+            {isSeller && (!storeDescription || !storeAddress || !storeContact) && (
+              <div className="fade-in" style={{
+                padding: '20px',
+                background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                border: '1.5px solid #fde68a',
+                borderRadius: '14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '1.3rem' }}>🏪</span>
+                  <span style={{ fontWeight: '900', fontSize: '0.95rem', color: '#92400e' }}>입점 효과 극대화하기: 스토어 정보 등록</span>
+                  <span style={{ fontSize: '0.65rem', padding: '2px 6px', backgroundColor: '#f59e0b', color: 'white', borderRadius: '6px', fontWeight: 'bold' }}>권장</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#b45309', lineHeight: '1.5', wordBreak: 'keep-all' }}>
+                  스토어 소개글, 실 주소, 문의 연락처를 모두 완성하면 구매자가 매장 위치를 지도로 확인하고 즉시 다잇톡으로 상담을 요청할 수 있습니다. 스토어 신뢰도를 높여보세요!
+                </p>
+                <button
+                  onClick={() => setActiveTab('store')}
+                  style={{
+                    alignSelf: 'flex-start',
+                    marginTop: '5px',
+                    padding: '8px 14px',
+                    backgroundColor: '#d97706',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 10px rgba(217, 119, 6, 0.15)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  지금 스토어 정보 등록하기 →
+                </button>
+              </div>
+            )}
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               {isSeller ? (
@@ -1424,6 +1567,162 @@ const MyPage = () => {
               {activeTab === 'dashboard' && (
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px' }}>{profile?.nickname}님의 대시보드</h2>
+
+                  {/* 파트너 사업자 심사 상태 카드 */}
+                  {!isSeller && businessApp && businessApp.status === 'pending' && (
+                    <div style={{
+                      padding: '24px',
+                      backgroundColor: '#f0f9ff',
+                      border: '1.5px solid #bae6fd',
+                      borderRadius: '16px',
+                      marginBottom: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px'
+                    }}>
+                      <span style={{ fontSize: '2.5rem' }}>⏳</span>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#0369a1' }}>🔒 입점 심사가 진행 중입니다 (최대 24시간 소요)</h4>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#0a5c85', lineHeight: '1.4' }}>
+                          제출하신 서류 및 매장 정보를 성실히 검토 중입니다. 심사가 완료되면 푸시 알림 및 문자로 즉시 안내해 드립니다. 조금만 기다려주세요!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isSeller && businessApp && businessApp.status === 'rejected' && (
+                    <div style={{
+                      padding: '24px',
+                      backgroundColor: '#fff5f5',
+                      border: '1.5px solid #feb2b2',
+                      borderRadius: '16px',
+                      marginBottom: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px'
+                    }}>
+                      <span style={{ fontSize: '2.5rem' }}>⚠️</span>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#9b1c1c' }}>입점 심사가 반려되었습니다</h4>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#c92a2a', fontWeight: 'bold' }}>
+                          반려 사유: {businessApp.rejected_reason || '사유 미기재'}
+                        </p>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#868e96', lineHeight: '1.4' }}>
+                          정보를 수정하여 다시 신청하시면 신속히 재심사를 진행하겠습니다.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsApplyModalOpen(true)}
+                        style={{
+                          padding: '12px 24px',
+                          backgroundColor: '#e53e3e',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(229, 62, 62, 0.2)',
+                          transition: 'all 0.2s',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#c53030'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#e53e3e'}
+                      >
+                        정보 수정 후 재신청
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 일반 구매자인데 신청도 안 한 경우 온보딩 유도 카드 */}
+                  {!isSeller && !businessApp && (
+                    <div style={{
+                      padding: '24px',
+                      backgroundColor: '#f6f9fc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '16px',
+                      marginBottom: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px'
+                    }}>
+                      <span style={{ fontSize: '2.5rem' }}>🏪</span>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#4a5568' }}>인증 분양 사업자(스토어)로 입점해보세요!</h4>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#718096', lineHeight: '1.4' }}>
+                          다잇독에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsApplyModalOpen(true)}
+                        style={{
+                          padding: '12px 24px',
+                          backgroundColor: 'var(--primary)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(38, 166, 154, 0.2)',
+                          transition: 'all 0.2s',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
+                      >
+                        사업자 신청하기
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 스토어 정보 미완성 CTA 배너 */}
+                  {isSeller && (!storeDescription || !storeAddress || !storeContact) && (
+                    <div style={{
+                      padding: '24px',
+                      background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                      border: '1.5px solid #fde68a',
+                      borderRadius: '16px',
+                      marginBottom: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      <span style={{ fontSize: '2.5rem' }}>🏪</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '900', fontSize: '1.1rem', color: '#92400e' }}>입점 효과 극대화하기: 스토어 정보 등록</span>
+                          <span style={{ fontSize: '0.7rem', padding: '3px 8px', backgroundColor: '#f59e0b', color: 'white', borderRadius: '8px', fontWeight: 'bold' }}>권장 사항</span>
+                        </div>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#b45309', lineHeight: '1.5' }}>
+                          스토어 소개글, 실 주소, 문의 연락처를 채워 구매자들에게 신뢰감을 전하세요. 정보를 모두 채우면 매장 지도가 활성화되고 다잇톡 상담률이 평균 40% 이상 상승합니다!
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('store')}
+                        style={{
+                          padding: '12px 24px',
+                          backgroundColor: '#d97706',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(217, 119, 6, 0.2)',
+                          transition: 'all 0.2s',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#b45309'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#d97706'}
+                      >
+                        지금 정보 등록하기 →
+                      </button>
+                    </div>
+                  )}
+
                   <div className={`dashboard-stats-grid ${isSeller ? '' : 'buyer'}`}>
                     {isSeller ? (
                       <>

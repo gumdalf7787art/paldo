@@ -25,6 +25,32 @@ const regionOptions = [
   "강원도", "충청남도", "충청북도", "경상남도", "경상북도", "전라남도", "전라북도", "제주도", "세종시"
 ];
 
+const parseRegionFromAddress = (address) => {
+  if (!address) return '전국';
+  const cleanAddr = address.trim();
+  
+  if (cleanAddr.includes('서울')) return '서울시';
+  if (cleanAddr.includes('인천')) return '인천시';
+  if (cleanAddr.includes('경기')) return '경기도';
+  if (cleanAddr.includes('부산')) return '부산시';
+  if (cleanAddr.includes('대구')) return '대구시';
+  if (cleanAddr.includes('대전')) return '대전시';
+  if (cleanAddr.includes('광주')) return '광주시';
+  if (cleanAddr.includes('울산')) return '울산시';
+  if (cleanAddr.includes('세종')) return '세종시';
+  if (cleanAddr.includes('제주')) return '제주도';
+  
+  if (cleanAddr.includes('경상북도') || cleanAddr.includes('경북')) return '경상북도';
+  if (cleanAddr.includes('경상남도') || cleanAddr.includes('경남')) return '경상남도';
+  if (cleanAddr.includes('전라북도') || cleanAddr.includes('전북')) return '전라북도';
+  if (cleanAddr.includes('전라남도') || cleanAddr.includes('전남')) return '전라남도';
+  if (cleanAddr.includes('충청북도') || cleanAddr.includes('충북')) return '충청북도';
+  if (cleanAddr.includes('충청남도') || cleanAddr.includes('충남')) return '충청남도';
+  if (cleanAddr.includes('강원')) return '강원도';
+
+  return '전국';
+};
+
 const UploadForm = () => {
   const [formData, setFormData] = useState({
     name: '', breed: '말티푸', price: '', originalPrice: '', region: '전국', 
@@ -82,10 +108,6 @@ const UploadForm = () => {
     }
   }, [editDog]);
 
-  useEffect(() => {
-    fetchPostingStats();
-  }, []);
-
   const fetchPostingStats = async () => {
     try {
       const { data: sessionData } = await api.auth.getSession();
@@ -97,6 +119,34 @@ const UploadForm = () => {
 
       const { data: userProfile } = await api.auth.getUser();
       setCurrentUser(userProfile);
+
+      // 주소 기반 자동 지역 설정 (신규 등록인 경우에만 적용)
+      if (!editDog) {
+        let storeAddr = '';
+        try {
+          // 1. 스토어 정보가 있는지 조회
+          const { data: storeProfile } = await api.store.getProfile(session.user.id);
+          if (storeProfile && storeProfile.address) {
+            storeAddr = storeProfile.address;
+          } else {
+            // 2. 스토어 정보가 없다면 마지막 사업자 신청 주소 조회
+            const { data: lastApp } = await api.business.getLastApplication();
+            if (lastApp && lastApp.address) {
+              storeAddr = lastApp.address;
+            }
+          }
+        } catch (e) {
+          console.error('Failed to get store address for auto region binding:', e);
+        }
+        
+        if (storeAddr) {
+          const autoRegion = parseRegionFromAddress(storeAddr);
+          setFormData(prev => ({
+            ...prev,
+            region: autoRegion
+          }));
+        }
+      }
 
       // 내 분양 매물 목록을 가져와 이번 달 글 등록 수 계산
       const { data: listData, error: listError } = await api.dogs.getList({ seller_id: session.user.id });
@@ -138,12 +188,31 @@ const UploadForm = () => {
     }
   };
 
+  useEffect(() => {
+    fetchPostingStats();
+  }, []);
+
   const handleSubmit = async () => {
     if (!formData.name || !formData.breed || !formData.birthday) {
       return alert('강아지 이름, 견종, 생일은 필수 입력 사항입니다.');
     }
     if (!formData.isFree && !formData.price) {
       return alert('최종 할인가격은 필수 입력 사항입니다. (할인이 없는 경우 최초가격과 동일하게 입력해주세요)');
+    }
+    // 유효성 체크: 음수 체크 및 할인가격이 최초가격보다 큰지 체크
+    if (!formData.isFree) {
+      const p = parseInt(formData.price);
+      const op = parseInt(formData.originalPrice);
+      if (p < 0 || (op && op < 0)) {
+        return alert('가격은 0원 이상 입력해야 합니다.');
+      }
+      if (op && p > op) {
+        return alert('최종 할인가격은 최초가격보다 높을 수 없습니다.');
+      }
+    }
+    // 생일 유효성 체크: 미래의 날짜 입력 방지
+    if (new Date(formData.birthday) > new Date()) {
+      return alert('생일은 오늘 이전 날짜여야 합니다.');
     }
     setLoading(true);
 
@@ -285,6 +354,7 @@ const UploadForm = () => {
           <div>
             <label style={labelStyle}>사진 등록 (사진은 최대 10장 가능)</label>
             <input type="file" multiple onChange={handleImageResizeAndUpload} style={{ display: 'block', marginTop: '10px' }} />
+            <p style={helperTextStyle}>📸 대표 사진 1장을 포함하여, 아이의 건강하고 사랑스러운 모습을 잘 보여주는 실제 사진을 등록해 주세요. 등록 후 '대표 설정' 버튼을 누르면 목록에 보여질 대표 이미지를 변경할 수 있습니다.</p>
             <div style={{ display: 'flex', gap: '10px', marginTop: '15px', flexWrap: 'wrap' }}>
               {images.map((img, i) => (
                 <div key={i} style={{ position: 'relative', width: '100px', height: '100px' }}>
@@ -305,12 +375,14 @@ const UploadForm = () => {
             <div>
               <label style={labelStyle}>강아지 이름</label>
               <input type="text" placeholder="예: 인절미" style={inputStyle} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              <p style={helperTextStyle}>🐶 아이의 애칭이나 매장에서 부르는 친근한 닉네임을 입력해주세요.</p>
             </div>
             <div>
               <label style={labelStyle}>분양 견종</label>
               <select style={inputStyle} value={formData.breed} onChange={e => setFormData({...formData, breed: e.target.value})}>
                 {breedOptions.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
+              <p style={helperTextStyle}>🔍 정확한 견종을 선택해야 구매자들이 더 쉽게 매물을 검색할 수 있습니다.</p>
             </div>
           </div>
 
@@ -324,6 +396,7 @@ const UploadForm = () => {
                 value={formData.age ? `${formData.age}개월령` : ''} 
                 readOnly 
               />
+              <p style={helperTextStyle}>⏳ 생년월일에 따라 자동으로 개월령이 계산됩니다.</p>
             </div>
             <div>
               <label style={labelStyle}>성별</label>
@@ -331,6 +404,7 @@ const UploadForm = () => {
                 <option value="남아">남아 (왕자님)</option>
                 <option value="여아">여아 (공주님)</option>
               </select>
+              <p style={helperTextStyle}>✨ 아이의 성별 정보를 바르게 기재해 주세요.</p>
             </div>
           </div>
 
@@ -340,6 +414,7 @@ const UploadForm = () => {
               <select style={inputStyle} value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})}>
                 {regionOptions.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
+              <p style={helperTextStyle}>📍 매장 주소지를 파악해 해당 지역이 자동으로 바인딩되었습니다. 필요한 경우 목록에서 변경하실 수 있습니다.</p>
             </div>
             <div>
               <label style={labelStyle}>생일 (필수)</label>
@@ -358,6 +433,7 @@ const UploadForm = () => {
                   });
                 }} 
               />
+              <p style={helperTextStyle}>📅 동물보호법상 2개월령(60일령) 이상의 아이만 등록 및 분양이 가능합니다.</p>
             </div>
           </div>
 
@@ -365,10 +441,11 @@ const UploadForm = () => {
             <div>
               <label style={labelStyle}>접종 내역</label>
               <input type="text" placeholder="예: 2차 접종 완료" style={inputStyle} value={formData.vaccination} onChange={e => setFormData({...formData, vaccination: e.target.value})} />
+              <p style={helperTextStyle}>💉 종합 백신, 코로나, 켄넬코프 등 현재까지 완료된 예방접종 차수를 자세히 적어주세요.</p>
             </div>
             <div>
                <label style={labelStyle}>분양 설정</label>
-               <div style={{ display: 'flex', gap: '15px' }}>
+               <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem' }}>
                   <input type="checkbox" checked={formData.isFree} onChange={e => setFormData({...formData, isFree: e.target.checked, price: e.target.checked ? '0' : '', originalPrice: e.target.checked ? '0' : ''})} /> 무료분양
                 </label>
@@ -378,6 +455,7 @@ const UploadForm = () => {
                   </label>
                 )}
               </div>
+              <p style={helperTextStyle}>💰 '무료분양' 체크 시 책임비는 0원으로 등록되며, '협의가능' 체크 시 가격 절충이 가능함을 표시합니다.</p>
             </div>
           </div>
 
@@ -385,11 +463,25 @@ const UploadForm = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div>
                 <label style={labelStyle}>최초가격 (만원)</label>
-                <input type="number" placeholder="예: 100" style={inputStyle} value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: e.target.value})} />
+                <input 
+                  type="text" 
+                  placeholder="예: 100" 
+                  style={inputStyle} 
+                  value={formData.originalPrice} 
+                  onChange={e => setFormData({...formData, originalPrice: e.target.value.replace(/[^0-9]/g, '')})} 
+                />
+                <p style={helperTextStyle}>💵 할인 전 정상 분양 금액을 만원 단위의 숫자로만 입력해 주세요. (예: 120만원 → 120)</p>
               </div>
               <div>
                 <label style={labelStyle}>최종 할인가격(만원) _ 필수입력</label>
-                <input type="number" placeholder="예: 80" style={inputStyle} value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                <input 
+                  type="text" 
+                  placeholder="예: 80" 
+                  style={inputStyle} 
+                  value={formData.price} 
+                  onChange={e => setFormData({...formData, price: e.target.value.replace(/[^0-9]/g, '')})} 
+                />
+                <p style={helperTextStyle}>🎁 구매자에게 노출될 실제 분양 금액입니다. 할인이 적용되지 않은 경우 최초가격과 동일하게 입력해 주세요.</p>
               </div>
             </div>
           )}
@@ -397,16 +489,15 @@ const UploadForm = () => {
           <div>
             <label style={labelStyle}>
               유튜브 영상 링크 (선택)
-              <span style={{ fontSize: '0.8rem', fontWeight: 'normal', marginLeft: '8px', color: '#888' }}>
-                유튜브 영상의 '공유'를 클릭하고 링크를 복사해서 넣어주세요. (쇼츠 영상도 가능합니다)
-              </span>
             </label>
             <input type="text" placeholder="유튜브 URL을 입력해주세요" style={inputStyle} value={formData.videoLink} onChange={e => setFormData({...formData, videoLink: e.target.value})} />
+            <p style={helperTextStyle}>🎥 유튜브 '공유' 버튼을 눌러 나오는 주소(Shorts 영상 주소도 가능)를 붙여넣어 주세요. 움직이는 영상을 업로드하면 매칭 성사율이 대폭 증가합니다.</p>
           </div>
 
           <div>
             <label style={labelStyle}>분양 설명글</label>
             <textarea placeholder="아이의 성격, 접종 상태, 특징 등을 자유롭게 적어주세요!" style={{...inputStyle, height: '150px', resize: 'vertical'}} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <p style={helperTextStyle}>📝 사료 먹는 법, 성격 및 특징, 배변 훈련 유무, 부견/모견 정보 등을 자세히 작성할수록 예비 견주의 결정을 돕는 데 효과적입니다.</p>
           </div>
 
           {/* 프리미엄 혜택 쿠폰 적용 */}
@@ -518,5 +609,6 @@ const UploadForm = () => {
 
 const labelStyle = { display: 'block', fontSize: '0.9rem', fontWeight: '700', color: 'var(--muted-text)', marginBottom: '8px' };
 const inputStyle = { width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #eee', outline: 'none' };
+const helperTextStyle = { fontSize: '0.78rem', color: '#718096', marginTop: '6px', lineHeight: '1.4' };
 
 export default UploadForm;

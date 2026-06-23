@@ -80,7 +80,7 @@ const LatestCommunityWidget = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: isMobile ? '-36px' : '20px' }}>
+      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: isMobile ? '-46px' : '20px' }}>
         불러오는 중...
       </div>
     );
@@ -96,7 +96,7 @@ const LatestCommunityWidget = () => {
       borderRadius: '12px',
       border: '1px solid #e2e8f0',
       padding: isMobile ? '12px 14px' : '20px',
-      marginTop: isMobile ? '-36px' : '15px',
+      marginTop: isMobile ? '-46px' : '15px',
       marginBottom: isMobile ? '6px' : '15px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
     }}>
@@ -286,7 +286,7 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '4px' : '12px' }}>
+        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '-15px' : '12px' }}>
           <SearchBar />
         </div>
         

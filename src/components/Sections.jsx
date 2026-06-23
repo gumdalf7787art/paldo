@@ -431,7 +431,7 @@ const HeroCarousel = ({ breedName }) => {
   );
 };
 
-const SectionTitle = ({ title, sub, isAd }) => {
+export const SectionTitle = ({ title, sub, isAd }) => {
   const { isMobile } = useMobile();
   return (
     <div className="section-title-wrap" style={{ 

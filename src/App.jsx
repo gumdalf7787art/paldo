@@ -96,14 +96,21 @@ const LatestCommunityWidget = () => {
       borderRadius: '12px',
       border: '1px solid #e2e8f0',
       padding: isMobile ? '12px 14px' : '20px',
-      marginTop: isMobile ? '8px' : '15px',
-      marginBottom: isMobile ? '8px' : '15px',
+      marginTop: isMobile ? '-6px' : '15px',
+      marginBottom: isMobile ? '6px' : '15px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '8px' : '15px' }}>
-        <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.25rem', fontWeight: 'bold', color: 'var(--body-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-          🐾 커뮤니티 최근 이야기
-        </h3>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-end', 
+        marginBottom: isMobile ? '8px' : '15px' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
+            🐾 커뮤니티 최근 이야기
+          </h2>
+        </div>
         <Link to="/community" style={{ fontSize: isMobile ? '0.8rem' : '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
           전체보기 ➔
         </Link>
@@ -131,9 +138,9 @@ const LatestCommunityWidget = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden', flex: 1, marginRight: '10px' }}>
                 <span style={{
-                  fontSize: isMobile ? '0.85rem' : '1.15rem',
+                  fontSize: isMobile ? '0.95rem' : '1.15rem',
                   color: '#2d3748',
-                  fontWeight: post.category === 'notice' ? 'bold' : 'normal',
+                  fontWeight: 'bold',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',

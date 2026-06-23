@@ -933,21 +933,21 @@ const AdSections = () => {
 
   return (
     <>
-      <AdSectionItem title="🛡️ 안심 분양 정보" sub="다잇독이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
+      <AdSectionItem title="🛡️ 안심 파트너 매물" sub="다잇독 안심 회원 매장이 등록한 신뢰할 수 있는 매물" dogs={safeDogs} badge="안심" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_a} 
         slotName="main_bottom_a" 
       />
 
-      <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
+      <AdSectionItem title="🔥 인기 파트너 매물" sub="지금 많은 반려인들이 주목하고 있는 우수 케어 매물" dogs={popularDogs} badge="인기" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_b} 
         slotName="main_bottom_b" 
       />
 
-      <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />
+      <AdSectionItem title="✨ 스페셜 파트너 매물" sub="특별한 혜택과 맞춤 케어가 보증된 스페셜 매물" dogs={specialDogs} badge="스페셜" loading={loading} />
     </>
   );
 };
@@ -989,7 +989,7 @@ const AdoptionList = () => {
         boxShadow: 'var(--shadow)'
       }
     }>
-      <SectionTitle title="전체 분양 리스트" sub="실시간 등록 정보" />
+      <SectionTitle title="전체 등록 매물 정보" sub="실시간 업데이트 매장 정보" />
       <div 
         className={isMobile ? "" : "adoption-grid"}
         style={
@@ -1003,7 +1003,7 @@ const AdoptionList = () => {
         {loading ? (
            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>리스트를 불러오는 중입니다...</p>
         ) : dogs.length === 0 ? (
-           <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>아직 등록된 분양 게시물이 없습니다.</p>
+           <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>아직 등록된 매장 매물 정보가 없습니다.</p>
         ) : (
           dogs.map((dog) => (
             <Card 

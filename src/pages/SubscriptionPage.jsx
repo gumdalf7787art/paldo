@@ -80,7 +80,7 @@ const SubscriptionPage = () => {
       pay_method: 'card',
       merchant_uid: merchantUid,
       name: `다잇독 비즈니스 멤버십 (${plan.name})`,
-      amount: 0, // 정기결제 빌링키 발급용
+      amount: 100, // 정기결제 빌링키 발급용 (이니시스 본인인증 오류 우회를 위해 100원 테스트 결제로 설정)
       customer_uid: customerUid, // ❗빌링키 발급을 위한 필수 파라미터
       buyer_email: currentUser.email || '',
       buyer_name: currentUser.nickname || currentUser.email || '',

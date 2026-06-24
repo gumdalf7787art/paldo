@@ -31,14 +31,6 @@ const AdStorePage = () => {
   // 상품 정보
   const items = [
     {
-      id: 9,
-      name: '[테스트] 100원 결제 테스트 상품',
-      price: 100,
-      description: 'PG사 결제 연동 테스트를 위한 임시 100원 결제용 상품입니다.',
-      type: 'test_100',
-      image: '/images/ads/ad_test.png'
-    },
-    {
       id: 1,
       name: '메인페이지 프리미엄 소개 서비스',
       price: 50000,

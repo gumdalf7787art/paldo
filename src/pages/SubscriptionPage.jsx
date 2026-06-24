@@ -204,7 +204,37 @@ const SubscriptionPage = () => {
           </div>
         ))}
       </div>
-      <div style={{ textAlign: 'center', marginTop: '50px', color: '#888', fontSize: '0.85rem' }}>
+
+      {/* 이니시스 심사용 상품 상세페이지 필수 고지 사항 */}
+      <div style={{
+        maxWidth: '1100px',
+        margin: '40px auto 0 auto',
+        padding: '24px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '16px',
+        border: '1px solid #eef2f7',
+        fontSize: '0.9rem',
+        color: '#4a5568',
+        lineHeight: '1.7',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+      }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#2d3748', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          📢 서비스 제공 및 취소/환불 안내 (필수 고지)
+        </h3>
+        <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <li><strong>서비스 제공기간 (배송 기간)</strong>: 본 서비스는 무형의 소프트웨어(SaaS) 솔루션으로, 결제 완료 및 정기 결제 카드 등록 즉시 멤버십 등급별 혜택이 계정에 활성화되어 실시간으로 제공됩니다. 기본 이용 기간은 결제일로부터 1개월(30일) 단위입니다.</li>
+          <li><strong>청약철회 및 취소/환불 규정</strong>: 
+            <ul style={{ paddingLeft: '15px', marginTop: '4px', listStyleType: 'circle', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <li>결제 후 7일 이내에 제공되는 비즈니스 멤버십 서비스 혜택(소식/정보 한도 증대 및 프리미엄 ERP 관리 기능 등)을 전혀 사용하지 않은 경우 <strong>100% 전액 환불</strong>이 가능합니다.</li>
+              <li>결제 후 7일이 경과했거나, 당월 제공되는 멤버십 기능을 이미 1회 이상 사용한 경우에는 디지털 콘텐츠 특성상 당월 환불이 불가하며, 해지 신청 시 다음 달 결제 예정일부터 청구가 중단되는 <strong>'자동 결제 해지(예약)'</strong>로 처리됩니다.</li>
+            </ul>
+          </li>
+          <li><strong>교환 및 반품 안내</strong>: 다잇독 비즈니스 멤버십은 오프라인 실물 배송 상품이 아닌 무형의 온라인 솔루션이므로 실물 제품 교환 및 반품은 적용되지 않습니다.</li>
+          <li>자세한 취소/환불 및 결제 조건은 하단 푸터의 <a href="/refund" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'underline' }}>[서비스 이용 및 환불 정책]</a> 페이지를 참고해 주시기 바랍니다.</li>
+        </ul>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '40px', color: '#888', fontSize: '0.85rem' }}>
         * 정기 요금 결제를 등록하시면 매월 선택하신 결제일에 서비스 이용료가 자동으로 청구됩니다. 언제든지 마이페이지에서 해지(비활성화)할 수 있습니다.
       </div>
     </div>

@@ -423,7 +423,7 @@ function Footer() {
                     border: '1px solid rgba(255,255,255,0.05)'
                   }}>
                     주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규<br />
-                    사업자등록번호 : 153-87-03544<br />
+                    사업자등록번호 : 153-87-03544 &nbsp;|&nbsp; 통신판매업신고번호 : 제 2025-서울노원-0724 호<br />
                     주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
                     고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
                   </div>
@@ -431,7 +431,7 @@ function Footer() {
               </div>
             ) : (
               <div style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)', marginBottom: '15px' }}>
-                주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544<br />
+                주식회사 블루프라임 &nbsp;|&nbsp; 대표자 : 김덕규 &nbsp;|&nbsp; 사업자등록번호 : 153-87-03544 &nbsp;|&nbsp; 통신판매업신고번호 : 제 2025-서울노원-0724 호<br />
                 주소 : 서울특별시 노원구 상계로23다길 13-8, 101동 11층 1101호(상계동, 노원 아이파크)<br />
                 고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
               </div>

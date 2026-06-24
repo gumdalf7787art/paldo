@@ -22,9 +22,9 @@ const SubscriptionPage = () => {
     };
     loadUser();
 
-    // 포트원 SDK 초기화 (다잇독 가맹점 코드)
+    // 포트원 SDK 초기화 (데모 가맹점 코드로 하드코딩하여 결제창 작동 보장)
     if (window.IMP) {
-      window.IMP.init('imp62573664');
+      window.IMP.init('imp14397622');
     }
   }, []);
 

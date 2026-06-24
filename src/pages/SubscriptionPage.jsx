@@ -76,7 +76,7 @@ const SubscriptionPage = () => {
 
     // 포트원 빌링키 발급 요청 (IMP.request_pay에 customer_uid 전달)
     window.IMP.request_pay({
-      pg: 'html5_inicis.INIBillTst', // 이니시스 정기결제(빌링) 데모
+      pg: 'html5_inicis', // 이니시스 정기결제(빌링) 데모
       pay_method: 'card',
       merchant_uid: merchantUid,
       name: `다잇독 비즈니스 멤버십 (${plan.name})`,

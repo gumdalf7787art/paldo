@@ -85,7 +85,7 @@ const RefundPolicyPage = () => {
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: '#333', fontWeight: 'bold' }}>🔄 정기 멤버십 서비스 취소/환불</h4>
                 <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.85rem', color: '#555', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <li>멤버십 결제 후 해당 회차에 플랫폼이 제공하는 멤버십 혜택(유료 기능 사용, 전용 권한 등)을 단 한 번도 이용하지 않고 7일 이내 취소를 요청한 경우: <strong>100% 전액 환불</strong></li>
-                  <li>결제 후 7일이 경과했거나, 해당 월의 멤버십 혜택 및 기능을 이미 1회 이상 사용한 경우: 당월은 정상 이용으로 간주되어 중도 환불이 불가능하며, <strong>'다음 달 자동 정기 결제 해지' 예약</strong>으로 처리됩니다.</li>
+                  <li>결제 후 7일이 경과했거나, 멤버십 혜택을 1회 이상 사용한 후 중도 해지를 요청하는 경우: <strong>결제 금액에서 '실제 이용한 일수 × 정상가 기준 일일 요금' 및 '해지 위약금(결제 금액의 10%)'을 공제한 잔여 금액을 환불</strong>하며, 서비스는 즉시 종료됩니다.</li>
                 </ul>
               </div>
             </div>

@@ -23,7 +23,7 @@ const AdStorePage = () => {
 
     // 포트원 SDK 초기화
     if (window.IMP) {
-      const impCode = 'imp14397622'; // 테스트 결제창 작동을 보장하기 위해 데모 계정 코드로 강제 하드코딩
+      const impCode = import.meta.env.VITE_PORTONE_IMP_CODE;
       window.IMP.init(impCode);
     }
   }, []);
@@ -356,7 +356,7 @@ const AdStorePage = () => {
                     }
 
                     const paymentData = {
-                      pg: 'html5_inicis', // 포트원 공식 데모 계정에 연결된 이니시스 웹표준 PG 연동
+                      channelKey: import.meta.env.VITE_PORTONE_CHANNEL_KEY_TOSS,
                       pay_method: payMethod,
                       merchant_uid: merchantUid,
                       name: selectedItem.name,

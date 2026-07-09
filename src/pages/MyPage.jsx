@@ -120,34 +120,36 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
-        setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` });
+        setTimeout(() => setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }), 100);
       } else {
-        setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
+        setTimeout(() => setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }), 100);
       }
-      navigate('/mypage', { replace: true });
+      window.history.replaceState({}, '', '/mypage');
     } else if (location.state?.paymentSuccess) {
-      setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
+      setTimeout(() => setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }), 100);
       const newState = { ...location.state };
       delete newState.paymentSuccess;
-      navigate('/mypage', { replace: true, state: newState });
+      window.history.replaceState(newState, '', '/mypage');
     } else if (location.state?.paymentError) {
-      setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` });
+      setTimeout(() => setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` }), 100);
       const newState = { ...location.state };
       delete newState.paymentError;
-      navigate('/mypage', { replace: true, state: newState });
+      window.history.replaceState(newState, '', '/mypage');
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
-      setPaymentResultMsg({ 
-        type: 'success', 
-        text: msgText,
-        vbankInfo: `${v.name} ${v.num}`
-      });
+      setTimeout(() => {
+        setPaymentResultMsg({ 
+          type: 'success', 
+          text: msgText,
+          vbankInfo: `${v.name} ${v.num}`
+        });
+      }, 100);
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
-      navigate('/mypage', { replace: true, state: newState });
+      window.history.replaceState(newState, '', '/mypage');
     }
   }, [location.search, location.state, navigate]);
 

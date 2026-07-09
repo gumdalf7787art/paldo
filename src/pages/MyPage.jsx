@@ -136,11 +136,8 @@ const MyPage = () => {
           sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
         }
         
-        // 결제 내역 탭으로 자동 이동 (URL 파라미터 감지)
-        const tabParam = searchParams.get('tab');
-        if (tabParam === 'payments') {
-          setActiveTab('payments');
-        }
+        // 결제 결과 리다이렉트로 돌아온 것이므로 무조건 결제 내역 탭으로 이동
+        setActiveTab('payments');
         window.history.replaceState({}, '', '/mypage');
         
         // 결제 내역 즉시 새로고침 (검증 로직 완료 후 호출)
@@ -149,22 +146,29 @@ const MyPage = () => {
         });
       });
     } else if (impUid && merchantUid) {
-      // 기타 imp_uid 파라미터가 붙어 돌아오는 경우 (결제 도중 취소/실패 등)
+      // 기타 imp_uid 파라미터가 붙어 돌아오는 경우 (결제 도중 취소/실패 또는 파라미터 유실 등)
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
+        window.history.replaceState({}, '', '/mypage');
       } else {
-        sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+        // 성공인데 payment_done 등 다른 파라미터가 유실된 경우 복구 로직
+        const match = merchantUid.match(/merchant_ad_(\d+)/);
+        const adId = match ? match[1] : '';
+        
+        api.payment.verify(impUid, merchantUid, 0, adId, 'tosspay').then(({ data, error }) => {
+          if (error) {
+            sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 검증 실패: ${error}` }));
+          } else {
+            sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+          }
+          setActiveTab('payments');
+          window.history.replaceState({}, '', '/mypage');
+          api.payment.getHistory().then(({ data: historyData }) => {
+            if (historyData) setPaymentHistory(historyData);
+          });
+        });
       }
-      const tabParam = searchParams.get('tab');
-      if (tabParam === 'payments') {
-        setActiveTab('payments');
-      }
-      window.history.replaceState({}, '', '/mypage');
-      // 혹시라도 성공이었다면 내역 업데이트
-      api.payment.getHistory().then(({ data: historyData }) => {
-        if (historyData) setPaymentHistory(historyData);
-      });
     }
 
     // React Router state로 넘어오는 경우 (PC 콜백)

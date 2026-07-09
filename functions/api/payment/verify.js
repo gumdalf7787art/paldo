@@ -46,8 +46,14 @@ export async function onRequestPost(context) {
     body = {};
   }
 
-  const { imp_uid, merchant_uid, amount, ad_id } = body;
-  if (!imp_uid || !merchant_uid || !amount || !ad_id) {
+  let { imp_uid, merchant_uid, amount, ad_id, pay_method, is_mock } = body;
+
+  if (!ad_id && merchant_uid) {
+    const match = merchant_uid.match(/merchant_ad_(\d+)/);
+    if (match) ad_id = match[1];
+  }
+
+  if (!imp_uid || !merchant_uid || !ad_id) {
     return new Response(JSON.stringify({ error: '필수 결제 검증 정보가 누락되었습니다.' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
   }
 
@@ -63,7 +69,10 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: '유효하지 않은 광고 신청 건입니다.' }), { status: 404, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
 
-    if (Number(ad.budget) !== Number(amount)) {
+    // 클라이언트가 amount를 전달하지 않았다면 DB의 budget을 기준으로 사용
+    if (!amount) {
+      amount = ad.budget;
+    } else if (Number(ad.budget) !== Number(amount)) {
       return new Response(JSON.stringify({ error: '결제 요청 금액이 신청 상품 가격과 일치하지 않습니다.' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
 

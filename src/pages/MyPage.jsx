@@ -119,17 +119,21 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
+        alert(`❌ 결제 실패: ${errorMsg}`);
         setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` });
       } else {
+        alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
         setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       }
       navigate('/mypage', { replace: true });
     } else if (location.state?.paymentSuccess) {
+      alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
       setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       navigate('/mypage', { replace: true, state: newState });
     } else if (location.state?.paymentError) {
+      alert(`❌ 결제 실패: ${location.state.paymentError}`);
       setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` });
       const newState = { ...location.state };
       delete newState.paymentError;
@@ -137,9 +141,11 @@ const MyPage = () => {
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+      const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
+      alert(msgText);
       setPaymentResultMsg({ 
         type: 'success', 
-        text: `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`,
+        text: msgText,
         vbankInfo: `${v.name} ${v.num}`
       });
       const newState = { ...location.state };
@@ -150,10 +156,10 @@ const MyPage = () => {
   }, [location.search, location.state, navigate]);
 
   useEffect(() => {
-    if (paymentResultMsg) {
+    if (paymentResultMsg && paymentResultMsg.type === 'error') {
       const timer = setTimeout(() => {
         setPaymentResultMsg(null);
-      }, 7000); // 7초 후 자동 닫힘
+      }, 7000); // 에러 메시지만 7초 후 자동 닫힘
       return () => clearTimeout(timer);
     }
   }, [paymentResultMsg]);

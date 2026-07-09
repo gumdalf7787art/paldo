@@ -112,6 +112,7 @@ const MyPage = () => {
   const [paymentResultMsg, setPaymentResultMsg] = useState(null);
 
   useEffect(() => {
+    // 1. URL 파라미터가 있는 경우 (모바일 리다이렉트)
     const searchParams = new URLSearchParams(location.search);
     const impUid = searchParams.get('imp_uid');
     const merchantUid = searchParams.get('merchant_uid');
@@ -120,18 +121,22 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
-        setTimeout(() => setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }), 100);
+        sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
       } else {
-        setTimeout(() => setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }), 100);
+        sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       }
+      // URL에서 지저분한 파라미터 제거
       window.history.replaceState({}, '', '/mypage');
-    } else if (location.state?.paymentSuccess) {
-      setTimeout(() => setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }), 100);
+    }
+
+    // 2. React Router State가 있는 경우 (PC 콜백 리다이렉트 - 하위호환성 유지)
+    if (location.state?.paymentSuccess) {
+      sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       window.history.replaceState(newState, '', '/mypage');
     } else if (location.state?.paymentError) {
-      setTimeout(() => setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` }), 100);
+      sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` }));
       const newState = { ...location.state };
       delete newState.paymentError;
       window.history.replaceState(newState, '', '/mypage');
@@ -139,19 +144,28 @@ const MyPage = () => {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
-      setTimeout(() => {
-        setPaymentResultMsg({ 
-          type: 'success', 
-          text: msgText,
-          vbankInfo: `${v.name} ${v.num}`
-        });
-      }, 100);
+      sessionStorage.setItem('paymentResult', JSON.stringify({ 
+        type: 'success', 
+        text: msgText,
+        vbankInfo: `${v.name} ${v.num}`
+      }));
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
       window.history.replaceState(newState, '', '/mypage');
     }
-  }, [location.search, location.state, navigate]);
+
+    // 3. sessionStorage에 저장된 결과가 있으면 꺼내서 모달 띄우기
+    const storedResult = sessionStorage.getItem('paymentResult');
+    if (storedResult) {
+      try {
+        setPaymentResultMsg(JSON.parse(storedResult));
+        sessionStorage.removeItem('paymentResult'); // 한 번 띄운 후 제거
+      } catch (e) {
+        console.error('Failed to parse payment result', e);
+      }
+    }
+  }, [location.search, location.state]);
 
   useEffect(() => {
     if (paymentResultMsg && paymentResultMsg.type === 'error') {

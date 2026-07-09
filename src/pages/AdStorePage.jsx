@@ -432,6 +432,7 @@ const AdStorePage = () => {
 
                         if (verifyError) {
                           setIsModalOpen(false);
+                          alert(`결제 실패: ${verifyError}`);
                           navigate('/mypage', { state: { paymentError: verifyError } });
                           return;
                         }
@@ -442,14 +443,17 @@ const AdStorePage = () => {
                             amount: selectedItem.price
                           };
                           setIsModalOpen(false);
+                          alert(`가상계좌 발급 완료: [${v.vbank_name} ${v.vbank_num}]`);
                           navigate('/mypage', { state: { paymentReady: true, vbank: v } });
                         } else {
                           setIsModalOpen(false);
+                          alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
                           navigate('/mypage', { state: { paymentSuccess: true } });
                         }
                       } else {
                         setIsSubmitting(false);
                         setIsModalOpen(false);
+                        alert(`결제 실패: ${rsp.error_msg}`);
                         navigate('/mypage', { state: { paymentError: rsp.error_msg } });
                       }
                     });

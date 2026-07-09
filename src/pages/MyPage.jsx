@@ -121,8 +121,10 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
+        alert(`결제 실패: ${errorMsg}`);
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
       } else {
+        alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       }
       // URL에서 지저분한 파라미터 제거

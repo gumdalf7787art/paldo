@@ -365,7 +365,7 @@ const AdStorePage = () => {
 
                     const paymentData = {
                       channelKey: import.meta.env.VITE_PORTONE_CHANNEL_KEY_TOSS,
-                      pay_method: payMethod === 'card' ? 'easy_pay' : payMethod,
+                      pay_method: payMethod === 'card' ? 'EASY_PAY' : payMethod,
                       merchant_uid: merchantUid,
                       name: selectedItem.name,
                       amount: selectedItem.price,

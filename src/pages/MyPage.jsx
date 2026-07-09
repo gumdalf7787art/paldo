@@ -111,27 +111,32 @@ const MyPage = () => {
   }, []);
   const [paymentResultMsg, setPaymentResultMsg] = useState(null);
 
+  // [Effect 1] URL 파라미터 / router state 감지 → sessionStorage에 저장
   useEffect(() => {
-    // 1. URL 파라미터가 있는 경우 (모바일 리다이렉트)
     const searchParams = new URLSearchParams(location.search);
+
+    // 토스페이 등 리다이렉트 결제 완료 (m_redirect_url로 넘어올 때)
+    const paymentDone = searchParams.get('payment_done');
     const impUid = searchParams.get('imp_uid');
     const merchantUid = searchParams.get('merchant_uid');
     const impSuccess = searchParams.get('imp_success');
 
-    if (impUid && merchantUid) {
+    if (paymentDone === 'true') {
+      // 토스페이 리다이렉트 완료
+      sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+      window.history.replaceState({}, '', '/mypage');
+    } else if (impUid && merchantUid) {
+      // 기타 imp_uid 파라미터가 붙어 돌아오는 경우
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
-        alert(`결제 실패: ${errorMsg}`);
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
       } else {
-        alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       }
-      // URL에서 지저분한 파라미터 제거
       window.history.replaceState({}, '', '/mypage');
     }
 
-    // 2. React Router State가 있는 경우 (PC 콜백 리다이렉트 - 하위호환성 유지)
+    // React Router state로 넘어오는 경우 (PC 콜백)
     if (location.state?.paymentSuccess) {
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       const newState = { ...location.state };
@@ -146,28 +151,29 @@ const MyPage = () => {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
-      sessionStorage.setItem('paymentResult', JSON.stringify({ 
-        type: 'success', 
-        text: msgText,
-        vbankInfo: `${v.name} ${v.num}`
-      }));
+      sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: msgText, vbankInfo: `${v.name} ${v.num}` }));
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
       window.history.replaceState(newState, '', '/mypage');
     }
-
-    // 3. sessionStorage에 저장된 결과가 있으면 꺼내서 모달 띄우기
-    const storedResult = sessionStorage.getItem('paymentResult');
-    if (storedResult) {
-      try {
-        setPaymentResultMsg(JSON.parse(storedResult));
-        sessionStorage.removeItem('paymentResult'); // 한 번 띄운 후 제거
-      } catch (e) {
-        console.error('Failed to parse payment result', e);
-      }
-    }
   }, [location.search, location.state]);
+
+  // [Effect 2] sessionStorage에 결제 결과가 있으면 꺼내서 모달 표시 (Effect 1 이후 렌더링에서 실행됨)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const storedResult = sessionStorage.getItem('paymentResult');
+      if (storedResult) {
+        try {
+          setPaymentResultMsg(JSON.parse(storedResult));
+          sessionStorage.removeItem('paymentResult');
+        } catch (e) {
+          console.error('결제 결과 파싱 실패', e);
+        }
+      }
+    }, 300); // 300ms 딜레이로 React 렌더링 완료 후 실행 보장
+    return () => clearTimeout(timer);
+  }); // 의존성 배열 없음 = 매 렌더링마다 체크
 
   useEffect(() => {
     if (paymentResultMsg && paymentResultMsg.type === 'error') {

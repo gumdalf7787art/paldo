@@ -77,7 +77,6 @@ const SubscriptionPage = () => {
     // 포트원 빌링키 발급 요청 (IMP.request_pay에 customer_uid 전달)
     window.IMP.request_pay({
       channelKey: import.meta.env.VITE_PORTONE_CHANNEL_KEY_GENERAL,
-      pg: 'html5_inicis',
       pay_method: 'card',
       merchant_uid: merchantUid,
       name: `다잇독 비즈니스 멤버십 (${plan.name})`,

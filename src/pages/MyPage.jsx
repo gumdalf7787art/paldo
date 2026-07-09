@@ -121,28 +121,50 @@ const MyPage = () => {
     const merchantUid = searchParams.get('merchant_uid');
     const impSuccess = searchParams.get('imp_success');
 
-    if (paymentDone === 'true') {
-      // 토스페이 리다이렉트 완료 → sessionStorage에 결과 저장
-      sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
-      // 결제 내역 탭으로 자동 이동 (URL 파라미터 감지)
-      const tabParam = searchParams.get('tab');
-      if (tabParam === 'payments') {
-        setActiveTab('payments');
-      }
-      window.history.replaceState({}, '', '/mypage');
-      // 결제 내역 즉시 새로고침
-      api.payment.getHistory().then(({ data }) => {
-        if (data) setPaymentHistory(data);
+    if (paymentDone === 'true' && impUid && merchantUid) {
+      // 1. URL에서 결제 관련 파라미터 추출
+      const amount = searchParams.get('amount') || 0;
+      const adId = searchParams.get('ad_id') || '';
+      const payMethod = searchParams.get('pay_method') || 'tosspay';
+
+      // 2. 서버로 결제 검증 (Verify) 요청 - 이 과정을 거쳐야 DB에 내역이 저장됨!
+      api.payment.verify(impUid, merchantUid, amount, adId, payMethod).then(({ data, error }) => {
+        if (error) {
+          sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 검증 실패: ${error}` }));
+        } else {
+          // 토스페이 리다이렉트 완료 → sessionStorage에 결과 저장
+          sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+        }
+        
+        // 결제 내역 탭으로 자동 이동 (URL 파라미터 감지)
+        const tabParam = searchParams.get('tab');
+        if (tabParam === 'payments') {
+          setActiveTab('payments');
+        }
+        window.history.replaceState({}, '', '/mypage');
+        
+        // 결제 내역 즉시 새로고침 (검증 로직 완료 후 호출)
+        api.payment.getHistory().then(({ data: historyData }) => {
+          if (historyData) setPaymentHistory(historyData);
+        });
       });
     } else if (impUid && merchantUid) {
-      // 기타 imp_uid 파라미터가 붙어 돌아오는 경우
+      // 기타 imp_uid 파라미터가 붙어 돌아오는 경우 (결제 도중 취소/실패 등)
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
       } else {
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
       }
+      const tabParam = searchParams.get('tab');
+      if (tabParam === 'payments') {
+        setActiveTab('payments');
+      }
       window.history.replaceState({}, '', '/mypage');
+      // 혹시라도 성공이었다면 내역 업데이트
+      api.payment.getHistory().then(({ data: historyData }) => {
+        if (historyData) setPaymentHistory(historyData);
+      });
     }
 
     // React Router state로 넘어오는 경우 (PC 콜백)

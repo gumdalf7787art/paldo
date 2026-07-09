@@ -242,38 +242,60 @@ const AdStorePage = () => {
                 </p>
 
                 {/* 결제 수단 선택 라디오/버튼 그룹 */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
                   <button
                     onClick={() => setPayMethod('card')}
                     style={{
                       flex: 1,
-                      padding: '12px',
+                      padding: '12px 6px',
                       borderRadius: '10px',
                       border: payMethod === 'card' ? '2px solid var(--primary)' : '1px solid #ddd',
                       backgroundColor: payMethod === 'card' ? '#fffbf0' : '#fff',
                       fontWeight: 'bold',
+                      fontSize: '0.9rem',
                       color: payMethod === 'card' ? 'var(--primary-dark)' : '#555',
                       cursor: 'pointer',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      wordBreak: 'keep-all'
                     }}
                   >
-                    💳 신용카드 / 간편결제
+                    💳 일반 신용카드
+                  </button>
+                  <button
+                    onClick={() => setPayMethod('tosspay')}
+                    style={{
+                      flex: 1,
+                      padding: '12px 6px',
+                      borderRadius: '10px',
+                      border: payMethod === 'tosspay' ? '2px solid var(--primary)' : '1px solid #ddd',
+                      backgroundColor: payMethod === 'tosspay' ? '#e6f0fa' : '#fff',
+                      fontWeight: 'bold',
+                      fontSize: '0.9rem',
+                      color: payMethod === 'tosspay' ? '#0064ff' : '#555',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      wordBreak: 'keep-all'
+                    }}
+                  >
+                    🔵 토스 간편결제
                   </button>
                   <button
                     onClick={() => setPayMethod('vbank')}
                     style={{
                       flex: 1,
-                      padding: '12px',
+                      padding: '12px 6px',
                       borderRadius: '10px',
                       border: payMethod === 'vbank' ? '2px solid var(--primary)' : '1px solid #ddd',
                       backgroundColor: payMethod === 'vbank' ? '#fffbf0' : '#fff',
                       fontWeight: 'bold',
+                      fontSize: '0.9rem',
                       color: payMethod === 'vbank' ? 'var(--primary-dark)' : '#555',
                       cursor: 'pointer',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      wordBreak: 'keep-all'
                     }}
                   >
-                    🏦 가상계좌 (무통장)
+                    🏦 가상계좌
                   </button>
                 </div>
 
@@ -365,7 +387,7 @@ const AdStorePage = () => {
 
                     const paymentData = {
                       channelKey: import.meta.env.VITE_PORTONE_CHANNEL_KEY_TOSS,
-                      pay_method: payMethod === 'card' ? 'tosspay' : payMethod,
+                      pay_method: payMethod,
                       merchant_uid: merchantUid,
                       name: selectedItem.name,
                       amount: selectedItem.price,

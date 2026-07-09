@@ -138,7 +138,7 @@ const MyPage = () => {
         
         // 결제 결과 리다이렉트로 돌아온 것이므로 무조건 결제 내역 탭으로 이동
         setActiveTab('payments');
-        window.history.replaceState({}, '', '/mypage');
+        navigate('/mypage', { replace: true, state: {} });
         
         // 결제 내역 즉시 새로고침 (검증 로직 완료 후 호출)
         api.payment.getHistory().then(({ data: historyData }) => {
@@ -150,12 +150,11 @@ const MyPage = () => {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
         sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` }));
-        window.history.replaceState({}, '', '/mypage');
+        navigate('/mypage', { replace: true, state: {} });
       } else {
         // 성공인데 payment_done 등 다른 파라미터가 유실된 경우 복구 로직
         const match = merchantUid.match(/merchant_ad_(\d+)/);
         const adId = match ? match[1] : '';
-        
         api.payment.verify(impUid, merchantUid, 0, adId, 'tosspay').then(({ data, error }) => {
           if (error) {
             sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 검증 실패: ${error}` }));
@@ -163,7 +162,7 @@ const MyPage = () => {
             sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
           }
           setActiveTab('payments');
-          window.history.replaceState({}, '', '/mypage');
+          navigate('/mypage', { replace: true, state: {} });
           api.payment.getHistory().then(({ data: historyData }) => {
             if (historyData) setPaymentHistory(historyData);
           });
@@ -178,14 +177,15 @@ const MyPage = () => {
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       delete newState.openTab;
-      window.history.replaceState(newState, '', '/mypage');
+      navigate(location.pathname, { replace: true, state: newState });
+      
       // 결제 내역 즉시 새로고침
       api.payment.getHistory().then(({ data }) => { if (data) setPaymentHistory(data); });
     } else if (location.state?.paymentError) {
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` }));
       const newState = { ...location.state };
       delete newState.paymentError;
-      window.history.replaceState(newState, '', '/mypage');
+      navigate(location.pathname, { replace: true, state: newState });
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';

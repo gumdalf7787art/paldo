@@ -80,7 +80,16 @@ export async function onRequestPost(context) {
     let access_token = '';
     let is_mock = false;
 
-    if (!env.PORTONE_API_KEY || !env.PORTONE_API_SECRET) {
+    // 결제 수단에 따라 토스페이 전용 환경변수가 존재할 경우 사용
+    let apiKey = env.PORTONE_API_KEY;
+    let apiSecret = env.PORTONE_API_SECRET;
+
+    if (body.pay_method === 'tosspay') {
+      apiKey = env.PORTONE_API_KEY_TOSS || env.TOSS_API_KEY || env.PORTONE_TOSS_API_KEY || apiKey;
+      apiSecret = env.PORTONE_API_SECRET_TOSS || env.TOSS_API_SECRET || env.PORTONE_TOSS_API_SECRET || apiSecret;
+    }
+
+    if (!apiKey || !apiSecret) {
       is_mock = true; // API 키가 존재하지 않는 로컬/테스트 환경에서는 Mock 처리하여 성공 반환
     } else {
       try {
@@ -88,8 +97,8 @@ export async function onRequestPost(context) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            imp_key: env.PORTONE_API_KEY,
-            imp_secret: env.PORTONE_API_SECRET
+            imp_key: apiKey,
+            imp_secret: apiSecret
           })
         });
         const tokenData = await tokenRes.json();

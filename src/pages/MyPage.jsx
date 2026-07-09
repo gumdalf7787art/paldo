@@ -129,6 +129,11 @@ const MyPage = () => {
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       navigate('/mypage', { replace: true, state: newState });
+    } else if (location.state?.paymentError) {
+      setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` });
+      const newState = { ...location.state };
+      delete newState.paymentError;
+      navigate('/mypage', { replace: true, state: newState });
     } else if (location.state?.paymentReady && location.state?.vbank) {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';

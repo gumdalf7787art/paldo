@@ -394,7 +394,7 @@ const AdStorePage = () => {
                       buyer_email: currentUser.email || '',
                       buyer_name: (payMethod === 'vbank' ? senderName.trim() : (currentUser.nickname || currentUser.email || '')),
                       buyer_tel: currentUser.phone || '',
-                      m_redirect_url: window.location.origin + '/mypage?payment_done=true'
+                      m_redirect_url: window.location.origin + '/mypage?payment_done=true&tab=payments'
                     };
 
                     window.IMP.request_pay(paymentData, async (rsp) => {
@@ -444,11 +444,10 @@ const AdStorePage = () => {
                           };
                           setIsModalOpen(false);
                           alert(`가상계좌 발급 완료: [${v.vbank_name} ${v.vbank_num}]`);
-                          navigate('/mypage', { state: { paymentReady: true, vbank: v } });
+                          navigate('/mypage', { state: { paymentReady: true, vbank: v, openTab: 'payments' } });
                         } else {
                           setIsModalOpen(false);
-                          alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
-                          navigate('/mypage', { state: { paymentSuccess: true } });
+                          navigate('/mypage', { state: { paymentSuccess: true, openTab: 'payments' } });
                         }
                       } else {
                         setIsSubmitting(false);

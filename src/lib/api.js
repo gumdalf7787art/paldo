@@ -926,5 +926,41 @@ export const api = {
         return { data: null, error: err.message };
       }
     }
+  },
+
+  // 15. 결제 (Payment)
+  payment: {
+    async getHistory() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/history`);
+        return { data: data.history || [], error: null };
+      } catch (err) {
+        return { data: [], error: err.message };
+      }
+    },
+
+    async verify(imp_uid, merchant_uid, amount, ad_id, pay_method, vbankInfo = {}) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/verify`, {
+          method: 'POST',
+          body: JSON.stringify({ imp_uid, merchant_uid, amount, ad_id, pay_method, ...vbankInfo }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
+    async requestCancel(payment_id) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/payment/cancel-request`, {
+          method: 'POST',
+          body: JSON.stringify({ payment_id }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    }
   }
 };

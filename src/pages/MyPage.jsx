@@ -122,9 +122,18 @@ const MyPage = () => {
     const impSuccess = searchParams.get('imp_success');
 
     if (paymentDone === 'true') {
-      // 토스페이 리다이렉트 완료
+      // 토스페이 리다이렉트 완료 → sessionStorage에 결과 저장
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+      // 결제 내역 탭으로 자동 이동 (URL 파라미터 감지)
+      const tabParam = searchParams.get('tab');
+      if (tabParam === 'payments') {
+        setActiveTab('payments');
+      }
       window.history.replaceState({}, '', '/mypage');
+      // 결제 내역 즉시 새로고침
+      api.payment.getHistory().then(({ data }) => {
+        if (data) setPaymentHistory(data);
+      });
     } else if (impUid && merchantUid) {
       // 기타 imp_uid 파라미터가 붙어 돌아오는 경우
       if (impSuccess === 'false') {
@@ -139,9 +148,13 @@ const MyPage = () => {
     // React Router state로 넘어오는 경우 (PC 콜백)
     if (location.state?.paymentSuccess) {
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' }));
+      if (location.state?.openTab) setActiveTab(location.state.openTab);
       const newState = { ...location.state };
       delete newState.paymentSuccess;
+      delete newState.openTab;
       window.history.replaceState(newState, '', '/mypage');
+      // 결제 내역 즉시 새로고침
+      api.payment.getHistory().then(({ data }) => { if (data) setPaymentHistory(data); });
     } else if (location.state?.paymentError) {
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` }));
       const newState = { ...location.state };
@@ -152,10 +165,14 @@ const MyPage = () => {
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
       sessionStorage.setItem('paymentResult', JSON.stringify({ type: 'success', text: msgText, vbankInfo: `${v.name} ${v.num}` }));
+      if (location.state?.openTab) setActiveTab(location.state.openTab);
       const newState = { ...location.state };
       delete newState.paymentReady;
       delete newState.vbank;
+      delete newState.openTab;
       window.history.replaceState(newState, '', '/mypage');
+      // 결제 내역 즉시 새로고침
+      api.payment.getHistory().then(({ data }) => { if (data) setPaymentHistory(data); });
     }
   }, [location.search, location.state]);
 

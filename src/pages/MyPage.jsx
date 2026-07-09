@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../lib/api';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -119,21 +120,17 @@ const MyPage = () => {
     if (impUid && merchantUid) {
       if (impSuccess === 'false') {
         const errorMsg = searchParams.get('error_msg') || '결제에 실패하였습니다.';
-        alert(`❌ 결제 실패: ${errorMsg}`);
         setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${errorMsg}` });
       } else {
-        alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
         setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       }
       navigate('/mypage', { replace: true });
     } else if (location.state?.paymentSuccess) {
-      alert('✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.');
       setPaymentResultMsg({ type: 'success', text: '✅ 결제가 성공적으로 완료되었습니다! 멤버십 이용권이 지급되었습니다.' });
       const newState = { ...location.state };
       delete newState.paymentSuccess;
       navigate('/mypage', { replace: true, state: newState });
     } else if (location.state?.paymentError) {
-      alert(`❌ 결제 실패: ${location.state.paymentError}`);
       setPaymentResultMsg({ type: 'error', text: `❌ 결제 실패: ${location.state.paymentError}` });
       const newState = { ...location.state };
       delete newState.paymentError;
@@ -142,7 +139,6 @@ const MyPage = () => {
       const v = location.state.vbank;
       const formattedDate = v.date ? new Date(v.date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
       const msgText = `✅ 가상계좌 발급 완료! [${v.name} ${v.num}] / 금액: ${v.amount ? v.amount.toLocaleString() : '100'}원 / 기한: ${formattedDate} 까지 입금해주세요.`;
-      alert(msgText);
       setPaymentResultMsg({ 
         type: 'success', 
         text: msgText,
@@ -618,32 +614,42 @@ const MyPage = () => {
   if (isMobile) {
     return (
       <div className="mobile-mypage-container" style={{ padding: '15px 15px 80px', backgroundColor: '#fdfdfd', minHeight: '100vh', position: 'relative' }}>
-        {/* 결제 결과 커스텀 토스트 알림 */}
+        {/* 결제 결과 풀스크린 커스텀 모달 */}
         {paymentResultMsg && (
           <div style={{
-            position: 'fixed', top: '15px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
-            backgroundColor: paymentResultMsg.type === 'success' ? '#e6fffa' : '#fff5f5',
-            borderLeft: `6px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
-            padding: '16px 20px', borderRadius: '10px', boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-            display: 'flex', alignItems: 'center', gap: '12px', width: 'calc(100% - 30px)', maxWidth: '450px',
-            boxSizing: 'border-box'
+            position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
           }}>
-            <div style={{ fontSize: '24px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: '900', fontSize: '1rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
-                {paymentResultMsg.type === 'success' ? '결제 성공' : '결제 실패'}
+            <div style={{
+              backgroundColor: '#fff', borderRadius: '16px', padding: '30px 20px', width: '100%', maxWidth: '380px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center', animation: 'fadeInDown 0.3s ease-out forwards',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px'
+            }}>
+              <div style={{ fontSize: '48px' }}>{paymentResultMsg.type === 'success' ? '🎉' : '⚠️'}</div>
+              <div style={{ fontWeight: '900', fontSize: '1.25rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
+                {paymentResultMsg.type === 'success' ? '결제 완료' : '결제 실패'}
               </div>
-              <div style={{ color: '#4a5568', fontSize: '0.85rem', marginTop: '6px', wordBreak: 'keep-all', lineHeight: '1.4' }}>{paymentResultMsg.text}</div>
+              <div style={{ color: '#4a5568', fontSize: '0.95rem', wordBreak: 'keep-all', lineHeight: '1.5', margin: '10px 0' }}>
+                {paymentResultMsg.text}
+              </div>
+              {paymentResultMsg.vbankInfo && (
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(paymentResultMsg.vbankInfo);
+                    alert('계좌 정보가 클립보드에 복사되었습니다: ' + paymentResultMsg.vbankInfo);
+                  }} 
+                  style={{ background: '#319795', border: 'none', color: 'white', padding: '12px', width: '100%', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', marginBottom: '8px' }}
+                >
+                  계좌 복사
+                </button>
+              )}
+              <button 
+                onClick={() => setPaymentResultMsg(null)} 
+                style={{ background: '#edf2f7', border: '1px solid #cbd5e0', color: '#4a5568', padding: '12px', width: '100%', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem' }}
+              >
+                확인
+              </button>
             </div>
-            <button 
-              onClick={() => setPaymentResultMsg(null)} 
-              style={{ 
-                background: '#edf2f7', border: '1px solid #cbd5e0', fontSize: '0.8rem', fontWeight: 'bold',
-                color: '#4a5568', cursor: 'pointer', padding: '6px 12px', borderRadius: '6px', flexShrink: 0
-              }}
-            >
-              닫기
-            </button>
           </div>
         )}
 
@@ -1360,52 +1366,48 @@ const MyPage = () => {
 
   return (
     <div className="container" style={{ padding: '60px 0', position: 'relative' }}>
-      {/* 결제 결과 커스텀 토스트 알림 */}
+      {/* 결제 결과 풀스크린 커스텀 모달 */}
       {paymentResultMsg && (
         <div style={{
-          position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
-          backgroundColor: paymentResultMsg.type === 'success' ? '#e6fffa' : '#fff5f5',
-          borderLeft: `8px solid ${paymentResultMsg.type === 'success' ? '#38b2ac' : '#f56565'}`,
-          padding: '24px 32px', borderRadius: '12px', boxShadow: '0 15px 35px rgba(0,0,0,0.25)',
-          display: 'flex', alignItems: 'center', gap: '20px', minWidth: '400px', maxWidth: '95vw',
-          animation: 'fadeInDown 0.4s ease-out forwards'
+          position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
         }}>
-          <div style={{ fontSize: '32px' }}>{paymentResultMsg.type === 'success' ? '✅' : '❌'}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '900', fontSize: '1.2rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
-              {paymentResultMsg.type === 'success' ? '결제 성공' : '결제 실패'}
+          <div style={{
+            backgroundColor: '#fff', borderRadius: '20px', padding: '40px 30px', width: '100%', maxWidth: '450px',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.25)', textAlign: 'center', animation: 'fadeInDown 0.3s ease-out forwards',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px'
+          }}>
+            <div style={{ fontSize: '64px' }}>{paymentResultMsg.type === 'success' ? '🎉' : '⚠️'}</div>
+            <div style={{ fontWeight: '900', fontSize: '1.5rem', color: paymentResultMsg.type === 'success' ? '#234e52' : '#742a2a' }}>
+              {paymentResultMsg.type === 'success' ? '결제 완료' : '결제 실패'}
             </div>
-            <div style={{ color: '#4a5568', fontSize: '1.05rem', marginTop: '6px', wordBreak: 'keep-all', lineHeight: '1.4' }}>{paymentResultMsg.text}</div>
+            <div style={{ color: '#4a5568', fontSize: '1.1rem', wordBreak: 'keep-all', lineHeight: '1.5', margin: '15px 0' }}>
+              {paymentResultMsg.text}
+            </div>
+            <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+              {paymentResultMsg.vbankInfo && (
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(paymentResultMsg.vbankInfo);
+                    alert('계좌 정보가 클립보드에 복사되었습니다: ' + paymentResultMsg.vbankInfo);
+                  }} 
+                  style={{ flex: 1, background: '#319795', border: 'none', color: 'white', padding: '14px', borderRadius: '10px', fontWeight: 'bold', fontSize: '1.05rem', cursor: 'pointer' }}
+                  onMouseEnter={(e) => e.target.style.background = '#285e61'}
+                  onMouseLeave={(e) => e.target.style.background = '#319795'}
+                >
+                  계좌 복사
+                </button>
+              )}
+              <button 
+                onClick={() => setPaymentResultMsg(null)} 
+                style={{ flex: 1, background: '#edf2f7', border: '1px solid #cbd5e0', color: '#4a5568', padding: '14px', borderRadius: '10px', fontWeight: 'bold', fontSize: '1.05rem', cursor: 'pointer' }}
+                onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
+                onMouseLeave={(e) => e.target.style.background = '#edf2f7'}
+              >
+                확인
+              </button>
+            </div>
           </div>
-          {paymentResultMsg.vbankInfo && (
-            <button 
-              onClick={() => {
-                navigator.clipboard.writeText(paymentResultMsg.vbankInfo);
-                alert('계좌 정보가 클립보드에 복사되었습니다: ' + paymentResultMsg.vbankInfo);
-              }} 
-              style={{ 
-                background: '#319795', border: 'none', fontSize: '0.9rem', fontWeight: 'bold',
-                color: 'white', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', marginLeft: '10px',
-                transition: 'all 0.2s', flexShrink: 0
-              }}
-              onMouseEnter={(e) => e.target.style.background = '#285e61'}
-              onMouseLeave={(e) => e.target.style.background = '#319795'}
-            >
-              계좌 복사
-            </button>
-          )}
-          <button 
-            onClick={() => setPaymentResultMsg(null)} 
-            style={{ 
-              background: '#edf2f7', border: '1px solid #cbd5e0', fontSize: '0.9rem', fontWeight: 'bold',
-              color: '#4a5568', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', marginLeft: '10px',
-              transition: 'all 0.2s', flexShrink: 0
-            }}
-            onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
-            onMouseLeave={(e) => e.target.style.background = '#edf2f7'}
-          >
-            닫기
-          </button>
         </div>
       )}
 

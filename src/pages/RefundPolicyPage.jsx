@@ -9,7 +9,7 @@ const RefundPolicyPage = () => {
       {/* 상단 네비게이션 및 헤더 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #f0f0f0', paddingBottom: '20px' }}>
         <div>
-          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Daitdog Policies</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>PaldoDog Policies</span>
           <h1 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#1a1a1a', marginTop: '5px', marginBottom: '0' }}>
             서비스 이용 및 환불 정책
           </h1>
@@ -39,7 +39,7 @@ const RefundPolicyPage = () => {
       {/* 안내 문구 */}
       <div style={{ backgroundColor: '#f9f9fb', borderLeft: '4px solid var(--primary)', padding: '20px', borderRadius: '0 12px 12px 0', marginBottom: '40px' }}>
         <p style={{ margin: 0, fontSize: '0.95rem', color: '#555', lineHeight: '1.6' }}>
-          본 약관은 주식회사 블루프라임이 운영하는 반려동물 매장 정보 제공 및 관리 솔루션 플랫폼 <strong>'다잇독(DAITDOG)'</strong>에서 제공하는 서비스 및 결제, 환불에 관한 조건과 절차를 규정합니다. 안전하고 신뢰할 수 있는 플랫폼 이용 서비스를 위해 이용 전에 반드시 숙지해 주시기 바랍니다.
+          본 약관은 주식회사 블루프라임이 운영하는 반려동물 매장 정보 제공 및 관리 솔루션 플랫폼 <strong>'팔도댕댕(DAITDOG)'</strong>에서 제공하는 서비스 및 결제, 환불에 관한 조건과 절차를 규정합니다. 안전하고 신뢰할 수 있는 플랫폼 이용 서비스를 위해 이용 전에 반드시 숙지해 주시기 바랍니다.
         </p>
       </div>
 
@@ -49,14 +49,14 @@ const RefundPolicyPage = () => {
         {/* 광고 및 구독 약관 메인 */}
         <section style={{ backgroundColor: '#fff', border: '1px solid #eef2f7', borderRadius: '16px', padding: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '20px', borderBottom: '1px solid #f0f0f0', paddingBottom: '10px' }}>
-            다잇독 비즈니스 멤버십 및 플랫폼 이용료 환불 규정
+            팔도댕댕 비즈니스 멤버십 및 플랫폼 이용료 환불 규정
           </h2>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>제1조 (목적)</h3>
               <p style={{ margin: 0, fontSize: '0.9rem', color: '#666', lineHeight: '1.6' }}>
-                본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 매장 정보 및 관리 솔루션 플랫폼 '다잇독(DAITDOG)'(이하 '플랫폼')에서 제공하는 사업자용 유료 서비스(비즈니스 멤버십 및 플랫폼 서비스 이용권) 결제 및 환불에 관한 조건과 절차를 규정함을 목적으로 합니다.
+                본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 매장 정보 및 관리 솔루션 플랫폼 '팔도댕댕(DAITDOG)'(이하 '플랫폼')에서 제공하는 사업자용 유료 서비스(비즈니스 멤버십 및 플랫폼 서비스 이용권) 결제 및 환불에 관한 조건과 절차를 규정함을 목적으로 합니다.
               </p>
             </div>
 

@@ -280,7 +280,7 @@ const MyPage = () => {
 
     if (profileData) {
       setProfile(profileData);
-      setNickname(profileData.nickname || '다잇독회원');
+      setNickname(profileData.nickname || '팔도댕댕회원');
       setPhone(profileData.phone || '');
       setAddress(profileData.address || '');
       setProfileImage(profileData.profile_image || null);
@@ -916,7 +916,7 @@ const MyPage = () => {
                 <span style={{ fontSize: '2rem' }}>🏪</span>
                 <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#4a5568' }}>펫샵 사장님이신가요?</h4>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#718096', lineHeight: '1.4', wordBreak: 'keep-all' }}>
-                  다잇독에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
+                  팔도댕댕에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
                 </p>
                 <button
                   onClick={() => setIsApplyModalOpen(true)}
@@ -1730,7 +1730,7 @@ const MyPage = () => {
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#4a5568' }}>인증 분양 사업자(스토어)로 입점해보세요!</h4>
                         <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#718096', lineHeight: '1.4' }}>
-                          다잇독에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
+                          팔도댕댕에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
                         </p>
                       </div>
                       <button

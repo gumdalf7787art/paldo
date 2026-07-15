@@ -169,13 +169,13 @@ const LatestCommunityWidget = () => {
 const PartnerBanner = () => {
   const { isMobile } = useMobile();
   const [isVisible, setIsVisible] = useState(() => {
-    return localStorage.getItem('daitdog_partner_banner_closed') !== 'true';
+    return localStorage.getItem('paldodog_partner_banner_closed') !== 'true';
   });
 
   if (!isVisible) return null;
 
   const handleClose = () => {
-    localStorage.setItem('daitdog_partner_banner_closed', 'true');
+    localStorage.setItem('paldodog_partner_banner_closed', 'true');
     setIsVisible(false);
   };
 
@@ -214,7 +214,7 @@ const PartnerBanner = () => {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🤝 다잇독 파트너스 매장 관리 솔루션(SaaS) 안내
+            🤝 팔도댕댕 파트너스 매장 관리 솔루션(SaaS) 안내
           </h3>
           <div style={{
             fontSize: isMobile ? '0.85rem' : '1rem',
@@ -226,13 +226,13 @@ const PartnerBanner = () => {
               올바른 반려문화의 시작
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 반려동물 매장의 효율적인 정보 관리와 디지털 전환을 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'B2B 매장 통합 관리(SaaS) 플랫폼'</strong>입니다.
+              팔도댕댕은 반려동물 매장의 효율적인 정보 관리와 디지털 전환을 돕는 <strong style={{ color: '#004D40', borderBottom: '2px solid #00796B', paddingBottom: '2px' }}>'B2B 매장 통합 관리(SaaS) 플랫폼'</strong>입니다.
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>플랫폼 내 상품 거래 및 소비자 대상 결제 기능은 제공하지 않습니다.</strong>
+              팔도댕댕은 관련 법률을 준수하며, 플랫폼 내에서 <strong style={{ color: '#c62828' }}>플랫폼 내 상품 거래 및 소비자 대상 결제 기능은 제공하지 않습니다.</strong>
             </p>
             <p style={{ margin: '4px 0' }}>
-              다잇독이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'매장 관리 ERP 솔루션 사용료 및 프리미엄 파트너스 멤버십 구독료' 결제용 무형 소프트웨어 서비스</strong>입니다.
+              팔도댕댕이 제공하는 전자결제 서비스는 오직 파트너사분들의 <strong style={{ color: '#004D40' }}>'매장 관리 ERP 솔루션 사용료 및 프리미엄 파트너스 멤버십 구독료' 결제용 무형 소프트웨어 서비스</strong>입니다.
             </p>
             <p style={{ margin: '8px 0 0 0', fontWeight: '700', color: '#00796B' }}>
               체계적이고 편리한 매장 관리 솔루션을 경험해보세요!
@@ -390,7 +390,7 @@ function Footer() {
           gap: isMobile ? '20px' : '30px' 
         }}>
           <div>
-            <h2 style={{ color: 'white', fontSize: isMobile ? '1.2rem' : '1.5rem', marginBottom: '10px' }}>다잇독</h2>
+            <h2 style={{ color: 'white', fontSize: isMobile ? '1.2rem' : '1.5rem', marginBottom: '10px' }}>팔도댕댕</h2>
             
             {isMobile ? (
               <div style={{ marginBottom: '15px' }}>
@@ -436,7 +436,7 @@ function Footer() {
                 고객센터 : 010-3046-9821 &nbsp;|&nbsp; 이메일 : goodduck2@naver.com
               </div>
             )}
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>© 2026 Daitdog. All rights reserved.</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>© 2026 PaldoDog. All rights reserved.</p>
           </div>
           <div style={{ 
             display: 'flex', 

@@ -168,7 +168,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  반려동물 사업자 운영 솔루션, 다잇독
+                  반려동물 사업자 운영 솔루션, 팔도댕댕
                 </span>
               </div>
 

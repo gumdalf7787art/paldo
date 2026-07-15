@@ -9,7 +9,7 @@ const PrivacyPage = () => {
       {/* 헤더 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #f0f0f0', paddingBottom: '20px' }}>
         <div>
-          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Daitdog Policies</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>PaldoDog Policies</span>
           <h1 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#1a1a1a', marginTop: '5px', marginBottom: '0' }}>
             개인정보처리방침
           </h1>
@@ -42,7 +42,7 @@ const PrivacyPage = () => {
         <section>
           <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제1조 (개인정보의 수집 항목 및 이용 목적)</h2>
           <p style={{ margin: '0 0 10px 0' }}>
-            주식회사 블루프라임(이하 '회사')은 다잇독(DAITDOG) 플랫폼의 안정적인 서비스 제공, 고객 문의 응대, 결제 처리, 마케팅 분석을 위해 필요한 최소한의 회원 개인정보를 수집하고 있습니다.
+            주식회사 블루프라임(이하 '회사')은 팔도댕댕(DAITDOG) 플랫폼의 안정적인 서비스 제공, 고객 문의 응대, 결제 처리, 마케팅 분석을 위해 필요한 최소한의 회원 개인정보를 수집하고 있습니다.
           </p>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left', marginTop: '10px' }}>
             <thead>

@@ -9,7 +9,7 @@ const TermsPage = () => {
       {/* 헤더 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #f0f0f0', paddingBottom: '20px' }}>
         <div>
-          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Daitdog Policies</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>PaldoDog Policies</span>
           <h1 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#1a1a1a', marginTop: '5px', marginBottom: '0' }}>
             서비스 이용약관
           </h1>
@@ -42,7 +42,7 @@ const TermsPage = () => {
         <section>
           <h2 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#333', marginBottom: '12px' }}>제1조 (목적)</h2>
           <p style={{ margin: 0 }}>
-            본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 매장 정보 제공 및 관리 솔루션 플랫폼 '다잇독(DAITDOG)'(이하 '플랫폼')에서 제공하는 정보 제공 서비스 및 비즈니스 멤버십 이용료 결제 등 플랫폼 서비스의 이용과 관련하여, 회사와 회원의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.
+            본 약관은 주식회사 블루프라임(이하 '회사')이 운영하는 반려동물 매장 정보 제공 및 관리 솔루션 플랫폼 '팔도댕댕(DAITDOG)'(이하 '플랫폼')에서 제공하는 정보 제공 서비스 및 비즈니스 멤버십 이용료 결제 등 플랫폼 서비스의 이용과 관련하여, 회사와 회원의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.
           </p>
         </section>
 

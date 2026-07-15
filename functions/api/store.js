@@ -53,7 +53,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-1': {
     profile: {
       id: 'dummy-store-1',
-      email: 'cheongdam@daitdog.com',
+      email: 'cheongdam@paldodog.com',
       nickname: '도그하우스 청담본점',
       phone: '02-543-9876',
       address: '서울특별시 강남구 청담동 89-4',
@@ -85,7 +85,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-2': {
     profile: {
       id: 'dummy-store-2',
-      email: 'mapo@daitdog.com',
+      email: 'mapo@paldodog.com',
       nickname: '퍼피랜드 마포점',
       phone: '02-712-3456',
       address: '서울특별시 마포구 도화동 173',
@@ -115,7 +115,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-3': {
     profile: {
       id: 'dummy-store-3',
-      email: 'songdo@daitdog.com',
+      email: 'songdo@paldodog.com',
       nickname: '댕댕이 하우스 송도',
       phone: '032-831-7788',
       address: '인천광역시 연수구 송도동 23-3',
@@ -143,7 +143,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-4': {
     profile: {
       id: 'dummy-store-4',
-      email: 'centum@daitdog.com',
+      email: 'centum@paldodog.com',
       nickname: '해피퍼피 부산센텀',
       phone: '051-744-1234',
       address: '부산광역시 해운대구 우동 1400',
@@ -170,7 +170,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-5': {
     profile: {
       id: 'dummy-store-5',
-      email: 'bundang@daitdog.com',
+      email: 'bundang@paldodog.com',
       nickname: '조이펫 분당수지점',
       phone: '031-708-5678',
       address: '경기도 성남시 분당구 정자동 16-2',
@@ -195,7 +195,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-6': {
     profile: {
       id: 'dummy-store-6',
-      email: 'ilsan@daitdog.com',
+      email: 'ilsan@paldodog.com',
       nickname: '골든퍼피 일산점',
       phone: '031-901-4321',
       address: '경기도 고양시 일산동구 장항동 740',
@@ -220,7 +220,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-7': {
     profile: {
       id: 'dummy-store-7',
-      email: 'gwangju@daitdog.com',
+      email: 'gwangju@paldodog.com',
       nickname: '스위트하우스 광주점',
       phone: '062-371-9988',
       address: '광주광역시 서구 치평동 1200',
@@ -245,7 +245,7 @@ const DUMMY_STORE_DETAILS = {
   'dummy-store-8': {
     profile: {
       id: 'dummy-store-8',
-      email: 'daegu@daitdog.com',
+      email: 'daegu@paldodog.com',
       nickname: '엔젤퍼피 대구수성점',
       phone: '053-755-1122',
       address: '대구광역시 수성구 범어동 45-1',

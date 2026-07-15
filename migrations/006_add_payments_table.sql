@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
     imp_uid TEXT UNIQUE NOT NULL,             -- 포트원 결제 고유 거래 ID
-    merchant_uid TEXT UNIQUE NOT NULL,        -- 다잇독 자체 주문 고유 번호
+    merchant_uid TEXT UNIQUE NOT NULL,        -- 팔도댕댕 자체 주문 고유 번호
     amount INTEGER NOT NULL,                  -- 결제 금액
     pay_method TEXT NOT NULL,                 -- card, vbank, trans 등
     status TEXT NOT NULL DEFAULT 'ready',      -- paid, ready, cancelled, failed

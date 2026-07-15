@@ -52,7 +52,7 @@ export async function onRequestGet(context) {
     }
 
     const googleId = userData.id;
-    const email = userData.email || `google_${googleId}@daitdog.com`;
+    const email = userData.email || `google_${googleId}@paldodog.com`;
     const nickname = userData.name || `구글회원_${googleId.toString().slice(-4)}`;
     const profileImage = userData.picture || '';
 

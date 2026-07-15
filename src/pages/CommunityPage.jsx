@@ -94,7 +94,7 @@ const CommunityPage = () => {
       
       {/* 히어로 헤더 섹션 */}
       <div style={{ ...heroHeaderStyle, ...(isMobile && { padding: '25px 15px', marginBottom: '20px' }) }}>
-        <h1 style={{ ...titleStyle, ...(isMobile && { fontSize: '1.6rem' }) }}>🐾 다잇독 커뮤니티</h1>
+        <h1 style={{ ...titleStyle, ...(isMobile && { fontSize: '1.6rem' }) }}>🐾 팔도댕댕 커뮤니티</h1>
         <p style={{ ...subtitleStyle, ...(isMobile && { fontSize: '0.88rem' }) }}>
           전국의 반려인들과 따뜻한 일상을 나누고 다양한 지식과 생생한 소식을 공유해보세요.
         </p>

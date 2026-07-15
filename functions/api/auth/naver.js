@@ -55,7 +55,7 @@ export async function onRequestGet(context) {
 
     const response = userData.response;
     const naverId = response.id;
-    const email = response.email || `naver_${naverId}@daitdog.com`;
+    const email = response.email || `naver_${naverId}@paldodog.com`;
     const nickname = response.nickname || response.name || `네이버회원_${naverId.toString().slice(-4)}`;
     const profileImage = response.profile_image || '';
 

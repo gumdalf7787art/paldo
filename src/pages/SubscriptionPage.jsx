@@ -22,7 +22,7 @@ const SubscriptionPage = () => {
     };
     loadUser();
 
-    // 포트원 SDK 초기화 (다잇독 가맹점 코드)
+    // 포트원 SDK 초기화 (팔도댕댕 가맹점 코드)
     if (window.IMP) {
       window.IMP.init(import.meta.env.VITE_PORTONE_IMP_CODE);
     }
@@ -79,7 +79,7 @@ const SubscriptionPage = () => {
       channelKey: import.meta.env.VITE_PORTONE_CHANNEL_KEY_GENERAL,
       pay_method: 'card',
       merchant_uid: merchantUid,
-      name: `다잇독 비즈니스 멤버십 (${plan.name})`,
+      name: `팔도댕댕 비즈니스 멤버십 (${plan.name})`,
       amount: 0, // 정기결제 빌링키 발급용
       customer_uid: customerUid, // ❗빌링키 발급을 위한 필수 파라미터
       buyer_email: currentUser.email || '',
@@ -115,10 +115,10 @@ const SubscriptionPage = () => {
     <div className="container fade-in" style={{ padding: '60px 20px', minHeight: '80vh' }}>
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '15px' }}>
-          다잇독 파트너스 비즈니스 멤버십
+          팔도댕댕 파트너스 비즈니스 멤버십
         </h1>
         <p style={{ color: '#666', fontSize: '1.1rem', lineHeight: '1.6' }}>
-          매월 정기적으로 이용하는 비즈니스 멤버십 서비스를 통해 다잇독의 프리미엄 혜택을 지속적으로 누리세요.<br/>
+          매월 정기적으로 이용하는 비즈니스 멤버십 서비스를 통해 팔도댕댕의 프리미엄 혜택을 지속적으로 누리세요.<br/>
           카드를 한 번만 등록하면 매월 편안하게 결제가 진행됩니다.
         </p>
       </div>
@@ -229,7 +229,7 @@ const SubscriptionPage = () => {
               <li>결제 후 7일이 경과했거나, 멤버십 기능을 1회 이상 사용한 후 중도 해지를 요청하는 경우, <strong>'결제 금액 - (이용 일수 × 일일 요금) - 해지 위약금(결제 금액의 10%)'</strong>을 공제한 잔여 금액이 환불되며, 이후 혜택은 즉시 종료됩니다.</li>
             </ul>
           </li>
-          <li><strong>교환 및 반품 안내</strong>: 다잇독 비즈니스 멤버십은 오프라인 실물 배송 상품이 아닌 무형의 온라인 솔루션이므로 실물 제품 교환 및 반품은 적용되지 않습니다.</li>
+          <li><strong>교환 및 반품 안내</strong>: 팔도댕댕 비즈니스 멤버십은 오프라인 실물 배송 상품이 아닌 무형의 온라인 솔루션이므로 실물 제품 교환 및 반품은 적용되지 않습니다.</li>
           <li>자세한 취소/환불 및 결제 조건은 하단 푸터의 <a href="/refund" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'underline' }}>[서비스 이용 및 환불 정책]</a> 페이지를 참고해 주시기 바랍니다.</li>
         </ul>
       </div>

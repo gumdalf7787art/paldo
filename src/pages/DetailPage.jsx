@@ -546,7 +546,7 @@ const DetailPage = () => {
               gap: '8px'
             }}>
               <span>💡</span>
-              <span>상담 시 <b>"다잇독 보고 연락드렸어요"</b> 라고 하시면 친절하고 빠른 안내를 받아보실 수 있습니다.</span>
+              <span>상담 시 <b>"팔도댕댕 보고 연락드렸어요"</b> 라고 하시면 친절하고 빠른 안내를 받아보실 수 있습니다.</span>
             </div>
 
             {/* 강아지 프로필 카드 형식 스펙 그리드 */}
@@ -628,7 +628,7 @@ const DetailPage = () => {
             <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '12px', color: '#1e293b' }}>📄 상세 설명</h3>
               <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.98rem', lineHeight: '1.6', margin: 0 }}>
-                {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
               </p>
 
               {dog.video_url && (
@@ -736,7 +736,7 @@ const DetailPage = () => {
                 textAlign: 'center',
                 lineHeight: '1.5'
               }}>
-                문의하실 때는 <b style={{ color: 'var(--primary)' }}>'다잇독에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
+                문의하실 때는 <b style={{ color: 'var(--primary)' }}>'팔도댕댕에서 보고 전화드렸습니다.'</b>라고 말씀하시면 문의가 쉬워집니다.
               </div>
               
               {allImages.length > 1 && (
@@ -761,7 +761,7 @@ const DetailPage = () => {
               <div className="glass-card" style={{ padding: '20px', marginBottom: '30px' }}>
                 <h2 style={{ marginBottom: '20px' }}>상세 설명</h2>
                 <p style={{ whiteSpace: 'pre-wrap', color: 'var(--muted-text)', fontSize: '1.02rem', lineHeight: '1.6', marginBottom: dog.video_url ? '30px' : '0' }}>
-                  {dog.desc || `안녕하세요! 다잇독 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
+                  {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
                 </p>
                 
                 {dog.video_url && (

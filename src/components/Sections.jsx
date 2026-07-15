@@ -117,7 +117,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
       region: dog.region || '지역 미지정',
       age: calculateAge(dog.birthday, dog.age),
       price: dog.price,
-      desc: dog.description || dog.desc || '다잇독 추천 분양입니다.',
+      desc: dog.description || dog.desc || '팔도댕댕 추천 분양입니다.',
       date: new Date(dog.created_at).toLocaleDateString()
     }));
   } catch (err) {
@@ -933,7 +933,7 @@ const AdSections = () => {
 
   return (
     <>
-      <AdSectionItem title="🛡️ 추천 파트너 정보" sub="다잇독 추천 회원 매장이 등록한 신뢰할 수 있는 정보" dogs={safeDogs} badge="추천" loading={loading} />
+      <AdSectionItem title="🛡️ 추천 파트너 정보" sub="팔도댕댕 추천 회원 매장이 등록한 신뢰할 수 있는 정보" dogs={safeDogs} badge="추천" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_a} 

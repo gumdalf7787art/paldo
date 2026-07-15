@@ -95,7 +95,7 @@ const LoginPage = () => {
           <Logo />
         </div>
 
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--secondary)' }}>반가워요! 다잇독입니다.</h2>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--secondary)' }}>반가워요! 팔도댕댕입니다.</h2>
         <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '40px' }}>
           가장 따뜻한 가족을 만나는 첫 걸음
         </p>

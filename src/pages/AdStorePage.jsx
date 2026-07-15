@@ -109,7 +109,7 @@ const AdStorePage = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            🛒 다잇독 비즈니스 멤버십 스토어
+            🛒 팔도댕댕 비즈니스 멤버십 스토어
           </h1>
           <p style={{ color: '#666', fontSize: '1.05rem', lineHeight: '1.6' }}>
             비즈니스 회원을 위한 다양한 맞춤형 프리미엄 멤버십 및 이용권을 만나보세요.<br/>
@@ -205,7 +205,7 @@ const AdStorePage = () => {
               <li>결제 후 7일이 경과했거나, 이용권을 이미 1회 이상 사용(서비스 적용 등)한 후 중도 해지를 요청하는 경우: <strong>결제 금액에서 '이용 기간에 해당하는 금액(일할 계산)'과 '해지 위약금(결제 금액의 10%)'을 공제한 잔여 금액을 환불</strong>해 드립니다.</li>
             </ul>
           </li>
-          <li><strong>교환 및 반품 안내</strong>: 다잇독 비즈니스 멤버십 스토어 상품은 오프라인 실물 배송 상품이 아닌 무형의 온라인 솔루션이므로 실물 제품 교환 및 반품은 적용되지 않습니다.</li>
+          <li><strong>교환 및 반품 안내</strong>: 팔도댕댕 비즈니스 멤버십 스토어 상품은 오프라인 실물 배송 상품이 아닌 무형의 온라인 솔루션이므로 실물 제품 교환 및 반품은 적용되지 않습니다.</li>
           <li>자세한 취소/환불 및 결제 조건은 하단 푸터의 <a href="/refund" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'underline' }}>[서비스 이용 및 환불 정책]</a> 페이지를 참고해 주시기 바랍니다.</li>
         </ul>
       </div>
@@ -361,7 +361,7 @@ const AdStorePage = () => {
                       return;
                     }
 
-                    // 1. 다잇독 백엔드에 임시 서비스 신청 생성
+                    // 1. 팔도댕댕 백엔드에 임시 서비스 신청 생성
                     const { data: requestData, error: requestError } = await api.ads.requestAdPurchase({
                       ad_type: selectedItem.type,
                       title: selectedItem.name,

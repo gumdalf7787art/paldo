@@ -53,7 +53,7 @@ export async function onRequestGet(context) {
     }
 
     const kakaoId = userData.id;
-    const email = userData.kakao_account?.email || `kakao_${kakaoId}@daitdog.com`;
+    const email = userData.kakao_account?.email || `kakao_${kakaoId}@paldodog.com`;
     const nickname = userData.properties?.nickname || userData.kakao_account?.profile?.nickname || `카카오회원_${kakaoId.toString().slice(-4)}`;
     const profileImage = userData.properties?.profile_image || userData.kakao_account?.profile?.profile_image_url || '';
 

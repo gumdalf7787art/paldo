@@ -526,7 +526,7 @@ const UploadForm = () => {
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem' }}>
                 <input type="checkbox" checked={formData.agreePromotion} onChange={e => setFormData({...formData, agreePromotion: e.target.checked})} />
-                등록하시는 이미지는 다잇독 홍보용으로 사용하는것에 동의합니다.
+                등록하시는 이미지는 팔도댕댕 홍보용으로 사용하는것에 동의합니다.
               </label>
             </div>
             

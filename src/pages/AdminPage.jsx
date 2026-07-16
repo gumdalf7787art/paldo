@@ -19,6 +19,7 @@ const AdminPage = () => {
   const [coupons, setCoupons] = useState([]);
   const [reports, setReports] = useState([]);
   const [adRequests, setAdRequests] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [banners, setBanners] = useState({});
   const [bannerUploadForm, setBannerUploadForm] = useState({ slot_key: '', image_url: '', link_url: '' });
   const [bannerUploadFile, setBannerUploadFile] = useState(null);
@@ -108,6 +109,10 @@ const AdminPage = () => {
       // 8. 시스템 배너 목록
       const { data: bannerData } = await api.banners.getList();
       if (bannerData) setBanners(bannerData);
+
+      // 9. 전체 결제 목록
+      const { data: payList } = await api.admin.getPayments();
+      setPayments(payList || []);
 
     } catch (error) {
       console.error('Data fetch error:', error);
@@ -245,6 +250,36 @@ const AdminPage = () => {
     }
   };
 
+  const handleApproveCancelPayment = async (payment) => {
+    if (payment.status !== 'cancel_requested') return;
+    
+    let refundInfo = {};
+    if (payment.pay_method === 'vbank') {
+      const isConfirmed = window.confirm('가상계좌 결제건입니다. 환불받을 계좌 정보를 입력하시겠습니까?\n(미입력 시 기본 취소 요청만 진행됩니다.)');
+      if (isConfirmed) {
+        const bank = window.prompt('환불받을 은행명을 입력하세요 (예: 국민은행):');
+        const account = window.prompt('환불받을 계좌번호를 입력하세요:');
+        const holder = window.prompt('예금주명을 입력하세요:');
+        if (bank && account && holder) {
+          refundInfo = { refund_bank: bank, refund_account: account, refund_holder: holder };
+        } else {
+          alert('계좌 정보가 불완전하여 취소 승인이 중단되었습니다.');
+          return;
+        }
+      }
+    } else {
+      if (!window.confirm('해당 결제 건의 취소를 승인하시겠습니까? 포트원을 통해 실결제 취소가 진행됩니다.')) return;
+    }
+
+    const { error } = await api.admin.approveCancelPayment(payment.id, refundInfo);
+    if (error) {
+      alert('결제 취소 처리 중 오류: ' + error);
+    } else {
+      alert('결제 취소가 승인되었습니다.');
+      fetchAdminData();
+    }
+  };
+
   const handleDeletePost = async (dogId) => {
     const { error } = await api.admin.deleteDog(dogId);
     if (error) {
@@ -348,7 +383,7 @@ const AdminPage = () => {
             { id: 'dogs', icon: '🐶', label: '게시물 관리' },
             { id: 'reports', icon: '🚨', label: '신고 관리' },
             { id: 'adRequests', icon: '🛒', label: '서비스 구매 신청' },
-            { id: 'adUsages', icon: '🎯', label: '서비스 사용 내역' },
+            { id: 'payments', icon: '💳', label: '결제 관리' },
             { id: 'banners', icon: '🖼️', label: '배너 이미지 관리' },
             { id: 'coupons', icon: '🎫', label: '쿠폰 시스템' }
           ].map(item => (
@@ -373,6 +408,7 @@ const AdminPage = () => {
             { activeTab === 'dogs' && '분양 게시물 관리' }
             { activeTab === 'reports' && '🚨 신고 내역 관리' }
             { activeTab === 'adRequests' && '🛒 서비스 신청 관리' }
+            { activeTab === 'payments' && '💳 결제 관리' }
             { activeTab === 'coupons' && '쿠폰 시스템 관리' }
           </h1>
           <div style={{ backgroundColor: 'white', padding: '10px 20px', borderRadius: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', fontSize: '0.9rem' }}>
@@ -1018,6 +1054,57 @@ const AdminPage = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'payments' && (
+          <div className="glass-card fade-in" style={{ padding: '0', overflow: 'hidden' }}>
+            <table style={tableStyle}>
+              <thead>
+                <tr style={{ backgroundColor: '#f8f9fa' }}>
+                  <th style={thStyle}>결제일시</th>
+                  <th style={thStyle}>결제번호(주문번호)</th>
+                  <th style={thStyle}>회원정보</th>
+                  <th style={thStyle}>금액</th>
+                  <th style={thStyle}>결제수단</th>
+                  <th style={thStyle}>상태</th>
+                  <th style={thStyle}>관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={{ padding: '30px', textAlign: 'center', color: '#888' }}>
+                      결제 내역이 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  payments.map(pay => (
+                    <tr key={pay.id} style={{ borderBottom: '1px solid #eee' }}>
+                      <td style={tdStyle}>{new Date(pay.created_at).toLocaleString()}</td>
+                      <td style={tdStyle}><small>{pay.merchant_uid}</small></td>
+                      <td style={tdStyle}>{pay.nickname || '알 수 없음'} <br/><small style={{color:'#999'}}>{pay.email}</small></td>
+                      <td style={tdStyle}><b>{pay.amount?.toLocaleString()}원</b></td>
+                      <td style={tdStyle}>{pay.pay_method}</td>
+                      <td style={tdStyle}>
+                        {pay.status === 'paid' && <span style={{ ...badgeStyle, backgroundColor: '#7ED321' }}>결제완료</span>}
+                        {pay.status === 'ready' && <span style={{ ...badgeStyle, backgroundColor: '#F5A623' }}>입금대기</span>}
+                        {pay.status === 'cancelled' && <span style={{ ...badgeStyle, backgroundColor: '#999' }}>취소완료</span>}
+                        {pay.status === 'failed' && <span style={{ ...badgeStyle, backgroundColor: '#D0021B' }}>실패</span>}
+                        {pay.status === 'cancel_requested' && <span style={{ ...badgeStyle, backgroundColor: '#E056FD' }}>취소요청</span>}
+                      </td>
+                      <td style={tdStyle}>
+                        {pay.status === 'cancel_requested' && (
+                          <button onClick={() => handleApproveCancelPayment(pay)} style={{ ...tableBtnStyle, backgroundColor: '#E056FD' }}>
+                            취소 승인
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </main>

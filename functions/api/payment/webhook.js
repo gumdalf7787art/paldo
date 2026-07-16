@@ -99,15 +99,16 @@ export async function onRequestPost(context) {
     }
 
     // 3. DB에 결제 상태 동기화 및 갱신
-    await env.DB.prepare(
-      `INSERT OR REPLACE INTO payments (user_id, imp_uid, merchant_uid, amount, pay_method, status)
-       VALUES (
-         COALESCE((SELECT user_id FROM payments WHERE merchant_uid = ?), ?),
-         ?, ?, ?, ?, ?
-       )`
-    )
-    .bind(merchant_uid, buyer_id, imp_uid, merchant_uid, portone_amount, portone_pay_method, portone_status)
-    .run();
+    const existing = await env.DB.prepare('SELECT id FROM payments WHERE merchant_uid = ?').bind(merchant_uid).first();
+    if (existing) {
+      await env.DB.prepare('UPDATE payments SET status = ?, amount = ?, pay_method = ? WHERE merchant_uid = ?')
+        .bind(portone_status, portone_amount, portone_pay_method, merchant_uid).run();
+    } else {
+      await env.DB.prepare(
+        `INSERT INTO payments (user_id, imp_uid, merchant_uid, amount, pay_method, status)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      ).bind(buyer_id, imp_uid, merchant_uid, portone_amount, portone_pay_method, portone_status).run();
+    }
 
     // 4. 광고 활성화 처리
     const ad = await env.DB.prepare(

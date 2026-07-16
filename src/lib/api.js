@@ -583,6 +583,27 @@ export const api = {
       }
     },
 
+    async getPayments() {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=payments`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: [], error: err.message };
+      }
+    },
+
+    async approveCancelPayment(paymentId, refundInfo = {}) {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin?action=approve_cancel_payment`, {
+          method: 'POST',
+          body: JSON.stringify({ payment_id: paymentId, ...refundInfo }),
+        });
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
     async approveApplication(id, userId) {
       try {
         const { data } = await request(`${BASE_URL}/api/admin?action=approve_app`, {

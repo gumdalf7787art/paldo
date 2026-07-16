@@ -394,7 +394,8 @@ const AdStorePage = () => {
                       buyer_email: currentUser.email || '',
                       buyer_name: (payMethod === 'vbank' ? senderName.trim() : (currentUser.nickname || currentUser.email || '')),
                       buyer_tel: currentUser.phone || '',
-                      m_redirect_url: window.location.origin + `/mypage?payment_done=true&tab=payments&amount=${selectedItem.price}&ad_id=${adId}&pay_method=${payMethod}`
+                      m_redirect_url: window.location.origin + `/mypage?payment_done=true&tab=payments&amount=${selectedItem.price}&ad_id=${adId}&pay_method=${payMethod}`,
+                      notice_url: [window.location.origin + '/api/payment/webhook']
                     };
 
                     window.IMP.request_pay(paymentData, async (rsp) => {

@@ -159,6 +159,21 @@ export async function onRequestGet(context) {
     }
   }
 
+  // 7. 전체 결제 내역 조회 (action = payments)
+  if (action === 'payments') {
+    try {
+      const { results: payments } = await env.DB.prepare(`
+        SELECT p.*, prof.nickname, prof.email 
+        FROM payments p
+        LEFT JOIN profiles prof ON p.user_id = prof.id
+        ORDER BY p.created_at DESC
+      `).all();
+      return createResponse(payments);
+    } catch (err) {
+      return createResponse({ error: `결제 내역 조회 실패: ${err.message}` }, 500);
+    }
+  }
+
   return createResponse({ error: '지원하지 않는 관리자 조회 액션입니다.' }, 400);
 }
 
@@ -419,6 +434,82 @@ export async function onRequestPost(context) {
       return createResponse({ success: true, changes: info.meta.changes });
     } catch (err) {
       return createResponse({ error: `광고 만료 동기화 실패: ${err.message}` }, 500);
+    }
+  }
+
+  // 11. 결제 취소 승인 (approve_cancel_payment)
+  if (action === 'approve_cancel_payment') {
+    const { payment_id, refund_holder, refund_bank, refund_account } = body;
+    if (!payment_id) {
+      return createResponse({ error: '결제 ID가 필요합니다.' }, 400);
+    }
+
+    try {
+      const payment = await env.DB.prepare('SELECT imp_uid, merchant_uid, amount, pay_method, status FROM payments WHERE id = ?').bind(payment_id).first();
+      if (!payment) return createResponse({ error: '결제 정보를 찾을 수 없습니다.' }, 404);
+      if (payment.status !== 'cancel_requested') return createResponse({ error: '취소 대기 상태가 아닙니다.' }, 400);
+
+      let is_mock = false;
+      let access_token = '';
+      
+      let apiKey = env.PORTONE_API_KEY;
+      let apiSecret = env.PORTONE_API_SECRET;
+
+      if (payment.pay_method === 'tosspay') {
+        apiKey = env.PORTONE_API_KEY_TOSS || env.TOSS_API_KEY || env.PORTONE_TOSS_API_KEY || apiKey;
+        apiSecret = env.PORTONE_API_SECRET_TOSS || env.TOSS_API_SECRET || env.PORTONE_TOSS_API_SECRET || apiSecret;
+      }
+
+      if (!apiKey || !apiSecret) {
+        is_mock = true;
+      } else {
+        const tokenRes = await fetch('https://api.iamport.kr/users/getToken', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imp_key: apiKey, imp_secret: apiSecret })
+        });
+        const tokenData = await tokenRes.json();
+        if (tokenData.code === 0) access_token = tokenData.response.access_token;
+        else is_mock = true;
+      }
+
+      if (!is_mock) {
+        const payload = {
+          imp_uid: payment.imp_uid,
+          reason: '관리자 승인에 의한 결제 취소',
+        };
+        // 가상계좌의 경우 환불 계좌 정보 추가
+        if (payment.pay_method === 'vbank' && refund_holder && refund_bank && refund_account) {
+          payload.refund_holder = refund_holder;
+          payload.refund_bank = refund_bank;
+          payload.refund_account = refund_account;
+        }
+
+        const cancelRes = await fetch('https://api.iamport.kr/payments/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': access_token },
+          body: JSON.stringify(payload)
+        });
+        const cancelData = await cancelRes.json();
+        if (cancelData.code !== 0) {
+          return createResponse({ error: `포트원 취소 실패: ${cancelData.message}` }, 400);
+        }
+      }
+
+      await env.DB.prepare('UPDATE payments SET status = "cancelled" WHERE id = ?').bind(payment_id).run();
+      
+      // 알림 통보
+      // user_id를 가져오기 위해 조회가 필요하므로 한 번 더 조회
+      const payInfo = await env.DB.prepare('SELECT user_id, amount FROM payments WHERE id = ?').bind(payment_id).first();
+      if (payInfo) {
+         await env.DB.prepare('INSERT INTO notifications (user_id, type, message) VALUES (?, "system", ?)')
+           .bind(payInfo.user_id, `요청하신 결제(금액: ${payInfo.amount.toLocaleString()}원)의 취소(환불)가 관리자에 의해 승인 완료되었습니다.`)
+           .run();
+      }
+
+      return createResponse({ success: true, message: '결제 취소가 승인되었습니다.' });
+    } catch (err) {
+      return createResponse({ error: `결제 취소 처리 중 오류: ${err.message}` }, 500);
     }
   }
 

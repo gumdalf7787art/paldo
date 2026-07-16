@@ -2167,8 +2167,11 @@ const MyPage = () => {
               {activeTab === 'payments' && isSeller && (
                 <div className="fade-in">
                   <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '10px' }}>결제 내역 관리</h2>
-                  <p style={{ color: '#666', marginBottom: '30px', fontSize: '0.95rem' }}>
+                  <p style={{ color: '#666', marginBottom: '10px', fontSize: '0.95rem' }}>
                     신청하신 멤버십 서비스 및 이용권의 결제 내역을 확인하고 취소를 요청하실 수 있습니다.
+                  </p>
+                  <p style={{ color: '#E056FD', marginBottom: '30px', fontSize: '0.85rem', fontWeight: '600' }}>
+                    * 무통장입금은 송금 완료 후 결제 상태가 '결제완료'로 변경되기까지 약 10분 정도 이상 소요될 수 있습니다.
                   </p>
                   
                   <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>

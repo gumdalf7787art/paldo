@@ -60,7 +60,7 @@ const AdStorePage = () => {
       price: 30000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 5개 증가합니다.',
       type: 'post_limit_5',
-      image: '/images/ads/post_add_5.png'
+      image: '/images/ads/post_add.png'
     },
     {
       id: 7,
@@ -68,7 +68,7 @@ const AdStorePage = () => {
       price: 50000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 10개 증가합니다.',
       type: 'post_limit_10',
-      image: '/images/ads/post_add_10.png'
+      image: '/images/ads/post_add.png'
     },
     {
       id: 8,
@@ -76,7 +76,7 @@ const AdStorePage = () => {
       price: 70000,
       description: '결제일로부터 30일 동안 게시물 등록 한도가 20개 증가합니다.',
       type: 'post_limit_20',
-      image: '/images/ads/post_add_20.png'
+      image: '/images/ads/post_add.png'
     },
     {
       id: 9,
@@ -84,7 +84,7 @@ const AdStorePage = () => {
       price: 200,
       description: '실제 토스페이 결제 연동 테스트를 위한 200원 결제 상품입니다.',
       type: 'test_100',
-      image: '/images/ads/post_add_5.png'
+      image: '/images/ads/ad_test.png'
     }
   ];
 

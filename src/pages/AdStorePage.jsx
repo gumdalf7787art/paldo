@@ -225,7 +225,7 @@ const AdStorePage = () => {
               {/* 추가된 서비스 안내 문구 */}
               {['main', 'breed', 'section'].includes(selectedItem.type) && (
                 <div style={{ marginBottom: '15px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px dashed #ccc', fontSize: '0.85rem' }}>
-                  <div style={{ color: '#333', fontWeight: 'bold', marginBottom: '6px' }}>✓ 입금이 완료되면 서비스 이용권이 즉시 지급됩니다.</div>
+                  <div style={{ color: '#333', fontWeight: 'bold', marginBottom: '6px' }}>✓ 결제가 완료되면 서비스 이용권이 즉시 지급됩니다.</div>
                   <div style={{ color: '#333', fontWeight: 'bold' }}>✓ 노출보장기간 : 서비스 이용권 사용후 7일</div>
                 </div>
               )}

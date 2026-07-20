@@ -222,11 +222,19 @@ const AdStorePage = () => {
               </h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
               
-              {/* 추가된 서비스 안내 문구 */}
+              {/* 추가된 서비스 안내 문구 (광고 상품) */}
               {['main', 'breed', 'section'].includes(selectedItem.type) && (
                 <div style={{ marginBottom: '15px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px dashed #ccc', fontSize: '0.85rem' }}>
                   <div style={{ color: '#333', fontWeight: 'bold', marginBottom: '6px' }}>✓ 결제가 완료되면 서비스 이용권이 즉시 지급됩니다.</div>
                   <div style={{ color: '#333', fontWeight: 'bold' }}>✓ 노출보장기간 : 서비스 이용권 사용후 7일</div>
+                </div>
+              )}
+
+              {/* 추가된 서비스 안내 문구 (게시물 추가 상품) */}
+              {selectedItem.type.startsWith('post_limit') && (
+                <div style={{ marginBottom: '15px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px dashed #ccc', fontSize: '0.85rem' }}>
+                  <div style={{ color: '#333', fontWeight: 'bold', marginBottom: '6px' }}>✓ 결제가 완료되면 서비스 이용권이 즉시 지급됩니다.</div>
+                  <div style={{ color: '#333', fontWeight: 'bold' }}>✓ 게시물 추가 기간 : 서비스 이용권 사용후 30일동안 {selectedItem.type.split('_')[2]}개 추가</div>
                 </div>
               )}
               <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>

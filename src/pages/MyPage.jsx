@@ -669,8 +669,8 @@ const MyPage = () => {
       { id: 'store', label: '🏪 스토어' },
       { id: 'ads', label: '📢 비즈니스 서비스' },
       { id: 'payments', label: '💳 결제 관리' },
-      { id: 'adStore', label: '🛒 멤버십 스토어', action: () => navigate('/ad-store') },
-      { id: 'subscription', label: '💎 파트너스 멤버십', action: () => navigate('/subscription') },
+      { id: 'adStore', label: '🛒 단건구매 스토어', action: () => navigate('/ad-store') },
+      { id: 'subscription', label: '💎 정기구매 스토어', action: () => navigate('/subscription') },
       { id: 'stats', label: '📊 통계' },
     ] : []),
     { id: 'chats', label: '💬 다잇톡' },
@@ -1539,8 +1539,8 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('store')} style={navBtnStyle('store')}>🏪 내 스토어 관리</button>
                     <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 비즈니스 서비스 관리</button>
                     <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
-                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 멤버십 스토어</button>
-                    <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 파트너스 멤버십</button>
+                    <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 단건구매 스토어</button>
+                    <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 정기구매 스토어</button>
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}
@@ -2018,7 +2018,7 @@ const MyPage = () => {
                       onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary-dark)'; e.target.style.transform = 'translateY(-2px)'; }}
                       onMouseLeave={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.transform = 'translateY(0)'; }}
                     >
-                      🛒 멤버십 스토어 가기
+                      🛒 단건구매 스토어 가기
                     </button>
                   </div>
 
@@ -2427,7 +2427,7 @@ const MyPage = () => {
                         <div key={n.id} onClick={() => handleMarkAsRead(n.id, n.is_read)} style={{ ...chatRoomItemStyle, cursor: n.is_read ? 'default' : 'pointer', backgroundColor: n.is_read ? '#fafafa' : '#fff', borderLeft: n.is_read ? '1px solid #eee' : '5px solid var(--primary-dark)', paddingLeft: '25px', opacity: n.is_read ? 0.7 : 1 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '5px' }}>
-                              {n.type === 'chat' && '💬 다잇톡 메시지'}
+                              {n.type === 'chat' && '💬 댕댕톡 메시지'}
                               {n.type === 'bookmark' && '💝 새로운 찜'}
                               {n.type === 'coupon' && '🎁 쿠폰 도착'}
                               {n.type === 'system' && '📢 전체 공지'}

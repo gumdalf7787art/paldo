@@ -243,7 +243,7 @@ const Header = () => {
                         {notifications.slice(0, 5).map(n => (
                           <div key={n.id} onClick={() => markAsRead(n.id, n.link_url)} style={{ ...notiItemStyle, padding: '12px 15px', backgroundColor: n.is_read ? 'white' : '#f0fdf4' }}>
                             <div style={{ fontSize: '0.72rem', color: 'var(--primary-dark)', fontWeight: 'bold', marginBottom: '4px' }}>
-                              {n.type === 'chat' && '💬 다잇톡 메시지'}
+                              {n.type === 'chat' && '💬 댕댕톡 메시지'}
                               {n.type === 'bookmark' && '💝 새로운 찜'}
                               {n.type === 'coupon' && '🎁 쿠폰 도착'}
                               {n.type === 'system' && '📢 전체 공지'}
@@ -323,18 +323,28 @@ const Header = () => {
                         onClick={() => setShowUserDropdown(false)}
                         className="header-dropdown-item"
                       >
-                        💬 다잇톡메시지
+                        💬 댕댕톡 메시지
                       </Link>
 
                       {role !== 'user' && (
-                        <Link 
-                          to="/subscription" 
-                          onClick={() => setShowUserDropdown(false)}
-                          className="header-dropdown-item"
-                          style={{ color: '#9b59b6', fontWeight: 'bold' }}
-                        >
-                          💎 파트너스 멤버십
-                        </Link>
+                        <>
+                          <Link 
+                            to="/ad-store" 
+                            onClick={() => setShowUserDropdown(false)}
+                            className="header-dropdown-item"
+                          >
+                            🛒 단건구매 스토어
+                          </Link>
+                          
+                          <Link 
+                            to="/subscription" 
+                            onClick={() => setShowUserDropdown(false)}
+                            className="header-dropdown-item"
+                            style={{ color: '#9b59b6', fontWeight: 'bold' }}
+                          >
+                            💎 정기구매 스토어
+                          </Link>
+                        </>
                       )}
 
                       <div style={{ borderTop: '1px solid #e2e8f0', margin: '6px 0' }} />

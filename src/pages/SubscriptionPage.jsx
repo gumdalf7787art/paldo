@@ -172,6 +172,11 @@ const SubscriptionPage = () => {
               ))}
             </ul>
 
+            <div style={{ marginBottom: '20px', fontSize: '0.8rem', color: '#666', lineHeight: '1.5', backgroundColor: '#f8f9fa', padding: '12px', borderRadius: '8px', border: '1px dashed #e2e8f0' }}>
+              <div style={{ marginBottom: '4px' }}><strong style={{ color: '#333' }}>월 정기 구독</strong> - 결제일로부터 1개월(30일) 이용 후 자동 갱신 / 매월 동일한 날짜에 자동 결제</div>
+              <div><strong style={{ color: 'var(--primary-dark)' }}>결제 후 바로 플랜 제공</strong></div>
+            </div>
+
             <button 
               disabled={isSubmitting}
               onClick={() => handleSubscribe(plan)}

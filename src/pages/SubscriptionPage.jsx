@@ -222,7 +222,7 @@ const SubscriptionPage = () => {
           📢 서비스 제공 및 취소/환불 안내 (필수 고지)
         </h3>
         <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <li><strong>서비스 제공기간 (배송 기간)</strong>: 본 서비스는 무형의 소프트웨어(SaaS) 솔루션으로, 결제 완료 및 정기 결제 카드 등록 즉시 멤버십 등급별 혜택이 계정에 활성화되어 실시간으로 제공됩니다. 기본 이용 기간은 결제일로부터 1개월(30일) 단위입니다.</li>
+          <li><strong>서비스 제공 기간: 결제 완료 후 즉시 이용 가능</strong> (본 서비스는 무형의 소프트웨어(SaaS) 솔루션으로, 결제 완료 및 정기 결제 카드 등록 즉시 멤버십 등급별 혜택이 계정에 활성화되어 실시간으로 제공됩니다. 기본 이용 기간은 결제일로부터 1개월(30일) 단위입니다.)</li>
           <li><strong>청약철회 및 취소/환불 규정</strong>: 
             <ul style={{ paddingLeft: '15px', marginTop: '4px', listStyleType: 'circle', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <li>결제 후 7일 이내에 제공되는 비즈니스 멤버십 서비스 혜택(소식/정보 한도 증대 및 프리미엄 ERP 관리 기능 등)을 전혀 사용하지 않은 경우 <strong>100% 전액 환불</strong>이 가능합니다.</li>

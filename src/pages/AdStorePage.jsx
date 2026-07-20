@@ -109,7 +109,7 @@ const AdStorePage = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            🛒 팔도댕댕 비즈니스 멤버십 스토어
+            🛒 단건결제 스토어
           </h1>
           <p style={{ color: '#666', fontSize: '1.05rem', lineHeight: '1.6' }}>
             비즈니스 회원을 위한 다양한 맞춤형 프리미엄 멤버십 및 이용권을 만나보세요.<br/>

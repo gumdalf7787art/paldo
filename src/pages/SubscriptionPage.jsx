@@ -115,7 +115,7 @@ const SubscriptionPage = () => {
     <div className="container fade-in" style={{ padding: '60px 20px', minHeight: '80vh' }}>
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--primary-dark)', marginBottom: '15px' }}>
-          팔도댕댕 파트너스 비즈니스 멤버십
+          정기결제 스토어
         </h1>
         <p style={{ color: '#666', fontSize: '1.1rem', lineHeight: '1.6' }}>
           매월 정기적으로 이용하는 비즈니스 멤버십 서비스를 통해 팔도댕댕의 프리미엄 혜택을 지속적으로 누리세요.<br/>

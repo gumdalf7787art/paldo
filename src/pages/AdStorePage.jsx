@@ -221,6 +221,14 @@ const AdStorePage = () => {
                 {selectedItem.type.startsWith('post_limit') ? '📦 비즈니스 멤버십 혜택 상세' : (selectedItem.type === 'test_100' ? '🛠️ 테스트 결제 상세' : '📺 프리미엄 서비스 노출 예시')}
               </h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{selectedItem.description}</p>
+              
+              {/* 추가된 서비스 안내 문구 */}
+              {['main', 'breed', 'section'].includes(selectedItem.type) && (
+                <div style={{ marginBottom: '15px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px dashed #ccc', fontSize: '0.85rem' }}>
+                  <div style={{ color: '#333', fontWeight: 'bold', marginBottom: '6px' }}>✓ 입금이 완료되면 서비스 이용권이 즉시 지급됩니다.</div>
+                  <div style={{ color: '#333', fontWeight: 'bold' }}>✓ 노출보장기간 : 서비스 이용권 사용후 7일</div>
+                </div>
+              )}
               <div style={{ flex: 1, backgroundColor: '#f0f4f8', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', border: '1px solid #eee', overflow: 'hidden' }}>
                 <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                 <div style={{ textAlign: 'center', color: '#64748b', display: 'none' }}>
@@ -237,8 +245,7 @@ const AdStorePage = () => {
                   💳 결제 수단 선택
                 </h3>
                 <p style={{ color: '#666', lineHeight: '1.5', fontSize: '0.9rem', marginBottom: '20px' }}>
-                  편리하고 안전한 결제 방식을 선택하여 서비스를 신청하세요.<br/>
-                  가상계좌 입금의 경우, 입금이 완료되면 서비스 이용권이 즉시 지급됩니다.
+                  편리하고 안전한 결제 방식을 선택하여 서비스를 신청하세요.
                 </p>
 
                 {/* 결제 수단 선택 라디오/버튼 그룹 */}

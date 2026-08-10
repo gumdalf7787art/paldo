@@ -5,7 +5,7 @@ import Card from './Card';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
 
-export const DynamicBanner = ({ banners, height = '140px' }) => {
+const DynamicBanner = ({ banners, height = '140px' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -129,203 +129,6 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
 
 const timeoutPromise = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
-const StoreCard = ({ store }) => {
-  const navigate = useNavigate();
-  return (
-    <div 
-      onClick={() => navigate(`/store/${store.id}`)}
-      style={{
-        width: '100%',
-        height: '100%',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        border: '1px solid #e2e8f0',
-        backgroundColor: '#fff',
-        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
-        transition: 'all 0.2s ease',
-        minWidth: 0
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 12px 20px rgba(0,0,0,0.06)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.05)';
-      }}
-    >
-      {/* 매장 배너/헤더 이미지 */}
-      <div style={{
-        width: '100%',
-        height: '100px',
-        backgroundImage: `url(${store.store_header_image || 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=400'})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-        flexShrink: 0
-      }}>
-        {/* 프로필 이미지 (오버랩) */}
-        <div style={{
-          position: 'absolute',
-          bottom: '-16px',
-          left: '12px',
-          width: '44px',
-          height: '44px',
-          borderRadius: '50%',
-          border: '2px solid #fff',
-          backgroundImage: `url(${store.profile_image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=100'})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundColor: '#eee',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
-        }} />
-      </div>
-      
-      {/* 매장 정보 텍스트 */}
-      <div style={{
-        padding: '24px 12px 12px 12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px',
-        flexGrow: 1,
-        justifyContent: 'space-between',
-        minWidth: 0
-      }}>
-        <div style={{ minWidth: 0 }}>
-          <h3 style={{
-            fontSize: '0.88rem',
-            fontWeight: '800',
-            color: '#1e293b',
-            margin: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {store.nickname || '파트너 매장'}
-          </h3>
-          <p style={{
-            fontSize: '0.72rem',
-            color: '#64748b',
-            margin: '4px 0 0 0',
-            lineHeight: '1.3',
-            height: '2.6em',
-            overflow: 'hidden',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical'
-          }}>
-            {store.store_description || '전국 우수 반려동물 매장 정보 제공 및 관리 솔루션 파트너입니다.'}
-          </p>
-        </div>
-        
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid #f1f5f9',
-          paddingTop: '6px',
-          marginTop: '4px',
-          fontSize: '0.68rem',
-          color: 'var(--primary)',
-          flexShrink: 0
-        }}>
-          <span style={{ fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
-            📍 {store.store_address ? store.store_address.split(' ')[0] + ' ' + (store.store_address.split(' ')[1] || '') : '지역 미지정'}
-          </span>
-          <span style={{
-            backgroundColor: '#eef2ff',
-            color: '#4f46e5',
-            padding: '1px 5px',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-            flexShrink: 0
-          }}>
-            정보 보기 →
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const DEFAULT_STORES = [
-  {
-    id: 'dummy-store-1',
-    nickname: '도그하우스 청담본점',
-    store_header_image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150',
-    store_description: '청담동 고품격 프리미엄 반려동물 케어 및 전문 브리딩 비즈니스 솔루션을 제공하는 플래그십 매장입니다.',
-    store_address: '서울특별시 강남구 청담동 89-4',
-    store_contact: '02-543-9876'
-  },
-  {
-    id: 'dummy-store-2',
-    nickname: '퍼피랜드 마포점',
-    store_header_image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150',
-    store_description: '안전하고 투명한 반려동물 건강 검진 솔루션과 1:1 맞춤 홈케어 컨설팅을 제공하는 안심 매장입니다.',
-    store_address: '서울특별시 마포구 도화동 173',
-    store_contact: '02-712-3456'
-  },
-  {
-    id: 'dummy-store-3',
-    nickname: '댕댕이 하우스 송도',
-    store_header_image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1537151608828-ea2b117b62e4?auto=format&fit=crop&q=80&w=150',
-    store_description: '송도 국제도시 최대 규모의 펫 아카데미 및 B2B 위생 안심 케어 서비스 인증 파트너사입니다.',
-    store_address: '인천광역시 연수구 송도동 23-3',
-    store_contact: '032-831-7788'
-  },
-  {
-    id: 'dummy-store-4',
-    nickname: '해피퍼피 부산센텀',
-    store_header_image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&q=80&w=150',
-    store_description: '부산 경남권 최고의 매장 인프라와 첨단 IoT 헬스 케어 모니터링 시스템을 도입한 혁신 매장입니다.',
-    store_address: '부산광역시 해운대구 우동 1400',
-    store_contact: '051-744-1234'
-  },
-  {
-    id: 'dummy-store-5',
-    nickname: '조이펫 분당수지점',
-    store_header_image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=150',
-    store_description: '동물 행동 전문가의 전문 컨설팅 서비스와 프리미엄 유기농 식단 분석 서비스를 상시 제공합니다.',
-    store_address: '경기도 성남시 분당구 정자동 16-2',
-    store_contact: '031-708-5678'
-  },
-  {
-    id: 'dummy-store-6',
-    nickname: '골든퍼피 일산점',
-    store_header_image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=150',
-    store_description: '자연 친화적 환경 설계와 엄격한 혈통 보존 및 독자적 위생 위탁 관리 라이선스를 보유한 정식 파트너입니다.',
-    store_address: '경기도 고양시 일산동구 장항동 740',
-    store_contact: '031-901-4321'
-  },
-  {
-    id: 'dummy-store-7',
-    nickname: '스위트하우스 광주점',
-    store_header_image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&q=80&w=150',
-    store_description: '24시간 무중단 스마트 매니지먼트 시스템과 협업 전문 의료진의 보증 케어 네트워크를 구축하였습니다.',
-    store_address: '광주광역시 서구 치평동 1200',
-    store_contact: '062-371-9988'
-  },
-  {
-    id: 'dummy-store-8',
-    nickname: '엔젤퍼피 대구수성점',
-    store_header_image: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?auto=format&fit=crop&q=80&w=600',
-    profile_image: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80&w=150',
-    store_description: '동대구 최대 규모의 안심 사후 관리 센터 운영 및 안심 펫 라이프 토탈 케어 서비스를 회원 특전으로 지원합니다.',
-    store_address: '대구광역시 수성구 범어동 45-1',
-    store_contact: '053-755-1122'
-  }
-];
-
 const HeroCarousel = ({ breedName }) => {
   const { isMobile } = useMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -336,26 +139,15 @@ const HeroCarousel = ({ breedName }) => {
   useEffect(() => {
     const loadHeroAds = async () => {
       try {
-        const { data } = await api.store.getList();
+        const data = await fetchAdsAndFill('main', 10, '추천', breedName);
         if (data && data.length > 0) {
-          // 기존 데이터와 더미 데이터를 합쳐 최대 8개 이상 채움
-          const combined = [...data, ...DEFAULT_STORES];
-          // 중복을 키(id) 기반으로 유니크화하여 8개 슬라이스로 자름
-          const uniqueStores = [];
-          const seenIds = new Set();
-          for (const s of combined) {
-            if (!seenIds.has(s.id)) {
-              seenIds.add(s.id);
-              uniqueStores.push(s);
-            }
-          }
-          setAds(uniqueStores.slice(0, 8));
+          setAds(data);
         } else {
-          setAds(DEFAULT_STORES);
+          setAds([]);
         }
       } catch (err) {
-        console.error('Failed to load main stores:', err);
-        setAds(DEFAULT_STORES);
+        console.error('Failed to load main ads:', err);
+        setAds([]);
       }
     };
     loadHeroAds();
@@ -456,16 +248,27 @@ const HeroCarousel = ({ breedName }) => {
           }}
           className="mobile-scroll-container"
         >
-          {ads.map((store, i) => (
+          {ads.map((dog, i) => (
             <div 
-              key={`hero-slide-mobile-${store.id}-${i}`}
+              key={`hero-slide-mobile-${dog.id}-${i}`}
               style={{
                 flex: '0 0 calc(45% - 8px)',
-                scrollSnapAlign: 'start',
-                height: '190px'
+                scrollSnapAlign: 'start'
               }}
             >
-              <StoreCard store={store} />
+              <Card 
+                badgeText={dog.badgeText || '추천'} 
+                data={{
+                  ...dog,
+                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
+                  breed: dog.breed || '견종 미상',
+                  nickname: dog.nickname || '이름 없음',
+                  gender: dog.gender || '-',
+                  region: dog.region || '지역 미지정',
+                  age: calculateAge(dog.birthday, dog.age),
+                  price: dog.price
+                }}
+              />
             </div>
           ))}
         </div>
@@ -508,7 +311,7 @@ const HeroCarousel = ({ breedName }) => {
           borderBottom: '1px solid #f1f5f9',
           letterSpacing: '0.5px'
         }}>
-          PREMIUM PARTNER
+          PREMIUM
         </div>
         {/* 좌측 화살표 버튼 */}
         <button 
@@ -592,20 +395,34 @@ const HeroCarousel = ({ breedName }) => {
             transform: `translateX(calc(-${currentIndex} * (20% + 2px)))`
           }}
         >
-          {extendedAds.map((store, i) => (
+          {extendedAds.map((dog, i) => (
             <div 
-              key={`hero-slide-${store.id}-${i}`}
+              key={`hero-slide-${dog.id}-${i}`}
               style={{
                 flex: '0 0 calc(20% - 8px)',
-                height: '190px',
+                height: '210px', /* Reduced from 250px */
                 backgroundColor: 'white',
                 borderRadius: '12px',
                 transition: 'transform 0.2s ease',
-                display: 'flex',
-                minWidth: 0
+                display: 'flex'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              <StoreCard store={store} />
+              <Card 
+                type="small" 
+                badgeText={dog.badgeText || '추천'} 
+                data={{
+                  ...dog,
+                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
+                  breed: dog.breed || '견종 미상',
+                  nickname: dog.nickname || '이름 없음',
+                  gender: dog.gender || '-',
+                  region: dog.region || '지역 미지정',
+                  age: calculateAge(dog.birthday, dog.age),
+                  price: dog.price
+                }}
+              />
             </div>
           ))}
         </div>
@@ -1185,4 +1002,4 @@ const itemCardStyle = {
   border: '1px solid transparent'
 };
 
-export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget };
+export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget, DynamicBanner };

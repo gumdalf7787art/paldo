@@ -278,7 +278,6 @@ const Home = () => {
     return (
       <main style={{ padding: '0 12px', backgroundColor: '#ffffff', minHeight: '100vh', paddingBottom: '40px', marginTop: '0px', paddingTop: '10px' }}>
         {/* 모바일 메인 페이지 히어로 섹션 위에 파트너 모집 배너 추가 */}
-        <PartnerBanner />
 
         {/* 1. 가로형 배너 */}
         <div style={{ marginBottom: '15px' }}>
@@ -320,7 +319,6 @@ const Home = () => {
   return (
     <main className="container" style={{ padding: '0 20px' }}>
       {/* 메인 페이지 히어로 섹션 위에 파트너 모집 배너 추가 */}
-      <PartnerBanner />
 
       {/* 1. 최상단 가로형 대표 강아지 홍보 배너 배치 */}
       <HeroCarousel />

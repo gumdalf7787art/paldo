@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '../components/Logo';
 import { api } from '../lib/api';
 
 // --- 이미지 리사이징 & 압축 헬퍼 함수 ---
@@ -231,9 +230,7 @@ const SignupPage = () => {
         padding: '50px 40px',
         textAlign: 'center'
       }}>
-        <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'center' }}>
-          <Logo />
-        </div>
+
 
         <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--secondary)' }}>새로운 가족 찾기의 시작</h2>
         <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '25px' }}>

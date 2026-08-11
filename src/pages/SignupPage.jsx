@@ -63,6 +63,7 @@ const SignupPage = () => {
   const [emailStatus, setEmailStatus] = useState(''); // '', 'invalid', 'valid', 'duplicate'
   const [passwordMatch, setPasswordMatch] = useState(null); // null, true, false
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [phone, setPhone] = useState('');
   
   const navigate = useNavigate();
 
@@ -87,44 +88,7 @@ const SignupPage = () => {
     }
   }, [password, confirmPassword]);
 
-  const [isCertified, setIsCertified] = useState(false);
-  const [certifiedInfo, setCertifiedInfo] = useState(null);
 
-  useEffect(() => {
-    if (window.IMP) {
-      window.IMP.init('imp14397622'); // 테스트 본인인증 작동을 보장하기 위해 데모 계정 코드로 강제 하드코딩
-    }
-  }, []);
-
-  const handleCertification = () => {
-    if (!window.IMP) {
-      alert('포트원 라이브러리가 로드되지 않았습니다.');
-      return;
-    }
-
-    window.IMP.certification({
-      pg: 'inicis_unified', // KG이니시스 통합 본인인증
-      merchant_uid: `cert_${Date.now()}`,
-      popup: true
-    }, async (rsp) => {
-      if (rsp.success) {
-        const { data, error } = await api.certification.verify(rsp.imp_uid);
-        if (error) {
-          alert('본인인증 검증에 실패했습니다: ' + error);
-          return;
-        }
-
-        setIsCertified(true);
-        setCertifiedInfo(data);
-        if (data.name) {
-          setNickname(data.name);
-        }
-        alert('✅ 본인인증이 완료되었습니다.');
-      } else {
-        alert('본인인증에 실패했습니다: ' + rsp.error_msg);
-      }
-    });
-  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -158,10 +122,6 @@ const SignupPage = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (!isCertified) {
-      alert('회원가입을 위해 본인인증을 완료해 주세요.');
-      return;
-    }
     if (password !== confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -182,7 +142,7 @@ const SignupPage = () => {
     try {
       const { data: userData, error: signupError } = await api.auth.signup(email, password, {
         nickname: nickname,
-        phone: certifiedInfo?.phone || ''
+        phone: phone
       });
 
       if (signupError) {
@@ -197,8 +157,8 @@ const SignupPage = () => {
           // 세션 토큰이 확보된 상태에서 즉시 사업자 인증 신청을 동시에 완료
           const { error: applyError } = await api.business.apply({
             business_name: bizName,
-            representative_name: certifiedInfo?.name || nickname,
-            phone: certifiedInfo?.phone || '',
+            representative_name: nickname,
+            phone: phone,
             address: bizAddress,
             biz_no: bizNo,
             animal_sale_no: animalNo,
@@ -325,42 +285,22 @@ const SignupPage = () => {
 
         <form onSubmit={handleSignup} style={{ display: 'grid', gap: '15px', textAlign: 'left', marginBottom: '30px' }}>
           <div>
-            <label style={labelStyle}>본인인증 (필수)</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                type="text" 
-                placeholder="본인인증 버튼을 눌러 인증을 진행해 주세요." 
-                style={{ ...inputStyle, flex: 2, backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} 
-                value={isCertified && certifiedInfo ? `${certifiedInfo.name} (${certifiedInfo.phone})` : ''}
-                readOnly
-                required
-              />
-              <button
-                type="button"
-                onClick={handleCertification}
-                style={{
-                  flex: 1,
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  backgroundColor: isCertified ? '#2ecc71' : 'var(--primary)',
-                  color: 'white',
-                  border: 'none',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {isCertified ? '✓ 인증 완료' : '본인인증'}
-              </button>
-            </div>
+            <label style={labelStyle}>연락처</label>
+            <input 
+              type="tel" 
+              placeholder="010-1234-5678" 
+              style={inputStyle} 
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
           </div>
 
           <div>
-            <label style={labelStyle}>닉네임 (실명 자동 입력)</label>
+            <label style={labelStyle}>닉네임 (실명)</label>
             <input 
               type="text" 
-              placeholder="댕댕이사랑" 
+              placeholder="홍길동" 
               style={inputStyle} 
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}

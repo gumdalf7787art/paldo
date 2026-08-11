@@ -293,6 +293,12 @@ const SignupPage = () => {
             <div style={socialBtnStyle('#fff', '#ddd', '#333')} title="구글 가입" onClick={handleGoogleSignup}>구글</div>
           </div>
 
+          {tab === 'seller' && (
+            <div style={{ textAlign: 'center', color: '#ff6b6b', fontSize: '0.8rem', marginTop: '5px', marginBottom: '10px', fontWeight: 'bold', wordBreak: 'keep-all', lineHeight: '1.4' }}>
+              💡 파트너 사업자 가입 시, 소셜 로그인 후 [마이페이지]에서 사업자 정보를 별도로 추가하셔야 정상 승인 처리됩니다.
+            </div>
+          )}
+
           <div style={{ position: 'relative', margin: '20px 0', borderTop: '1px solid #eee' }}>
             <span style={{ 
               position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',

@@ -296,6 +296,26 @@ const SignupPage = () => {
             />
           </div>
 
+          <div style={{ position: 'relative', margin: '20px 0', borderTop: '1px solid #eee' }}>
+            <span style={{ 
+              position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
+              backgroundColor: '#fff', padding: '0 15px', color: '#bbb', fontSize: '0.8rem'
+            }}>소셜 계정으로 3초만에 가입</span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
+            <div style={socialBtnStyle('#FEE500')} title="카카오 가입" onClick={handleKakaoSignup}>카카오</div>
+            <div style={socialBtnStyle('#03C75A', null, '#fff')} title="네이버 가입" onClick={handleNaverSignup}>네이버</div>
+            <div style={socialBtnStyle('#fff', '#ddd', '#333')} title="구글 가입" onClick={handleGoogleSignup}>구글</div>
+          </div>
+
+          <div style={{ position: 'relative', margin: '20px 0', borderTop: '1px solid #eee' }}>
+            <span style={{ 
+              position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
+              backgroundColor: '#fff', padding: '0 15px', color: '#bbb', fontSize: '0.8rem'
+            }}>또는 이메일로 가입</span>
+          </div>
+
           <div>
             <label style={labelStyle}>닉네임 (실명)</label>
             <input 
@@ -492,18 +512,7 @@ const SignupPage = () => {
           </button>
         </form>
 
-        <div style={{ position: 'relative', margin: '40px 0', borderTop: '1px solid #eee' }}>
-          <span style={{ 
-            position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
-            backgroundColor: '#fff', padding: '0 15px', color: '#bbb', fontSize: '0.8rem'
-          }}>소셜 계정으로 가입</span>
-        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
-          <div style={socialBtnStyle('#FEE500')} title="카카오 가입" onClick={handleKakaoSignup}>K</div>
-          <div style={socialBtnStyle('#03C75A')} title="네이버 가입" onClick={handleNaverSignup}>N</div>
-          <div style={socialBtnStyle('#fff', '#eee')} title="구글 가입" onClick={handleGoogleSignup}>G</div>
-        </div>
 
         <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)' }}>
           이미 계정이 있으신가요? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>로그인</Link>
@@ -522,9 +531,9 @@ const SignupPage = () => {
 const labelStyle = { display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--muted-text)', marginBottom: '8px' };
 const inputStyle = { width: '100%', padding: '14px', borderRadius: '10px', border: '1px solid #eee', outline: 'none', fontSize: '1rem', transition: 'var(--transition)' };
 const checkLineStyle = { display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--muted-text)', cursor: 'pointer' };
-const socialBtnStyle = (bg, border) => ({
-  width: '50px', height: '50px', borderRadius: '50%', backgroundColor: bg, border: border ? `1px solid ${border}` : 'none',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: '800', fontSize: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+const socialBtnStyle = (bg, border, color = '#333') => ({
+  flex: 1, height: '46px', borderRadius: '23px', backgroundColor: bg, border: border ? `1px solid ${border}` : 'none', color: color,
+  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
 });
 
 export default SignupPage;

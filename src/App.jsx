@@ -88,7 +88,7 @@ const LatestCommunityWidget = () => {
 
   if (posts.length === 0) return null;
 
-  const displayPosts = isMobile ? posts.slice(0, 3) : posts;
+  const displayPosts = posts.slice(0, 4);
 
   return (
     <div style={{
@@ -104,7 +104,7 @@ const LatestCommunityWidget = () => {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-end', 
-        marginBottom: isMobile ? '8px' : '15px' 
+        marginBottom: isMobile ? '12px' : '15px' 
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
           <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
@@ -116,7 +116,7 @@ const LatestCommunityWidget = () => {
         </Link>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
         {displayPosts.map((post, idx) => {
           return (
             <div
@@ -124,23 +124,32 @@ const LatestCommunityWidget = () => {
               onClick={() => navigate(`/community/${post.id}`)}
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: isMobile ? '8px 4px' : '12px 8px',
-                borderBottom: idx === displayPosts.length - 1 ? 'none' : '1px solid #cbd5e1',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: isMobile ? '12px 10px' : '16px',
+                border: '1px solid #e2e8f0',
                 cursor: 'pointer',
-                transition: 'background-color 0.15s ease',
-                borderRadius: '6px',
-                backgroundColor: '#ffffff'
+                transition: 'all 0.2s ease',
+                borderRadius: '8px',
+                backgroundColor: '#f8fafc',
+                gap: '6px'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.borderColor = 'var(--primary)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8fafc';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden', flex: 1, marginRight: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                 <span style={{
-                  fontSize: isMobile ? '0.95rem' : '1.15rem',
-                  color: '#2d3748',
-                  fontWeight: 'bold',
+                  fontSize: isMobile ? '0.9rem' : '1.05rem',
+                  color: '#1e293b',
+                  fontWeight: '700',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -149,12 +158,12 @@ const LatestCommunityWidget = () => {
                   {post.title}
                 </span>
                 {post.comment_count > 0 && (
-                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.78rem' : '0.92rem', fontWeight: 'bold', flexShrink: 0 }}>
+                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.75rem' : '0.85rem', fontWeight: 'bold', marginLeft: '4px' }}>
                     [{post.comment_count}]
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#718096', fontSize: isMobile ? '0.75rem' : '0.85rem', flexShrink: 0 }}>
+              <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.85rem' }}>
                 <span style={{ fontWeight: '500' }}>{post.nickname || '사용자'}</span>
               </div>
             </div>

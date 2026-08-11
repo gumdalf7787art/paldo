@@ -118,6 +118,14 @@ const LatestCommunityWidget = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
         {displayPosts.map((post, idx) => {
+          let thumbnail = null;
+          if (post.images) {
+            try {
+              const imgs = JSON.parse(post.images);
+              if (imgs && imgs.length > 0) thumbnail = imgs[0];
+            } catch (e) {}
+          }
+
           return (
             <div
               key={post.id}
@@ -126,13 +134,16 @@ const LatestCommunityWidget = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
                 padding: isMobile ? '12px 10px' : '16px',
                 border: '1px solid #e2e8f0',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 borderRadius: '8px',
                 backgroundColor: '#f8fafc',
-                gap: '6px'
+                gap: '6px',
+                boxSizing: 'border-box'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#ffffff';
@@ -145,7 +156,12 @@ const LatestCommunityWidget = () => {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              {thumbnail && (
+                <div style={{ width: '100%', height: isMobile ? '80px' : '100px', borderRadius: '6px', overflow: 'hidden', marginBottom: '4px' }}>
+                  <img src={thumbnail} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '0 4px', boxSizing: 'border-box' }}>
                 <span style={{
                   fontSize: isMobile ? '0.9rem' : '1.05rem',
                   color: '#1e293b',
@@ -153,12 +169,12 @@ const LatestCommunityWidget = () => {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  flex: 1
+                  maxWidth: '90%'
                 }}>
                   {post.title}
                 </span>
                 {post.comment_count > 0 && (
-                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.75rem' : '0.85rem', fontWeight: 'bold', marginLeft: '4px' }}>
+                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.75rem' : '0.85rem', fontWeight: 'bold', marginLeft: '4px', flexShrink: 0 }}>
                     [{post.comment_count}]
                   </span>
                 )}

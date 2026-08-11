@@ -65,6 +65,11 @@ const SignupPage = () => {
   
   const navigate = useNavigate();
 
+  // 페이지 진입 시 항상 최상단 스크롤
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // 실시간 이메일 형식 체크
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

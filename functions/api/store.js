@@ -402,7 +402,7 @@ export async function onRequestPost(context) {
 
   // 리뷰 작성
   if (action === 'create_review') {
-    const { seller_id, rating, content } = body;
+    const { seller_id, dog_id, rating, content, tags } = body;
     if (!seller_id || rating === undefined) {
       return createResponse({ error: '판매자 ID와 평점은 필수 입력 사항입니다.' }, 400);
     }
@@ -413,11 +413,70 @@ export async function onRequestPost(context) {
         return createResponse({ error: '자신의 상점에는 리뷰를 작성할 수 없습니다.' }, 400);
       }
 
-      await env.DB.prepare(
-        'INSERT INTO store_reviews (seller_id, reviewer_id, rating, content) VALUES (?, ?, ?, ?)'
-      )
-        .bind(seller_id, authUser.id, rating, content || '')
-        .run();
+      // 1. 강아지(게시물) 당 중복 리뷰 제한 (1회)
+      if (dog_id) {
+        try {
+          const existingReview = await env.DB.prepare('SELECT id FROM store_reviews WHERE reviewer_id = ? AND dog_id = ?')
+            .bind(authUser.id, dog_id)
+            .first();
+          if (existingReview) {
+            return createResponse({ error: '이미 이 게시물에 평가를 남기셨습니다.' }, 400);
+          }
+        } catch (e) {
+          // 컬럼이 아직 없을 경우 무시 (마이그레이션 전 호환성)
+        }
+      }
+
+      // 2. 쿨타임 제한 (10분 내 연속 작성 방지)
+      const lastReview = await env.DB.prepare('SELECT created_at FROM store_reviews WHERE reviewer_id = ? ORDER BY created_at DESC LIMIT 1')
+        .bind(authUser.id)
+        .first();
+      
+      if (lastReview) {
+        const lastDate = new Date(lastReview.created_at);
+        const now = new Date();
+        const diffMinutes = (now - lastDate) / (1000 * 60);
+        if (diffMinutes < 10) {
+          return createResponse({ error: '단기간에 여러 리뷰를 작성할 수 없습니다. 10분 후 다시 시도해 주세요.' }, 400);
+        }
+      }
+
+      // 3. 동일 매장 리뷰 제한 (30일 이내 최대 2회)
+      const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const storeReviewCount = await env.DB.prepare('SELECT COUNT(*) as count FROM store_reviews WHERE reviewer_id = ? AND seller_id = ? AND created_at > ?')
+        .bind(authUser.id, seller_id, monthAgo)
+        .first();
+      
+      if (storeReviewCount && storeReviewCount.count >= 2) {
+        return createResponse({ error: '동일 매장에는 한 달에 최대 2회까지만 리뷰를 작성할 수 있습니다.' }, 400);
+      }
+
+      // 4. 플랫폼 전체 리뷰 제한 (7일 이내 최대 3회)
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const weekReviewCount = await env.DB.prepare('SELECT COUNT(*) as count FROM store_reviews WHERE reviewer_id = ? AND created_at > ?')
+        .bind(authUser.id, weekAgo)
+        .first();
+      
+      if (weekReviewCount && weekReviewCount.count >= 3) {
+        return createResponse({ error: '비정상적인 리뷰 활동이 감지되었습니다. 일주일에 최대 3회까지만 작성 가능합니다.' }, 400);
+      }
+
+      const tagsJson = Array.isArray(tags) ? JSON.stringify(tags) : '[]';
+
+      try {
+        await env.DB.prepare(
+          'INSERT INTO store_reviews (seller_id, reviewer_id, dog_id, rating, content, tags) VALUES (?, ?, ?, ?, ?, ?)'
+        )
+          .bind(seller_id, authUser.id, dog_id || null, rating, content || '', tagsJson)
+          .run();
+      } catch (e) {
+        // migration이 적용되지 않아 column이 없는 경우를 위한 fallback
+        await env.DB.prepare(
+          'INSERT INTO store_reviews (seller_id, reviewer_id, rating, content) VALUES (?, ?, ?, ?)'
+        )
+          .bind(seller_id, authUser.id, rating, content || '')
+          .run();
+      }
 
       return createResponse({ success: true, message: '리뷰가 정상적으로 등록되었습니다.' });
     } catch (err) {

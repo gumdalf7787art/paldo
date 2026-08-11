@@ -63,11 +63,14 @@ CREATE TABLE IF NOT EXISTS store_reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     seller_id TEXT NOT NULL,
     reviewer_id TEXT NOT NULL,
+    dog_id INTEGER,
     rating REAL DEFAULT 5.0,                   -- 평점 (1.0 ~ 5.0)
     content TEXT,
+    tags TEXT,                                 -- JSON string array
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(seller_id) REFERENCES profiles(id) ON DELETE CASCADE,
-    FOREIGN KEY(reviewer_id) REFERENCES profiles(id) ON DELETE CASCADE
+    FOREIGN KEY(reviewer_id) REFERENCES profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY(dog_id) REFERENCES dogs(id) ON DELETE SET NULL
 );
 
 -- 5. 알림 테이블

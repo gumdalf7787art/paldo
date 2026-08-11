@@ -723,32 +723,27 @@ const DetailPage = () => {
               )}
 
               {/* 리뷰 작성 & 신고 버튼 */}
-              {currentUser?.id !== dog?.seller_id && (
+              {(!currentUser || currentUser.id !== dog?.seller_id) && (
                 <div style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
-                  <button 
-                    onClick={() => {
-                      if (!currentUser) {
+                  {!currentUser && (
+                    <button 
+                      onClick={() => {
                         alert('로그인하셔야 가능합니다.');
                         navigate('/login');
-                        return;
-                      }
-                      if (hasReviewedThisDog) {
-                        alert('이미 이 게시물에 평가를 남기셨습니다.');
-                      } else {
-                        setShowReviewForm(!showReviewForm);
-                      }
-                    }} 
-                    style={{ 
-                      flex: 1, padding: '10px 0', border: '1px solid var(--primary)', borderRadius: '8px',
-                      backgroundColor: showReviewForm ? '#eee' : 'white', color: showReviewForm ? '#999' : 'var(--primary)',
-                      fontSize: '0.82rem', fontWeight: '700', cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    {hasReviewedThisDog ? '⭐ 리뷰 작성 완료' : (showReviewForm ? '리뷰 폼 접기' : '⭐ 매장 방문/상담 리뷰 남기기')}
-                  </button>
+                      }} 
+                      style={{ 
+                        flex: 1, padding: '10px 0', border: '1px solid var(--primary)', borderRadius: '8px',
+                        backgroundColor: 'white', color: 'var(--primary)',
+                        fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer'
+                      }}
+                    >
+                      ⭐ 매장 방문/상담 리뷰 남기기
+                    </button>
+                  )}
                   <button 
                     onClick={() => setShowReportModal(true)}
                     style={{ 
+                      flex: currentUser ? 1 : undefined,
                       padding: '10px 12px', border: '1px solid #f87171', borderRadius: '8px',
                       backgroundColor: 'white', color: '#ef4444', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer'
                     }}
@@ -961,22 +956,16 @@ const DetailPage = () => {
                       🏪 이 스토어의 모든 게시물 보기
                     </button>
                   )}
-                  {currentUser?.id !== dog?.seller_id && (
+                  {(!currentUser || currentUser.id !== dog?.seller_id) && (
                     <>
-                      <button onClick={() => {
-                        if (!currentUser) {
+                      {!currentUser && (
+                        <button onClick={() => {
                           alert('로그인하셔야 가능합니다.');
                           navigate('/login');
-                          return;
-                        }
-                        if (hasReviewedThisDog) {
-                          alert('이미 이 게시물에 평가를 남기셨습니다.');
-                        } else {
-                          setShowReviewForm(!showReviewForm);
-                        }
-                      }} style={{ ...chatBtnStyle, backgroundColor: showReviewForm ? '#ccc' : '#fef2f2', color: showReviewForm ? 'white' : '#e63946', opacity: hasReviewedThisDog ? 0.6 : 1, cursor: hasReviewedThisDog ? 'not-allowed' : 'pointer' }}>
-                        {hasReviewedThisDog ? '⭐ 평가 완료' : (showReviewForm ? '접기' : '⭐ 리뷰 및 평점 남기기')}
-                      </button>
+                        }} style={{ ...chatBtnStyle, backgroundColor: '#fef2f2', color: '#e63946' }}>
+                          ⭐ 리뷰 및 평점 남기기
+                        </button>
+                      )}
                       <div style={{ textAlign: 'right', marginTop: '10px' }}>
                         <span 
                           onClick={() => setShowReportModal(true)} 
@@ -1076,7 +1065,7 @@ const DetailPage = () => {
               </div>
             )}
 
-            {showReviewForm && !hasReviewedThisDog && currentUser?.id !== dog?.seller_id && (
+            {currentUser && !hasReviewedThisDog && currentUser.id !== dog?.seller_id && (
               <div className="fade-in" style={{ marginTop: '20px', padding: '20px', backgroundColor: '#fdfdfd', border: '1px solid #eee', borderRadius: '12px' }}>
                 <h4 style={{ marginBottom: '15px', color: 'var(--primary-dark)', fontSize: '1.1rem' }}>리뷰 작성하기</h4>
                 

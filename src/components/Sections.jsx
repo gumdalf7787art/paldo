@@ -877,121 +877,127 @@ const LoginWidget = () => {
 
 const PersonalRecommendWidget = () => {
   const navigate = useNavigate();
-  const [recommendedDogs, setRecommendedDogs] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { isMobile } = useMobile();
+  const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadRecommendations = async () => {
+    const loadStores = async () => {
       setLoading(true);
       try {
-        const { data: sessionData } = await api.auth.getSession();
-        const user = sessionData?.session?.user || null;
-        setCurrentUser(user);
+        const { data } = await api.store.getList();
+        const availableStores = Array.isArray(data) ? data : [];
 
-        // 비로그인 또는 로그인 모두 api.dogs.getList로 쳐리
-        const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
-        const available = Array.isArray(allDogs) ? allDogs : [];
-
-        if (available.length >= 3) {
-          const shuffled = [...available].sort(() => 0.5 - Math.random());
-          setRecommendedDogs(shuffled.slice(0, 3));
+        if (availableStores.length > 0) {
+          const shuffled = shuffleArray(availableStores);
+          setStores(shuffled.slice(0, 4));
         } else {
-          setRecommendedDogs([]);
+          setStores([]);
         }
       } catch (err) {
-        console.error('Failed to load recommendation:', err);
-        setRecommendedDogs([]);
+        console.error('Failed to load stores:', err);
+        setStores([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadRecommendations();
+    loadStores();
   }, []);
 
   if (loading) {
     return (
-      <div style={widgetContainerStyle}>
-        <h4 style={widgetTitleStyle}>🎯 맞춤 개별 추천</h4>
-        <div style={{ textAlign: 'center', padding: '15px 0', fontSize: '0.78rem', color: '#888' }}>
-          매물을 분석 중입니다...
-        </div>
+      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginBottom: '10px' }}>
+        불러오는 중...
       </div>
     );
   }
 
-  if (recommendedDogs.length === 0) return null;
+  if (stores.length === 0) return null;
 
   return (
-    <div style={widgetContainerStyle}>
-      <h4 style={widgetTitleStyle}>
-        🎯 {currentUser ? `${currentUser.user_metadata?.name || '회원'}님 맞춤 추천` : '오늘의 개별 추천'}
-      </h4>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {recommendedDogs.map((dog) => (
-          <div 
-            key={dog.id} 
-            onClick={() => navigate('/detail', { state: { dog } })}
-            style={itemCardStyle}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8fafc';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <img 
-              src={dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200'} 
-              alt={dog.nickname} 
+    <div style={{
+      backgroundColor: '#ffffff',
+      borderRadius: '12px',
+      border: '1px solid #e2e8f0',
+      padding: isMobile ? '12px 14px' : '20px',
+      marginBottom: isMobile ? '10px' : '15px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-end', 
+        marginBottom: isMobile ? '12px' : '15px' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
+            🏪 우수 매장 소개
+          </h2>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
+        {stores.map((store) => {
+          const storeImage = store.profile_image || store.store_header_image;
+          const storeName = store.business_name || store.nickname || '우수 매장';
+          const storeRegion = store.store_address ? store.store_address.split(' ').slice(0, 2).join(' ') : '전국';
+
+          return (
+            <div
+              key={store.id}
+              onClick={() => navigate(`/store/${store.id}`)}
               style={{
-                width: '42px', /* Reduced from 50px */
-                height: '42px', /* Reduced from 50px */
-                borderRadius: '8px',
-                objectFit: 'cover',
-                flexShrink: 0
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s ease',
+                gap: '2px',
+                width: '100%'
               }}
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                  {dog.breed}
-                </span>
-                <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{dog.region}</span>
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '6px', backgroundColor: '#f1f5f9' }}>
+                {storeImage ? (
+                  <img src={storeImage} alt="store thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+                    No Image
+                  </div>
+                )}
               </div>
-              <span style={{ fontSize: '0.78rem', fontWeight: '600', color: '#1e293b', marginTop: '1px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                {dog.nickname}
-              </span>
-              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#f59e0b', marginTop: '1px' }}>
-                {dog.price === 0 || !dog.price ? '무료분양' : `${(dog.price / 10000).toLocaleString()}만원`}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
+                <span style={{
+                  fontSize: isMobile ? '0.9rem' : '1rem',
+                  color: '#1e293b',
+                  fontWeight: '600',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 1,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  lineHeight: '1.4'
+                }}>
+                  {storeName}
+                </span>
+              </div>
+              <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginTop: '4px' }}>
+                {storeRegion}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
-};
-
-const widgetContainerStyle = {
-  backgroundColor: 'white',
-  border: '1px solid #cbd5e1',
-  borderRadius: '12px',
-  padding: '14px',
-  boxShadow: 'var(--shadow)',
-  marginBottom: '10px'
-};
-
-const widgetTitleStyle = {
-  color: '#1e293b', 
-  fontSize: '0.85rem', 
-  fontWeight: '800',
-  marginBottom: '10px', 
-  display: 'flex', 
-  alignItems: 'center', 
-  gap: '5px'
 };
 
 const itemCardStyle = {

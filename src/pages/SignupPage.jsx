@@ -261,7 +261,7 @@ const SignupPage = () => {
               transition: 'all 0.2s'
             }}
           >
-            일반 구매자 가입
+            일반 가입
           </button>
           <button
             type="button"
@@ -280,7 +280,7 @@ const SignupPage = () => {
               transition: 'all 0.2s'
             }}
           >
-            파트너 사업자 가입
+            사업자 가입
           </button>
         </div>
 

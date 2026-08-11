@@ -148,10 +148,10 @@ const UploadForm = () => {
         }
       }
 
-      // 내 분양 매물 목록을 가져와 이번 달 글 등록 수 계산
+      // 내 분양글 목록을 가져와 이번 달 글 등록 수 계산
       const { data: listData, error: listError } = await api.dogs.getList({ seller_id: session.user.id });
       if (listError || !listData) {
-        throw new Error(listError || '매물 목록을 조회하지 못했습니다.');
+        throw new Error(listError || '분양글 목록을 조회하지 못했습니다.');
       }
 
       const now = new Date();
@@ -382,7 +382,7 @@ const UploadForm = () => {
               <select style={inputStyle} value={formData.breed} onChange={e => setFormData({...formData, breed: e.target.value})}>
                 {breedOptions.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
-              <p style={helperTextStyle}>🔍 정확한 견종을 선택해야 구매자들이 더 쉽게 매물을 검색할 수 있습니다.</p>
+              <p style={helperTextStyle}>🔍 정확한 견종을 선택해야 구매자들이 더 쉽게 아이들을 검색할 수 있습니다.</p>
             </div>
           </div>
 

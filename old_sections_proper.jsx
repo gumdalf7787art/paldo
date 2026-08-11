@@ -5,7 +5,7 @@ import Card from './Card';
 import { api } from '../lib/api';
 import { calculateAge } from '../utils/age';
 
-const DynamicBanner = ({ banners, height = '140px' }) => {
+export const DynamicBanner = ({ banners, height = '140px' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const shuffleArray = (array) => {
 const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
   try {
     // API를 통해 사용가능한 매물 로드
-    const params = { status: 'available', limit: 100 };
+    const params = { status: 'available', limit: 20 };
     if (breedName) params.breed = breedName;
     const { data: allDogs } = await api.dogs.getList(params);
     const dogs = Array.isArray(allDogs) ? allDogs : [];
@@ -117,7 +117,7 @@ const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
       region: dog.region || '지역 미지정',
       age: calculateAge(dog.birthday, dog.age),
       price: dog.price,
-      desc: dog.description || dog.desc || '팔도댕댕 추천 분양입니다.',
+      desc: dog.description || dog.desc || '다잇독 추천 분양입니다.',
       date: new Date(dog.created_at).toLocaleDateString()
     }));
   } catch (err) {
@@ -567,11 +567,11 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
         
         {loading && dogs.length === 0 ? (
           <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
-            아이들 정보를 불러오는 중입니다...
+            매물을 불러오는 중입니다...
           </p>
         ) : dogs.length === 0 ? (
           <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
-            등록된 분양 아이들이 없습니다.
+            등록된 분양 매물이 없습니다.
           </p>
         ) : (
           <div 
@@ -621,11 +621,11 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
       
       {loading && dogs.length === 0 ? (
         <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
-          아이들 정보를 불러오는 중입니다...
+          매물을 불러오는 중입니다...
         </p>
       ) : dogs.length === 0 ? (
         <p style={{ textAlign: 'center', padding: '20px 0', color: '#888' }}>
-          등록된 분양 아이들이 없습니다.
+          등록된 분양 매물이 없습니다.
         </p>
       ) : showSlider ? (
         /* 슬라이드 뷰 (8개 초과 시 가로 1열씩 무한 슬라이드) */
@@ -717,10 +717,10 @@ const AdSections = () => {
   useEffect(() => {
     const loadAllSections = async () => {
       try {
-        // 섹션 통합 광고(section) 데이터 풀을 한 번에 24개 가져옵니다.
+        // 섹션 통합 광고(section) 데이터 풀을 한 번에 60개 가져옵니다.
         const [allSectionAds, bannerDataResponse] = await Promise.all([
           Promise.race([
-            fetchAdsAndFill('section', 24, '추천'), 
+            fetchAdsAndFill('section', 60, '추천'), 
             timeoutPromise(2500)
           ]),
           api.banners.getList()
@@ -731,14 +731,11 @@ const AdSections = () => {
           setSystemBanners(bannerDataResponse.data);
         }
         
-        // 가져온 전체 광고 풀에서 각각 무작위로 8개씩 추출하여 할당합니다 (매물 수가 적을 경우 중복 허용)
-        const safePool = shuffleArray(ads).slice(0, 8);
-        const popularPool = shuffleArray(ads).slice(0, 8);
-        const specialPool = shuffleArray(ads).slice(0, 8);
-        
-        setSafeDogs(safePool.map(d => ({...d, badgeText: '추천'})));
-        setPopularDogs(popularPool.map(d => ({...d, badgeText: '인기'})));
-        setSpecialDogs(specialPool.map(d => ({...d, badgeText: '스페셜'})));
+        // 가져온 전체 광고를 3등분하여 안심, 인기, 스페셜 구역에 무작위 배치합니다.
+        // 현재 fetchAdsAndFill 내부에서 shuffleArray가 동작하므로 이미 섞여 있습니다.
+        setSafeDogs(ads.slice(0, 20).map(d => ({...d, badgeText: '안심'})));
+        setPopularDogs(ads.slice(20, 40).map(d => ({...d, badgeText: '인기'})));
+        setSpecialDogs(ads.slice(40, 60).map(d => ({...d, badgeText: '스페셜'})));
       } catch (err) {
         console.error('Failed to load sections:', err);
         setSafeDogs([]);
@@ -753,21 +750,21 @@ const AdSections = () => {
 
   return (
     <>
-      <AdSectionItem title="🛡️ 추천 파트너 정보" sub="팔도댕댕 추천 회원 매장이 등록한 신뢰할 수 있는 정보" dogs={safeDogs} badge="추천" loading={loading} />
+      <AdSectionItem title="🛡️ 안심 분양 정보" sub="다잇독이 직접 검증한 깨끗한 안심 분양" dogs={safeDogs} badge="안심" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_a} 
         slotName="main_bottom_a" 
       />
 
-      <AdSectionItem title="🔥 인기 파트너 아이들" sub="지금 많은 반려인들이 주목하고 있는 우수 케어 아이들" dogs={popularDogs} badge="인기" loading={loading} />
+      <AdSectionItem title="🔥 인기 분양 정보" sub="지금 많은 분들이 주목하고 있는 댕댕이" dogs={popularDogs} badge="인기" loading={loading} />
       
       <DynamicBanner 
         banners={systemBanners.main_bottom_b} 
         slotName="main_bottom_b" 
       />
 
-      <AdSectionItem title="✨ 스페셜 파트너 아이들" sub="특별한 혜택과 맞춤 케어가 보증된 스페셜 아이들" dogs={specialDogs} badge="스페셜" loading={loading} />
+      <AdSectionItem title="✨ 스페셜 분양 정보" sub="선택받은 특별한 케어와 혜택의 분양" dogs={specialDogs} badge="스페셜" loading={loading} />
     </>
   );
 };
@@ -809,7 +806,7 @@ const AdoptionList = () => {
         boxShadow: 'var(--shadow)'
       }
     }>
-      <SectionTitle title="전체 등록 댕댕이 정보" sub="실시간 업데이트 매장 정보" />
+      <SectionTitle title="전체 분양 리스트" sub="실시간 등록 정보" />
       <div 
         className={isMobile ? "" : "adoption-grid"}
         style={
@@ -823,7 +820,7 @@ const AdoptionList = () => {
         {loading ? (
            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>리스트를 불러오는 중입니다...</p>
         ) : dogs.length === 0 ? (
-           <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>아직 등록된 매장 아이들 정보가 없습니다.</p>
+           <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: '#666' }}>아직 등록된 분양 게시물이 없습니다.</p>
         ) : (
           dogs.map((dog) => (
             <Card 
@@ -877,127 +874,121 @@ const LoginWidget = () => {
 
 const PersonalRecommendWidget = () => {
   const navigate = useNavigate();
-  const { isMobile } = useMobile();
-  const [stores, setStores] = useState([]);
+  const [recommendedDogs, setRecommendedDogs] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadStores = async () => {
+    const loadRecommendations = async () => {
       setLoading(true);
       try {
-        const { data } = await api.store.getList();
-        const availableStores = Array.isArray(data) ? data : [];
+        const { data: sessionData } = await api.auth.getSession();
+        const user = sessionData?.session?.user || null;
+        setCurrentUser(user);
 
-        if (availableStores.length > 0) {
-          const shuffled = shuffleArray(availableStores);
-          setStores(shuffled.slice(0, 4));
+        // 비로그인 또는 로그인 모두 api.dogs.getList로 쳐리
+        const { data: allDogs } = await api.dogs.getList({ status: 'available', limit: 20 });
+        const available = Array.isArray(allDogs) ? allDogs : [];
+
+        if (available.length >= 3) {
+          const shuffled = [...available].sort(() => 0.5 - Math.random());
+          setRecommendedDogs(shuffled.slice(0, 3));
         } else {
-          setStores([]);
+          setRecommendedDogs([]);
         }
       } catch (err) {
-        console.error('Failed to load stores:', err);
-        setStores([]);
+        console.error('Failed to load recommendation:', err);
+        setRecommendedDogs([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadStores();
+    loadRecommendations();
   }, []);
 
   if (loading) {
     return (
-      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginBottom: '10px' }}>
-        불러오는 중...
+      <div style={widgetContainerStyle}>
+        <h4 style={widgetTitleStyle}>🎯 맞춤 개별 추천</h4>
+        <div style={{ textAlign: 'center', padding: '15px 0', fontSize: '0.78rem', color: '#888' }}>
+          매물을 분석 중입니다...
+        </div>
       </div>
     );
   }
 
-  if (stores.length === 0) return null;
+  if (recommendedDogs.length === 0) return null;
 
   return (
-    <div style={{
-      backgroundColor: '#ffffff',
-      borderRadius: '12px',
-      border: '1px solid #e2e8f0',
-      padding: isMobile ? '12px 14px' : '20px',
-      marginBottom: isMobile ? '10px' : '15px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-end', 
-        marginBottom: isMobile ? '12px' : '15px' 
-      }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-          <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
-            🏪 우수 매장 소개
-          </h2>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
-        {stores.map((store) => {
-          const storeImage = store.profile_image || store.store_header_image;
-          const storeName = store.business_name || store.nickname || '우수 매장';
-          const storeRegion = store.store_address ? store.store_address.split(' ').slice(0, 2).join(' ') : '전국';
-
-          return (
-            <div
-              key={store.id}
-              onClick={() => navigate(`/store/${store.id}`)}
+    <div style={widgetContainerStyle}>
+      <h4 style={widgetTitleStyle}>
+        🎯 {currentUser ? `${currentUser.user_metadata?.name || '회원'}님 맞춤 추천` : '오늘의 개별 추천'}
+      </h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {recommendedDogs.map((dog) => (
+          <div 
+            key={dog.id} 
+            onClick={() => navigate('/detail', { state: { dog } })}
+            style={itemCardStyle}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f8fafc';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <img 
+              src={dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200'} 
+              alt={dog.nickname} 
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                textAlign: 'left',
-                cursor: 'pointer',
-                transition: 'opacity 0.2s ease',
-                gap: '2px',
-                width: '100%'
+                width: '42px', /* Reduced from 50px */
+                height: '42px', /* Reduced from 50px */
+                borderRadius: '8px',
+                objectFit: 'cover',
+                flexShrink: 0
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '0.8';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '1';
-              }}
-            >
-              <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '6px', backgroundColor: '#f1f5f9' }}>
-                {storeImage ? (
-                  <img src={storeImage} alt="store thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                    No Image
-                  </div>
-                )}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
-                <span style={{
-                  fontSize: isMobile ? '0.9rem' : '1rem',
-                  color: '#1e293b',
-                  fontWeight: '600',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  lineHeight: '1.4'
-                }}>
-                  {storeName}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                  {dog.breed}
                 </span>
+                <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{dog.region}</span>
               </div>
-              <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginTop: '4px' }}>
-                {storeRegion}
-              </div>
+              <span style={{ fontSize: '0.78rem', fontWeight: '600', color: '#1e293b', marginTop: '1px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                {dog.nickname}
+              </span>
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#f59e0b', marginTop: '1px' }}>
+                {dog.price === 0 || !dog.price ? '무료분양' : `${(dog.price / 10000).toLocaleString()}만원`}
+              </span>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
+};
+
+const widgetContainerStyle = {
+  backgroundColor: 'white',
+  border: '1px solid #cbd5e1',
+  borderRadius: '12px',
+  padding: '14px',
+  boxShadow: 'var(--shadow)',
+  marginBottom: '10px'
+};
+
+const widgetTitleStyle = {
+  color: '#1e293b', 
+  fontSize: '0.85rem', 
+  fontWeight: '800',
+  marginBottom: '10px', 
+  display: 'flex', 
+  alignItems: 'center', 
+  gap: '5px'
 };
 
 const itemCardStyle = {
@@ -1011,4 +1002,4 @@ const itemCardStyle = {
   border: '1px solid transparent'
 };
 
-export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget, DynamicBanner };
+export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget };

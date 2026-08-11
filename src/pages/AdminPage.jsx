@@ -421,7 +421,7 @@ const AdminPage = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
               <StatCard label="총 회원" value={stats.users} color="#4A90E2" />
               <StatCard label="승인 대기" value={stats.applications} color="#F5A623" />
-              <StatCard label="활성 매물" value={stats.dogs} color="#7ED321" />
+              <StatCard label="활성 분양글" value={stats.dogs} color="#7ED321" />
               <StatCard label="누적 활동수" value={stats.clicks} color="#9013FE" />
             </div>
 
@@ -648,7 +648,7 @@ const AdminPage = () => {
           <div className="glass-card fade-in" style={{ padding: '0' }}>
             <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>사용자 신고 접수 내역</h3>
-              <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '5px' }}>허위 매물이나 규정 위반으로 접수된 내역입니다.</p>
+              <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '5px' }}>허위 분양글이나 규정 위반으로 접수된 내역입니다.</p>
             </div>
             <table style={tableStyle}>
               <thead>

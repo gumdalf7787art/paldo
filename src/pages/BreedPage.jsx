@@ -144,7 +144,7 @@ const BreedPage = () => {
             ) : regularDogs.length === 0 && adDogs.length === 0 ? (
               <div style={{ padding: '80px 0', textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🐶</div>
-                <p style={{ color: '#64748b', fontWeight: '600' }}>현재 조건에 맞는 {breedName} 분양 매물이 없습니다.</p>
+                <p style={{ color: '#64748b', fontWeight: '600' }}>현재 조건에 맞는 {breedName} 분양 아이들이 없습니다.</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

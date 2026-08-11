@@ -111,7 +111,7 @@ const DetailPage = () => {
     reason: '',
     details: ''
   });
-  const reportReasons = ['허위매물', '내용이 다름', '추가요금', '완료', '기타입력'];
+  const reportReasons = ['허위 게시물', '내용이 다름', '추가요금', '완료', '기타입력'];
 
   // 리뷰 폼 state 추가
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -122,12 +122,12 @@ const DetailPage = () => {
   });
   const reviewTagsList = ['허위등록 없음', '친절해요.', '설명문 그대로예요.', '방문했는데 깔끔해요.'];
 
-  // 유사 매물 추천 관련
+  // 유사 강아지 추천 관련
   const [recommendDogs, setRecommendDogs] = useState([]);
 
   const fetchRecommendations = async (currentDog) => {
     try {
-      // 1. 동일 품종의 분양가능 매물 조회
+      // 1. 동일 품종의 분양가능 게시글 조회
       const { data: sameBreed } = await api.dogs.getList({
         breed: currentDog.breed,
         exclude_id: currentDog.id,
@@ -137,7 +137,7 @@ const DetailPage = () => {
 
       let finalDogs = sameBreed || [];
 
-      // 2. 만약 4개 미만이라면, 최근 전체 매물로 채우기
+      // 2. 만약 4개 미만이라면, 최근 전체 게시글로 채우기
       if (finalDogs.length < 4) {
         const { data: recentDogs } = await api.dogs.getList({
           exclude_id: currentDog.id,
@@ -1031,7 +1031,7 @@ const DetailPage = () => {
             {showReportModal && currentUser?.id !== dog?.seller_id && (
               <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
-                  <h3 style={{ marginBottom: '20px', color: '#e63946' }}>🚨 허위매물/문제 게시물 신고</h3>
+                  <h3 style={{ marginBottom: '20px', color: '#e63946' }}>🚨 허위게시물/문제 게시물 신고</h3>
                   <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>신고 사유를 선택하시고 제출해주세요. <br />허위 신고 시 이용에 제한이 있을 수 있습니다.</p>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>

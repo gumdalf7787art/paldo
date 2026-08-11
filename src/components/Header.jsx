@@ -159,7 +159,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  전국 파트너 매장 정보
+                  전국의 댕댕이 정보
                 </span>
                 <span style={{ 
                   fontSize: '0.8rem', 
@@ -168,7 +168,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  반려동물 사업자 운영 솔루션, 팔도댕댕
+                  팔도댕댕에서 모두 살펴보세요.
                 </span>
               </div>
 
@@ -194,7 +194,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  투명한 매장 검색 및 홍보 제휴
+                  믿을 수 있는 안심 입양
                 </span>
                 <span style={{ 
                   fontSize: '0.8rem', 
@@ -203,7 +203,7 @@ const Header = () => {
                   letterSpacing: '-0.3px',
                   lineHeight: '1.2'
                 }}>
-                  클린 펫샵 파트너를 소개합니다.
+                  투명한 매장 정보와 올바른 입양 문화!
                 </span>
               </div>
             </div>

@@ -727,6 +727,11 @@ const DetailPage = () => {
                 <div style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
                   <button 
                     onClick={() => {
+                      if (!currentUser) {
+                        alert('로그인하셔야 가능합니다.');
+                        navigate('/login');
+                        return;
+                      }
                       if (hasReviewedThisDog) {
                         alert('이미 이 게시물에 평가를 남기셨습니다.');
                       } else {
@@ -959,6 +964,11 @@ const DetailPage = () => {
                   {currentUser?.id !== dog?.seller_id && (
                     <>
                       <button onClick={() => {
+                        if (!currentUser) {
+                          alert('로그인하셔야 가능합니다.');
+                          navigate('/login');
+                          return;
+                        }
                         if (hasReviewedThisDog) {
                           alert('이미 이 게시물에 평가를 남기셨습니다.');
                         } else {

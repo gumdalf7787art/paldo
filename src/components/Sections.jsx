@@ -731,11 +731,14 @@ const AdSections = () => {
           setSystemBanners(bannerDataResponse.data);
         }
         
-        // 가져온 전체 광고를 3등분하여 안심, 인기, 스페셜 구역에 무작위 배치합니다.
-        // 현재 fetchAdsAndFill 내부에서 shuffleArray가 동작하므로 이미 섞여 있습니다.
-        setSafeDogs(ads.slice(0, 8).map(d => ({...d, badgeText: '추천'})));
-        setPopularDogs(ads.slice(8, 16).map(d => ({...d, badgeText: '인기'})));
-        setSpecialDogs(ads.slice(16, 24).map(d => ({...d, badgeText: '스페셜'})));
+        // 가져온 전체 광고 풀에서 각각 무작위로 8개씩 추출하여 할당합니다 (매물 수가 적을 경우 중복 허용)
+        const safePool = shuffleArray(ads).slice(0, 8);
+        const popularPool = shuffleArray(ads).slice(0, 8);
+        const specialPool = shuffleArray(ads).slice(0, 8);
+        
+        setSafeDogs(safePool.map(d => ({...d, badgeText: '추천'})));
+        setPopularDogs(popularPool.map(d => ({...d, badgeText: '인기'})));
+        setSpecialDogs(specialPool.map(d => ({...d, badgeText: '스페셜'})));
       } catch (err) {
         console.error('Failed to load sections:', err);
         setSafeDogs([]);

@@ -63,7 +63,6 @@ const SignupPage = () => {
   const [emailStatus, setEmailStatus] = useState(''); // '', 'invalid', 'valid', 'duplicate'
   const [passwordMatch, setPasswordMatch] = useState(null); // null, true, false
   const [isTermsOpen, setIsTermsOpen] = useState(false);
-  const [phone, setPhone] = useState('');
   
   const navigate = useNavigate();
 
@@ -142,7 +141,7 @@ const SignupPage = () => {
     try {
       const { data: userData, error: signupError } = await api.auth.signup(email, password, {
         nickname: nickname,
-        phone: phone
+        phone: ''
       });
 
       if (signupError) {
@@ -158,7 +157,7 @@ const SignupPage = () => {
           const { error: applyError } = await api.business.apply({
             business_name: bizName,
             representative_name: nickname,
-            phone: phone,
+            phone: '',
             address: bizAddress,
             biz_no: bizNo,
             animal_sale_no: animalNo,
@@ -284,18 +283,6 @@ const SignupPage = () => {
         </div>
 
         <form onSubmit={handleSignup} style={{ display: 'grid', gap: '15px', textAlign: 'left', marginBottom: '30px' }}>
-          <div>
-            <label style={labelStyle}>연락처</label>
-            <input 
-              type="tel" 
-              placeholder="010-1234-5678" 
-              style={inputStyle} 
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-            />
-          </div>
-
           <div style={{ position: 'relative', margin: '20px 0', borderTop: '1px solid #eee' }}>
             <span style={{ 
               position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',

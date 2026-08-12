@@ -502,23 +502,44 @@ const AdminPage = () => {
                             <button onClick={() => handleReject(app)} style={{ ...tableBtnStyle, backgroundColor: '#ff4757' }}>반려</button>
                           </>
                         )}
-                        <button 
-                          onClick={() => {
-                            if (app.file_url) {
-                              window.open(app.file_url);
-                            } else {
-                              alert('첨부된 증빙 서류가 없습니다.');
-                            }
-                          }} 
-                          style={{ 
-                            ...tableBtnStyle, 
-                            backgroundColor: app.file_url ? '#eee' : '#f5f5f5', 
-                            color: app.file_url ? '#666' : '#ccc',
-                            cursor: app.file_url ? 'pointer' : 'not-allowed'
-                          }}
-                        >
-                          서류 확인
-                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <button 
+                            onClick={() => {
+                              if (app.file_url) {
+                                window.open(app.file_url);
+                              } else {
+                                alert('첨부된 사업자등록증 서류가 없습니다.');
+                              }
+                            }} 
+                            style={{ 
+                              ...tableBtnStyle, 
+                              backgroundColor: app.file_url ? '#eee' : '#f5f5f5', 
+                              color: app.file_url ? '#666' : '#ccc',
+                              cursor: app.file_url ? 'pointer' : 'not-allowed',
+                              fontSize: '0.75rem', padding: '4px 8px'
+                            }}
+                          >
+                            사업자등록증
+                          </button>
+                          <button 
+                            onClick={() => {
+                              if (app.animal_sale_file_url) {
+                                window.open(app.animal_sale_file_url);
+                              } else {
+                                alert('첨부된 동물판매업 등록증 서류가 없습니다.');
+                              }
+                            }} 
+                            style={{ 
+                              ...tableBtnStyle, 
+                              backgroundColor: app.animal_sale_file_url ? '#eee' : '#f5f5f5', 
+                              color: app.animal_sale_file_url ? '#666' : '#ccc',
+                              cursor: app.animal_sale_file_url ? 'pointer' : 'not-allowed',
+                              fontSize: '0.75rem', padding: '4px 8px'
+                            }}
+                          >
+                            동물판매업증
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>

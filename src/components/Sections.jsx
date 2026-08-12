@@ -810,7 +810,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 };
 
 
-const AdSections = ({ mobileMiddleContent }) => {
+const AdSections = ({ mobileMiddleContent, breedName }) => {
   const [safeDogs, setSafeDogs] = useState([]);
   const [popularDogs, setPopularDogs] = useState([]);
   const [specialDogs, setSpecialDogs] = useState([]);
@@ -823,7 +823,7 @@ const AdSections = ({ mobileMiddleContent }) => {
         // 섹션 통합 광고(section) 데이터 풀을 한 번에 24개 가져옵니다.
         const [allSectionAds, bannerDataResponse] = await Promise.all([
           Promise.race([
-            fetchAdsAndFill('section', 24, '추천'), 
+            fetchAdsAndFill('section', 24, '추천', breedName), 
             timeoutPromise(2500)
           ]),
           api.banners.getList()

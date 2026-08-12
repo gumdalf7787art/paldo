@@ -3,13 +3,12 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../lib/api';
 import Card from '../components/Card';
 import SearchBar from '../components/SearchBar';
-import { HeroCarousel, PersonalRecommendWidget, LatestCommunityWidget } from '../components/Sections';
+import { HeroCarousel, AdSections, PersonalRecommendWidget, LatestCommunityWidget } from '../components/Sections';
 
 const BreedPage = () => {
   const { breedName } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [adDogs, setAdDogs] = useState([]);
   const [regularDogs, setRegularDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState({});
@@ -33,30 +32,13 @@ const BreedPage = () => {
       // Currently API might not support gender/price, but we pass region.
       
       try {
-        // 1. 프리미엄 서비스 데이터 가져오기 및 배너 가져오기 병렬 실행
-        const [adResponse, bannerResponse] = await Promise.all([
-          api.ads.getList({
-            status: 'active',
-            breed: breedName,
-            region: region
-          }),
-          api.banners.getList()
-        ]);
-        
-        const adData = adResponse.data;
+        // 1. 배너 가져오기 (AdSections는 자체적으로 배너와 광고를 가져옴)
+        const bannerResponse = await api.banners.getList();
         if (bannerResponse.data) {
           setBanners(bannerResponse.data);
         }
 
-        const ads = (adData || []).map(ad => ({
-          ...ad,
-          isAd: true,
-          image: ad.image_url,
-          badgeText: 'PREMIUM'
-        }));
-        setAdDogs(ads.slice(0, 4)); // 상단 프리미엄은 최대 4개 (1줄)만 노출
-
-        // 2. 일반 분양 리스트 가져오기 (REST API)
+        // 2. 일반 분양 리스트 가져오기
         const { data: dogData } = await api.dogs.getList(queryParams);
 
         if (dogData) {
@@ -67,7 +49,6 @@ const BreedPage = () => {
             filteredDogs = filteredDogs.filter(d => d.gender === gender);
           }
           if (price && price !== '전체') {
-            // 간단한 텍스트 기반 필터링 (필요시 상세 로직 구현)
             if (price.includes('이하')) {
               const max = parseInt(price.replace(/[^0-9]/g, ''));
               filteredDogs = filteredDogs.filter(d => (d.price / 10000) <= max);
@@ -79,9 +60,7 @@ const BreedPage = () => {
             }
           }
 
-          const adDogIds = new Set(ads.map(ad => ad.id));
           const sortedDogs = filteredDogs
-            .filter(dog => !adDogIds.has(dog.id))
             .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
             .map(dog => ({
               ...dog,
@@ -128,7 +107,9 @@ const BreedPage = () => {
       <div className="main-portal-layout">
         
         <div className="portal-main-col">
-          <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)' }}>
+          <AdSections breedName={breedName} />
+          
+          <section style={{ padding: '24px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow)', marginTop: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>전체 {breedName} 분양 리스트</h2>
@@ -136,60 +117,21 @@ const BreedPage = () => {
                   🔍 조건: {breedName === '전체' ? '품종전체' : breedName} / {currentRegion || '전국'} / {(!currentGender || currentGender === '모두선택') ? '남여전체' : currentGender} / {(!currentPrice || currentPrice === '전체') ? '가격전체' : currentPrice}
                 </div>
               </div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length + adDogs.length}</b>건</span>
+              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>총 <b>{regularDogs.length}</b>건</span>
             </div>
             
             {loading ? (
               <div style={{ padding: '60px 0', textAlign: 'center', color: '#999' }}>데이터를 불러오는 중입니다...</div>
-            ) : regularDogs.length === 0 && adDogs.length === 0 ? (
+            ) : regularDogs.length === 0 ? (
               <div style={{ padding: '80px 0', textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🐶</div>
                 <p style={{ color: '#64748b', fontWeight: '600' }}>현재 조건에 맞는 {breedName} 분양 아이들이 없습니다.</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                
-                {/* 1. 프리미엄 스폰서 블록 */}
-                {adDogs.length > 0 && (
-                  <div style={{ 
-                    backgroundColor: '#fffbeb', 
-                    borderRadius: '12px',
-                    padding: '20px',
-                    border: '1px solid #fcd34d'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#b45309', margin: 0 }}>🌟 프리미엄 스폰서</h3>
-                      <span style={{ 
-                        fontSize: '0.65rem', 
-                        fontWeight: '500', 
-                        backgroundColor: '#fffbeb', 
-                        color: '#fbbf24', 
-                        padding: '2px 6px', 
-                        borderRadius: '4px', 
-                        border: '1px solid #fef3c7',
-                        letterSpacing: '0.5px'
-                      }}>
-                        PREMIUM
-                      </span>
-                    </div>
-                    <div className="adoption-grid">
-                      {adDogs.map(dog => (
-                        <Card 
-                          key={dog.id} 
-                          type="medium" 
-                          data={dog} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. 일반 분양 리스트 */}
+                {/* 일반 분양 리스트 */}
                 {regularDogs.length > 0 && (
                   <div>
-                    {adDogs.length > 0 && (
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#334155', marginBottom: '16px', paddingLeft: '4px' }}>일반 분양 리스트</h3>
-                    )}
                     <div className="adoption-grid">
                       {regularDogs.map(dog => (
                         <Card 
@@ -201,7 +143,6 @@ const BreedPage = () => {
                     </div>
                   </div>
                 )}
-
               </div>
             )}
           </section>

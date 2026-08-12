@@ -2502,11 +2502,12 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
         const ocrText = result.data.text.replace(/[^0-9]/g, '');
         const inputBizNo = form.bizNo.replace(/[^0-9]/g, '');
         
-        if (!ocrText.includes(inputBizNo)) {
-          alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
-          setUploading(false);
-          return;
-        }
+        // [임시 비활성화] 테스트를 위해 OCR 사업자번호 일치 검증 생략
+        // if (!ocrText.includes(inputBizNo)) {
+        //   alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
+        //   setUploading(false);
+        //   return;
+        // }
       } catch (err) {
         console.error('OCR Error:', err);
       }

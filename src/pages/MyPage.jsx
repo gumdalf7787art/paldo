@@ -1830,7 +1830,26 @@ const MyPage = () => {
                               <div style={{ fontSize: '0.85rem', color: '#ff6b6b' }}>💝 찜: <b>{dogStats[dog.id]?.likes || 0}</b></div>
                             </td>
                             <td style={tdStyle}>
-                              <span style={{ padding: '4px 8px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>분양중</span>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
+                                <span style={{ padding: '4px 8px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>분양중</span>
+                                {dog.ad_type && (
+                                  <span style={{ padding: '4px 8px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                    <span>📢</span>
+                                    <span>
+                                      {dog.ad_type === 'popular' ? '인기스토어' :
+                                       dog.ad_type === 'special' ? '스페셜분양' :
+                                       dog.ad_type === 'safe' ? '안심분양' :
+                                       dog.ad_type === 'main' ? '메인추천' :
+                                       dog.ad_type === 'recommend' ? '추천분양' : '프리미엄광고'}
+                                    </span>
+                                  </span>
+                                )}
+                                {dog.ad_end_date && (
+                                  <span style={{ fontSize: '0.7rem', color: '#888' }}>
+                                    ~{new Date(dog.ad_end_date).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td style={{ ...tdStyle, textAlign: 'center' }}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -1855,7 +1874,25 @@ const MyPage = () => {
                       <div key={dog.id} className="post-mobile-card">
                         <img src={dog.image_url} alt="dog" style={{ width: '72px', height: '72px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                            <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
+                            {dog.ad_type && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ padding: '3px 6px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>
+                                  📢 {dog.ad_type === 'popular' ? '인기스토어' :
+                                     dog.ad_type === 'special' ? '스페셜분양' :
+                                     dog.ad_type === 'safe' ? '안심분양' :
+                                     dog.ad_type === 'main' ? '메인추천' :
+                                     dog.ad_type === 'recommend' ? '추천분양' : '프리미엄광고'}
+                                </span>
+                                {dog.ad_end_date && (
+                                  <span style={{ fontSize: '0.65rem', color: '#888' }}>
+                                    ~{new Date(dog.ad_end_date).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                           <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>{dog.nickname} ({dog.gender}) · {dog.region} · <b style={{ color: 'var(--primary-dark)' }}>{dog.price === 0 ? '무료' : dog.price + '만원'}</b></div>
                           <div style={{ fontSize: '0.8rem', color: '#888' }}>👀 {dogStats[dog.id]?.views || 0}  💝 {dogStats[dog.id]?.likes || 0}</div>
                           <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>

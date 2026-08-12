@@ -259,7 +259,9 @@ export async function onRequestGet(context) {
 
   try {
     let sql = `
-      SELECT d.*, p.nickname AS seller_nickname, b.business_name AS seller_business_name
+      SELECT d.*, p.nickname AS seller_nickname, b.business_name AS seller_business_name,
+             (SELECT ad_type FROM advertisements WHERE dog_id = d.id AND status = 'active' ORDER BY id DESC LIMIT 1) AS ad_type,
+             (SELECT end_date FROM advertisements WHERE dog_id = d.id AND status = 'active' ORDER BY id DESC LIMIT 1) AS ad_end_date
       FROM dogs d
       LEFT JOIN profiles p ON d.seller_id = p.id
       LEFT JOIN business_applications b ON d.seller_id = b.user_id AND b.status = 'approved'

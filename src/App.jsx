@@ -174,7 +174,7 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '-15px' : '12px' }}>
+        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '-20px' : '12px' }}>
           <SearchBar />
         </div>
         

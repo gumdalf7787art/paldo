@@ -651,7 +651,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 
     return (
       <section style={{ 
-        padding: isSafeAd ? '0px 10px 10px 10px' : '10px 10px 10px 10px', 
+        padding: '0px 10px 10px 10px', 
         backgroundColor: 'transparent', 
         borderRadius: 0, 
         border: 'none', 

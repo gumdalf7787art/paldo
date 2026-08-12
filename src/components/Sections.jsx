@@ -136,6 +136,10 @@ const HeroCarousel = ({ breedName }) => {
   const [isTransitionActive, setIsTransitionActive] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   
+  const mobileScrollRef = useRef(null);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef(null);
+  
   useEffect(() => {
     const loadHeroAds = async () => {
       try {
@@ -232,43 +236,93 @@ const HeroCarousel = ({ breedName }) => {
 
   if (ads.length === 0) return null;
 
+  // 모바일 부드러운 자동 스크롤 로직
+  useEffect(() => {
+    if (!isMobile || isInteracting || !mobileScrollRef.current || ads.length === 0) return;
+
+    let animationFrameId;
+    const smoothScroll = () => {
+      if (mobileScrollRef.current) {
+        mobileScrollRef.current.scrollLeft += 0.5; // 천천히 이동
+        
+        // 끝에 도달하면 자연스럽게 처음으로 이동 (무한 롤링 트릭)
+        if (mobileScrollRef.current.scrollLeft >= (mobileScrollRef.current.scrollWidth - mobileScrollRef.current.clientWidth) / 2) {
+           mobileScrollRef.current.scrollLeft = 0;
+        }
+      }
+      animationFrameId = requestAnimationFrame(smoothScroll);
+    };
+
+    animationFrameId = requestAnimationFrame(smoothScroll);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isMobile, isInteracting, ads]);
+
+  const handleTouchStart = () => {
+    setIsInteracting(true);
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    interactionTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, 2000); // 2초 후 자동 스크롤 재개
+  };
+
   if (isMobile) {
+    // 2줄로 만들기 위해 2개씩 묶음
+    const pairs = [];
+    for (let i = 0; i < ads.length; i += 2) {
+      // 홀수 개일 경우 마지막은 1개만 들어감
+      pairs.push(ads.slice(i, i + 2));
+    }
+    // 무한 스크롤을 위해 복제
+    const displayPairs = [...pairs, ...pairs, ...pairs];
     return (
       <section style={{ padding: '0px 0 5px 0', position: 'relative' }}>
         <div 
+          ref={mobileScrollRef}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           style={{ 
             overflowX: 'auto', 
             display: 'flex',
             gap: '10px',
             padding: '4px 10px',
-            scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none'
           }}
           className="mobile-scroll-container"
         >
-          {ads.map((dog, i) => (
+          {displayPairs.map((pair, i) => (
             <div 
-              key={`hero-slide-mobile-${dog.id}-${i}`}
+              key={`hero-slide-mobile-pair-${i}`}
               style={{
                 flex: '0 0 calc(45% - 8px)',
-                scrollSnapAlign: 'start'
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
               }}
             >
-              <Card 
-                badgeText={dog.badgeText || '추천'} 
-                data={{
-                  ...dog,
-                  image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
-                  breed: dog.breed || '견종 미상',
-                  nickname: dog.nickname || '이름 없음',
-                  gender: dog.gender || '-',
-                  region: dog.region || '지역 미지정',
-                  age: calculateAge(dog.birthday, dog.age),
-                  price: dog.price
-                }}
-              />
+              {pair.map(dog => (
+                <Card 
+                  key={`mobile-ad-${dog.id}-${i}`}
+                  badgeText={dog.badgeText || '추천'} 
+                  data={{
+                    ...dog,
+                    image: dog.image || dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
+                    breed: dog.breed || '견종 미상',
+                    nickname: dog.nickname || '이름 없음',
+                    gender: dog.gender || '-',
+                    region: dog.region || '지역 미지정',
+                    age: calculateAge(dog.birthday, dog.age),
+                    price: dog.price
+                  }}
+                />
+              ))}
             </div>
           ))}
         </div>

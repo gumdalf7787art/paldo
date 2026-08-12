@@ -1071,6 +1071,9 @@ const MyPage = () => {
                         <button onClick={() => handleCompleteAdoption(dog.id)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>분양완료</button>
                         <button onClick={() => handleEditPost(dog)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#edf2f7', color: '#333', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>수정</button>
                         <button onClick={() => handleDeletePost(dog.id)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#fff5f5', color: '#ff4757', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>삭제</button>
+                        {!dog.ad_type && (
+                          <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '4px 8px', borderRadius: '6px', backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>📢 광고하기</button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1858,6 +1861,9 @@ const MyPage = () => {
                                   <button onClick={() => handleEditPost(dog)} style={{ ...tableBtnStyle, flex: 1 }}>수정</button>
                                   <button onClick={() => handleDeletePost(dog.id)} style={{ ...tableBtnStyle, backgroundColor: '#ff6b6b', color: 'white', flex: 1 }}>삭제</button>
                                 </div>
+                                {!dog.ad_type && (
+                                  <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold' }}>📢 광고 진행하기</button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -1899,6 +1905,9 @@ const MyPage = () => {
                             <button onClick={() => handleCompleteAdoption(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>💖 분양완료</button>
                             <button onClick={() => handleEditPost(dog)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#eee', color: '#333', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>✏️ 수정</button>
                             <button onClick={() => handleDeletePost(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#ff6b6b', color: 'white', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>🗑️ 삭제</button>
+                            {!dog.ad_type && (
+                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>📢 광고 진행</button>
+                            )}
                           </div>
                         </div>
                       </div>

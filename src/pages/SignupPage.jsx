@@ -171,15 +171,18 @@ const SignupPage = () => {
 
           if (applyError) {
             alert('회원가입은 완료되었으나, 사업자 인증 신청 중 오류가 발생했습니다: ' + applyError);
+            window.dispatchEvent(new Event('auth-change'));
             navigate('/mypage');
             return;
           }
 
           alert('🎉 회원가입 및 사업자 등록 신청이 함께 접수되었습니다! 최대 24시간 내 심사가 완료됩니다.');
+          window.dispatchEvent(new Event('auth-change'));
           navigate('/mypage');
         } else {
           alert('회원가입이 완료되었습니다!');
-          navigate('/login');
+          window.dispatchEvent(new Event('auth-change'));
+          navigate('/');
         }
       }
     } catch (error) {

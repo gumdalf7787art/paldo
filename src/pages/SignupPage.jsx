@@ -55,6 +55,8 @@ const SignupPage = () => {
   const [bizName, setBizName] = useState('');
   const [bizNo, setBizNo] = useState('');
   const [animalNo, setAnimalNo] = useState('');
+  const [bizPhone, setBizPhone] = useState('');
+  const [bizRepName, setBizRepName] = useState('');
   const [bizAddress, setBizAddress] = useState('');
   const [bizFile, setBizFile] = useState(null);
   const [bizFileBase64, setBizFileBase64] = useState('');
@@ -132,7 +134,7 @@ const SignupPage = () => {
     }
     
     if (tab === 'seller') {
-      if (!bizName.trim() || !bizNo.trim() || !animalNo.trim() || !bizAddress.trim()) {
+      if (!bizName.trim() || !bizNo.trim() || !animalNo.trim() || !bizAddress.trim() || !bizPhone.trim() || !bizRepName.trim()) {
         alert('파트너 사업자 정보를 모두 입력해 주세요.');
         return;
       }
@@ -178,8 +180,8 @@ const SignupPage = () => {
           // 세션 토큰이 확보된 상태에서 즉시 사업자 인증 신청을 동시에 완료
           const { error: applyError } = await api.business.apply({
             business_name: bizName,
-            representative_name: nickname,
-            phone: '',
+            representative_name: bizRepName,
+            phone: bizPhone,
             address: bizAddress,
             biz_no: bizNo,
             animal_sale_no: animalNo,
@@ -417,6 +419,30 @@ const SignupPage = () => {
                   style={inputStyle}
                   value={bizName}
                   onChange={e => setBizName(e.target.value)}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>대표자명</label>
+                <input
+                  type="text"
+                  placeholder="예: 홍길동"
+                  style={inputStyle}
+                  value={bizRepName}
+                  onChange={e => setBizRepName(e.target.value)}
+                  required={tab === 'seller'}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>핸드폰 번호</label>
+                <input
+                  type="tel"
+                  placeholder="예: 010-1234-5678"
+                  style={inputStyle}
+                  value={bizPhone}
+                  onChange={e => setBizPhone(e.target.value)}
                   required={tab === 'seller'}
                 />
               </div>

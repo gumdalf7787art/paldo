@@ -2555,9 +2555,10 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '15px', marginTop: '20px' }}>
           <div><label style={labelStyle}>사업장 이름</label><input required style={inputStyle} value={form.bizName} onChange={e => setForm({...form, bizName: e.target.value})} /></div>
           
-          {/* 본인인증 영역 삭제됨 */}
+          <div><label style={labelStyle}>대표자명</label><input required style={inputStyle} placeholder="예: 홍길동" value={form.repName} onChange={e => setForm({...form, repName: e.target.value})} /></div>
+          <div><label style={labelStyle}>핸드폰 번호</label><input required type="tel" style={inputStyle} placeholder="예: 010-1234-5678" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
 
-          <div><label style={labelStyle}>주소</label><input required style={inputStyle} value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
+          <div><label style={labelStyle}>매장 실 주소</label><input required style={inputStyle} value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록번호</label><input required style={inputStyle} value={form.bizNo} onChange={e => setForm({...form, bizNo: e.target.value})} /></div>
           <div><label style={labelStyle}>동물판매업번호</label><input required style={inputStyle} value={form.animalNo} onChange={e => setForm({...form, animalNo: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록증 첨부 (필수)</label><input type="file" required onChange={e => setFile(e.target.files[0])} /></div>

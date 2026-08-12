@@ -22,16 +22,16 @@ const AdSetupPage = () => {
 
   const adTypes = {
     main: [
-      { id: 'main', label: '히어로 섹션', img: '/images/ad_hero.jpg' },
-      { id: 'recommend', label: '추천 섹션', img: '/images/ad_recommend.jpg' },
+      { id: 'main', label: '히어로 섹션', img: '/images/ad_recommend.jpg' },
+      { id: 'recommend', label: '추천 섹션', img: '/images/ad_hero.jpg' },
       { id: 'popular', label: '인기 섹션', img: '/images/ad_popular.jpg' },
       { id: 'special', label: '스페셜 섹션', img: '/images/ad_special.jpg' }
     ],
     breed: [
-      { id: 'breed_main', label: '히어로 섹션', img: '/images/ad_hero.jpg' },
-      { id: 'breed_recommend', label: '추천 섹션', img: '/images/ad_recommend.jpg' },
-      { id: 'breed_popular', label: '인기 섹션', img: '/images/ad_popular.jpg' },
-      { id: 'breed_special', label: '스페셜 섹션', img: '/images/ad_special.jpg' }
+      { id: 'breed_main', label: '히어로 섹션', img: '/images/ad_breed_hero.jpg' },
+      { id: 'breed_recommend', label: '추천 섹션', img: '/images/ad_breed_recommend.jpg' },
+      { id: 'breed_popular', label: '인기 섹션', img: '/images/ad_breed_popular.jpg' },
+      { id: 'breed_special', label: '스페셜 섹션', img: '/images/ad_breed_special.jpg' }
     ]
   };
 

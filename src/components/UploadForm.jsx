@@ -531,7 +531,16 @@ const UploadForm = () => {
               <div style={{ flex: 1 }}>
                 {selectedCouponId ? (
                   <div style={{ padding: '12px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #fcd34d', fontWeight: '600', color: '#b45309' }}>
-                    ✅ 적용 예정: {userCoupons.find(c => c.user_coupon_id === selectedCouponId)?.name || '광고 적용됨'}
+                    ✅ 적용 예정: {
+                      (() => {
+                        const c = userCoupons.find(c => c.user_coupon_id === selectedCouponId);
+                        if (!c) return '광고 적용됨';
+                        const isMain = adTypes.main.some(a => a.id === c.ad_type);
+                        const isBreed = adTypes.breed.some(a => a.id === c.ad_type);
+                        const prefix = isMain ? '[메인페이지] ' : (isBreed ? '[견종별 페이지] ' : '');
+                        return `${prefix}${c.name}`;
+                      })()
+                    }
                   </div>
                 ) : (
                   <div style={{ color: '#92400e', fontSize: '0.95rem' }}>

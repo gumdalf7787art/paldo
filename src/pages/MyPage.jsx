@@ -937,7 +937,7 @@ const MyPage = () => {
 
 
             {/* 스토어 정보 미완성 CTA 배너 */}
-            {isSeller && (!storeDescription || !storeAddress || !storeContact) && (
+            {isSeller && (!storeDescription && !storeAddress && !storeContact) && (
               <div className="fade-in" style={{
                 padding: '20px',
                 background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
@@ -1712,7 +1712,7 @@ const MyPage = () => {
 
 
                   {/* 스토어 정보 미완성 CTA 배너 */}
-                  {isSeller && (!storeDescription || !storeAddress || !storeContact) && (
+                  {isSeller && (!storeDescription && !storeAddress && !storeContact) && (
                     <div style={{
                       padding: '24px',
                       background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',

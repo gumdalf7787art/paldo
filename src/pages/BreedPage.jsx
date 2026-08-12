@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../lib/api';
 import Card from '../components/Card';
 import SearchBar from '../components/SearchBar';
-import { HeroCarousel, LoginWidget, DynamicBanner } from '../components/Sections';
+import { HeroCarousel, PersonalRecommendWidget, LatestCommunityWidget } from '../components/Sections';
 
 const BreedPage = () => {
   const { breedName } = useParams();
@@ -208,16 +208,13 @@ const BreedPage = () => {
         </div>
 
         <div className="portal-side-col">
-          <LoginWidget />
+          {/* 1. 우수 매장 소개 */}
+          <PersonalRecommendWidget />
+
+          {/* 2. 커뮤니티 최근 이야기 */}
+          <LatestCommunityWidget />
           
-          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
-            <DynamicBanner 
-              banners={banners.breed_sidebar} 
-              slotName="breed_sidebar" 
-              height="250px" 
-            />
-          </div>
-          
+          {/* 3. 안심 입양 가이드 */}
           <div style={{
             backgroundColor: '#FFF8F6',
             border: '1px solid #FFECE5',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useMobile } from '../context/MobileContext';
 import Card from './Card';
 import { api } from '../lib/api';
@@ -1011,4 +1011,136 @@ const itemCardStyle = {
   border: '1px solid transparent'
 };
 
-export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget, DynamicBanner };
+const LatestCommunityWidget = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { isMobile } = useMobile();
+
+  useEffect(() => {
+    const fetchLatestPosts = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await api.board.getList('all', 1, 5, '');
+        if (!error && data) {
+          setPosts(data.posts || []);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    fetchLatestPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: isMobile ? '-46px' : '20px' }}>
+        불러오는 중...
+      </div>
+    );
+  }
+
+  if (posts.length === 0) return null;
+
+  const displayPosts = posts.slice(0, 4);
+
+  return (
+    <div style={{
+      backgroundColor: '#ffffff',
+      borderRadius: '12px',
+      border: '1px solid #e2e8f0',
+      padding: isMobile ? '12px 14px' : '20px',
+      marginTop: isMobile ? '-46px' : '15px',
+      marginBottom: isMobile ? '6px' : '15px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-end', 
+        marginBottom: isMobile ? '12px' : '15px' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
+            🐾 커뮤니티 최근 이야기
+          </h2>
+        </div>
+        <Link to="/community" style={{ fontSize: isMobile ? '0.8rem' : '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
+          전체보기 ➔
+        </Link>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
+        {displayPosts.map((post, idx) => {
+          let thumbnail = null;
+          if (post.images) {
+            try {
+              const imgs = JSON.parse(post.images);
+              if (imgs && imgs.length > 0) thumbnail = imgs[0];
+            } catch (e) {}
+          }
+
+          return (
+            <div
+              key={post.id}
+              onClick={() => navigate(`/community/${post.id}`)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s ease',
+                gap: '2px',
+                width: '100%'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '6px', backgroundColor: '#f1f5f9' }}>
+                {thumbnail ? (
+                  <img src={thumbnail} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
+                <span style={{
+                  fontSize: isMobile ? '0.9rem' : '1rem',
+                  color: '#1e293b',
+                  fontWeight: '600',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  lineHeight: '1.4'
+                }}>
+                  {post.title}
+                </span>
+                {post.comment_count > 0 && (
+                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.75rem' : '0.8rem', fontWeight: 'bold', marginLeft: '4px', marginTop: '2px', flexShrink: 0 }}>
+                    [{post.comment_count}]
+                  </span>
+                )}
+              </div>
+              <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginTop: '4px' }}>
+                {post.nickname || '사용자'}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget, DynamicBanner, LatestCommunityWidget };

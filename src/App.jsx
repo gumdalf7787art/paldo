@@ -4,7 +4,7 @@ import { api } from './lib/api'
 import Header from './components/Header'
 import BottomNavigation from './components/BottomNavigation'
 import { MobileProvider, useMobile } from './context/MobileContext'
-import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget } from './components/Sections'
+import { HeroCarousel, AdSections, AdoptionList, LoginWidget, PersonalRecommendWidget, LatestCommunityWidget } from './components/Sections'
 import SearchBar from './components/SearchBar'
 import DetailPage from './pages/DetailPage'
 import MyPage from './pages/MyPage'
@@ -54,141 +54,7 @@ const AnalyticsTracker = () => {
 };
 
 
-// 메인 페이지 노출용 최신 커뮤니티 글 위젯 (소식 배지 제거, 폰트 상향)
-// 메인 페이지 노출용 최신 커뮤니티 글 위젯 (소식 배지 제거, 폰트 상향)
-const LatestCommunityWidget = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { isMobile } = useMobile();
-
-  useEffect(() => {
-    const fetchLatestPosts = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await api.board.getList('all', 1, 5, '');
-        if (!error && data) {
-          setPosts(data.posts || []);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setLoading(false);
-    };
-    fetchLatestPosts();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ padding: isMobile ? '12px' : '20px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #edf2f7', marginTop: isMobile ? '-46px' : '20px' }}>
-        불러오는 중...
-      </div>
-    );
-  }
-
-  if (posts.length === 0) return null;
-
-  const displayPosts = posts.slice(0, 4);
-
-  return (
-    <div style={{
-      backgroundColor: '#ffffff',
-      borderRadius: '12px',
-      border: '1px solid #e2e8f0',
-      padding: isMobile ? '12px 14px' : '20px',
-      marginTop: isMobile ? '-46px' : '15px',
-      marginBottom: isMobile ? '6px' : '15px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-end', 
-        marginBottom: isMobile ? '12px' : '15px' 
-      }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-          <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', color: 'var(--body-text)', margin: 0, fontWeight: '700' }}>
-            🐾 커뮤니티 최근 이야기
-          </h2>
-        </div>
-        <Link to="/community" style={{ fontSize: isMobile ? '0.8rem' : '0.92rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}>
-          전체보기 ➔
-        </Link>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '8px' : '12px' }}>
-        {displayPosts.map((post, idx) => {
-          let thumbnail = null;
-          if (post.images) {
-            try {
-              const imgs = JSON.parse(post.images);
-              if (imgs && imgs.length > 0) thumbnail = imgs[0];
-            } catch (e) {}
-          }
-
-          return (
-            <div
-              key={post.id}
-              onClick={() => navigate(`/community/${post.id}`)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                textAlign: 'left',
-                cursor: 'pointer',
-                transition: 'opacity 0.2s ease',
-                gap: '2px',
-                width: '100%'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '0.8';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '1';
-              }}
-            >
-              <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '6px', backgroundColor: '#f1f5f9' }}>
-                {thumbnail ? (
-                  <img src={thumbnail} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                    No Image
-                  </div>
-                )}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
-                <span style={{
-                  fontSize: isMobile ? '0.9rem' : '1rem',
-                  color: '#1e293b',
-                  fontWeight: '600',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  lineHeight: '1.4'
-                }}>
-                  {post.title}
-                </span>
-                {post.comment_count > 0 && (
-                  <span style={{ color: '#e53e3e', fontSize: isMobile ? '0.75rem' : '0.8rem', fontWeight: 'bold', marginLeft: '4px', marginTop: '2px', flexShrink: 0 }}>
-                    [{post.comment_count}]
-                  </span>
-                )}
-              </div>
-              <div style={{ color: '#64748b', fontSize: isMobile ? '0.75rem' : '0.8rem', marginTop: '4px' }}>
-                {post.nickname || '사용자'}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-
+// 메인 페이지 노출용 최신 커뮤니티 글 위젯은 Sections.jsx로 이동됨
 const PartnerBanner = () => {
   const { isMobile } = useMobile();
   const [isVisible, setIsVisible] = useState(() => {
@@ -312,17 +178,20 @@ const Home = () => {
           <SearchBar />
         </div>
         
-        {/* 6. 커뮤니티 최신 이야기 (검색 섹션 아래로 이동) */}
-        <LatestCommunityWidget />
-        
+        {/* 6. 우수 매장 소개 */}
+        <div style={{ marginBottom: '10px' }}>
+          <PersonalRecommendWidget />
+        </div>
+
+        {/* 4. 커뮤니티 최근 이야기 */}
+        <div style={{ marginBottom: '10px' }}>
+          <LatestCommunityWidget />
+        </div>
+
+
         {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
         <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
           <AdSections />
-        </div>
-
-        {/* 4. 로그인 위젯 (사이드 1번 광고 배너) */}
-        <div style={{ marginBottom: '10px' }}>
-          <LoginWidget />
         </div>
 
         {/* 5. 일반 분양 리스트 (전체 분양 리스트) */}
@@ -330,10 +199,6 @@ const Home = () => {
           <AdoptionList />
         </div>
 
-        {/* 7. 개별 추천 위젯 */}
-        <div style={{ marginBottom: '20px' }}>
-          <PersonalRecommendWidget />
-        </div>
       </main>
     );
   }
@@ -359,11 +224,14 @@ const Home = () => {
         
         {/* 우측 사이드바 영역 */}
         <div className="portal-side-col">
-          <LoginWidget />
+          
+          {/* 1. 우수 매장 소개 */}
+          <PersonalRecommendWidget />
 
+          {/* 2. 커뮤니티 최근 이야기 */}
           <LatestCommunityWidget />
           
-          {/* 입양 안내 위젯 */}
+          {/* 3. 안심 입양 가이드 */}
           <div style={{
             backgroundColor: '#FFF8F6',
             border: '1px solid #FFECE5',
@@ -381,9 +249,6 @@ const Home = () => {
               <li>• 계약서 작성 시 15일 이내 폐사/질병에 대한 보상 조건을 확인하세요.</li>
             </ul>
           </div>
-
-          {/* 맞춤형 개별 추천 위젯 */}
-          <PersonalRecommendWidget />
         </div>
       </div>
     </main>

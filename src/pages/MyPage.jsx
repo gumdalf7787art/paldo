@@ -450,16 +450,29 @@ const MyPage = () => {
     };
   };
 
-  const renderAdName = (name) => {
+  const renderAdName = (name, style) => {
     if (!name) return name;
-    if (name.includes('메인페이지')) {
-      const suffix = name.replace('메인페이지', '').trim();
-      return <><span style={{ color: '#4A90E2' }}>메인페이지</span> <span style={{ color: '#333' }}>{suffix}</span></>;
-    } else if (name.includes('품종별페이지')) {
-      const suffix = name.replace('품종별페이지', '').trim();
-      return <><span style={{ color: '#7ED321' }}>품종별페이지</span> <span style={{ color: '#333' }}>{suffix}</span></>;
+    const isBreed = name.includes('견종') || name.includes('품종');
+    let prefix = isBreed ? '견종별 페이지' : '메인페이지';
+    let restName = name;
+
+    if (isBreed) {
+      restName = name.replace(/견종별\s*/, '');
+    } else {
+      if (restName.includes('히어로 페이지')) {
+        restName = restName.replace('히어로 페이지', '히어로');
+      }
     }
-    return <span style={{ color: '#333' }}>{name}</span>;
+
+    const prefixColor = isBreed ? '#00796B' : '#E65100';
+    const textColor = style?.title || '#333';
+
+    return (
+      <>
+        <span style={{ color: prefixColor, fontWeight: '900', marginRight: '6px' }}>[{prefix}]</span>
+        <span style={{ color: textColor }}>{restName}</span>
+      </>
+    );
   };
 
   const handleMarkAsRead = async (id, isRead) => {
@@ -2131,7 +2144,7 @@ const MyPage = () => {
                           <div key={idx} style={{ padding: '20px', border: `1px solid ${style.border}`, borderRadius: '15px', backgroundColor: style.bg, position: 'relative', overflow: 'hidden' }}>
                             <div style={{ position: 'absolute', right: '-10px', top: '-10px', width: '50px', height: '50px', backgroundColor: style.icon, borderRadius: '50%', opacity: 0.3 }}></div>
                             <div style={{ position: 'absolute', right: '15px', bottom: '15px', fontSize: '2rem', fontWeight: '900', color: style.title, opacity: 0.8 }}>{coupon.count}장</div>
-                            <h4 style={{ margin: '0 0 10px 0', color: style.title }}>🎁 {renderAdName(coupon.name)}</h4>
+                            <h4 style={{ margin: '0 0 10px 0' }}>🎁 {renderAdName(coupon.name, style)}</h4>
                             <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px', fontWeight: 'bold' }}>
                               사용 기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '무제한'}
                             </div>

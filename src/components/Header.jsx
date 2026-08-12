@@ -326,26 +326,7 @@ const Header = () => {
                         💬 댕댕톡 메시지
                       </Link>
 
-                      {role !== 'user' && (
-                        <>
-                          <Link 
-                            to="/ad-store" 
-                            onClick={() => setShowUserDropdown(false)}
-                            className="header-dropdown-item"
-                          >
-                            🛒 단건구매 스토어
-                          </Link>
-                          
-                          <Link 
-                            to="/subscription" 
-                            onClick={() => setShowUserDropdown(false)}
-                            className="header-dropdown-item"
-                            style={{ color: '#9b59b6', fontWeight: 'bold' }}
-                          >
-                            💎 정기구매 스토어
-                          </Link>
-                        </>
-                      )}
+
 
                       <div style={{ borderTop: '1px solid #e2e8f0', margin: '6px 0' }} />
 

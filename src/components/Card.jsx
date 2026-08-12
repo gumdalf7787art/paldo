@@ -8,15 +8,33 @@ const Card = ({ data, badgeText }) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     const checkLikeStatus = async () => {
-      const { data: userData } = await api.auth.getUser();
-      if (userData) {
-        setUserId(userData.id);
-        const { data: bookmarkData } = await api.bookmarks.check(data.id);
-        if (bookmarkData?.bookmarked) setIsLiked(true);
+      const token = localStorage.getItem('paldo_session_token');
+      if (token) {
+        setUserId('active'); // 로컬 토큰만으로 임시 인증 처리 (불필요한 API 호출 방지)
+        try {
+          const { data: bookmarkData } = await api.bookmarks.check(data.id);
+          if (isMounted && bookmarkData?.bookmarked) setIsLiked(true);
+        } catch (e) {
+          // ignore
+        }
       }
     };
     checkLikeStatus();
+
+    // 다른 위치(동일한 매물의 다른 카드 복제본)에서 찜 상태가 변경되었을 때 동기화
+    const handleBookmarkToggle = (e) => {
+      if (e.detail.dogId === data.id) {
+        setIsLiked(e.detail.bookmarked);
+      }
+    };
+    window.addEventListener('bookmark-toggled', handleBookmarkToggle);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('bookmark-toggled', handleBookmarkToggle);
+    };
   }, [data.id]);
 
   const toggleLike = async (e) => {

@@ -2026,14 +2026,6 @@ const MyPage = () => {
                 <div className="fade-in">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>광고 쿠폰 관리</h2>
-                    <button 
-                      onClick={() => navigate('/ad-store')}
-                      style={{ padding: '10px 20px', borderRadius: '10px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(255, 171, 0, 0.2)' }}
-                      onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary-dark)'; e.target.style.transform = 'translateY(-2px)'; }}
-                      onMouseLeave={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.transform = 'translateY(0)'; }}
-                    >
-                      🛒 단건구매 스토어 가기
-                    </button>
                   </div>
 
                   {/* 데스크탑 테이블 */}

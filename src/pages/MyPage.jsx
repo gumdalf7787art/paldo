@@ -1821,7 +1821,7 @@ const MyPage = () => {
 
                   {/* 데스크탑 테이블 */}
                   <div className="post-table-wrap" style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #eee' }}>
                           <th style={thStyle}>사진</th>
@@ -1829,6 +1829,7 @@ const MyPage = () => {
                           <th style={thStyle}>지역/가격</th>
                           <th style={thStyle}>성과 (조회/찜)</th>
                           <th style={thStyle}>상태</th>
+                          <th style={thStyle}>광고 현황</th>
                           <th style={{ ...thStyle, textAlign: 'center' }}>관리</th>
                         </tr>
                       </thead>
@@ -1848,22 +1849,33 @@ const MyPage = () => {
                             <td style={tdStyle}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
                                 <span style={{ padding: '4px 8px', backgroundColor: '#eefbe7', color: '#7ed321', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>분양중</span>
-                                {dog.ad_type && (
-                                  <span style={{ padding: '4px 8px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', gap: '4px', alignItems: 'center' }}>
-                                    <span>📢</span>
-                                    <span>
-                                      {dog.ad_type === 'popular' ? '인기스토어' :
-                                       dog.ad_type === 'special' ? '스페셜분양' :
-                                       dog.ad_type === 'safe' ? '안심분양' :
-                                       dog.ad_type === 'main' ? '메인추천' :
-                                       dog.ad_type === 'recommend' ? '추천분양' : '프리미엄광고'}
+                              </div>
+                            </td>
+                            <td style={tdStyle}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
+                                {dog.ad_type ? (
+                                  <>
+                                    <span style={{ padding: '6px 10px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                      <span>📢</span>
+                                      <span>
+                                        {dog.ad_type === 'popular' ? '메인 인기섹션' :
+                                         dog.ad_type === 'special' ? '메인 스페셜섹션' :
+                                         dog.ad_type === 'main' ? '메인 히어로섹션' :
+                                         dog.ad_type === 'recommend' ? '메인 추천섹션' : 
+                                         dog.ad_type === 'breed_main' ? '견종 히어로' :
+                                         dog.ad_type === 'breed_recommend' ? '견종 추천' :
+                                         dog.ad_type === 'breed_popular' ? '견종 인기' :
+                                         dog.ad_type === 'breed_special' ? '견종 스페셜' : '프리미엄광고'}
+                                      </span>
                                     </span>
-                                  </span>
-                                )}
-                                {dog.ad_end_date && (
-                                  <span style={{ fontSize: '0.7rem', color: '#888' }}>
-                                    ~{new Date(dog.ad_end_date).toLocaleDateString()}
-                                  </span>
+                                    {dog.ad_end_date && (
+                                      <span style={{ fontSize: '0.75rem', color: '#666', fontWeight: 'bold', marginTop: '2px' }}>
+                                        ~{new Date(dog.ad_end_date).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '6px 12px', borderRadius: '8px', backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }}>📢 광고 진행하기</button>
                                 )}
                               </div>
                             </td>
@@ -1874,9 +1886,6 @@ const MyPage = () => {
                                   <button onClick={() => handleEditPost(dog)} style={{ ...tableBtnStyle, flex: 1 }}>수정</button>
                                   <button onClick={() => handleDeletePost(dog.id)} style={{ ...tableBtnStyle, backgroundColor: '#ff6b6b', color: 'white', flex: 1 }}>삭제</button>
                                 </div>
-                                {!dog.ad_type && (
-                                  <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ ...tableBtnStyle, backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold' }}>📢 광고 진행하기</button>
-                                )}
                               </div>
                             </td>
                           </tr>
@@ -1895,22 +1904,6 @@ const MyPage = () => {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
                             <div style={{ fontWeight: '800', fontSize: '1rem' }}>{dog.breed}</div>
-                            {dog.ad_type && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ padding: '3px 6px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold' }}>
-                                  📢 {dog.ad_type === 'popular' ? '인기스토어' :
-                                     dog.ad_type === 'special' ? '스페셜분양' :
-                                     dog.ad_type === 'safe' ? '안심분양' :
-                                     dog.ad_type === 'main' ? '메인추천' :
-                                     dog.ad_type === 'recommend' ? '추천분양' : '프리미엄광고'}
-                                </span>
-                                {dog.ad_end_date && (
-                                  <span style={{ fontSize: '0.65rem', color: '#888' }}>
-                                    ~{new Date(dog.ad_end_date).toLocaleDateString()}
-                                  </span>
-                                )}
-                              </div>
-                            )}
                           </div>
                           <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>{dog.nickname} ({dog.gender}) · {dog.region} · <b style={{ color: 'var(--primary-dark)' }}>{dog.price === 0 ? '무료' : dog.price + '만원'}</b></div>
                           <div style={{ fontSize: '0.8rem', color: '#888' }}>👀 {dogStats[dog.id]?.views || 0}  💝 {dogStats[dog.id]?.likes || 0}</div>
@@ -1918,8 +1911,31 @@ const MyPage = () => {
                             <button onClick={() => handleCompleteAdoption(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>💖 분양완료</button>
                             <button onClick={() => handleEditPost(dog)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#eee', color: '#333', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>✏️ 수정</button>
                             <button onClick={() => handleDeletePost(dog.id)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#ff6b6b', color: 'white', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>🗑️ 삭제</button>
-                            {!dog.ad_type && (
-                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ padding: '7px 12px', borderRadius: '8px', backgroundColor: '#f59e0b', color: 'white', fontWeight: 'bold', border: 'none', fontSize: '0.8rem', cursor: 'pointer' }}>📢 광고 진행</button>
+                          </div>
+                          
+                          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #eee' }}>
+                            {dog.ad_type ? (
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ padding: '4px 8px', backgroundColor: '#fff4e6', color: '#d97706', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                  📢 {dog.ad_type === 'popular' ? '메인 인기섹션' :
+                                     dog.ad_type === 'special' ? '메인 스페셜섹션' :
+                                     dog.ad_type === 'main' ? '메인 히어로섹션' :
+                                     dog.ad_type === 'recommend' ? '메인 추천섹션' : 
+                                     dog.ad_type === 'breed_main' ? '견종 히어로' :
+                                     dog.ad_type === 'breed_recommend' ? '견종 추천' :
+                                     dog.ad_type === 'breed_popular' ? '견종 인기' :
+                                     dog.ad_type === 'breed_special' ? '견종 스페셜' : '프리미엄광고'}
+                                </span>
+                                {dog.ad_end_date && (
+                                  <span style={{ fontSize: '0.75rem', color: '#666', fontWeight: 'bold' }}>
+                                    ~{new Date(dog.ad_end_date).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <button onClick={() => navigate(`/ad-setup/${dog.id}`)} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#fffbf0', color: '#b45309', border: '1px solid #fde68a', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                📢 광고 진행하기
+                              </button>
                             )}
                           </div>
                         </div>

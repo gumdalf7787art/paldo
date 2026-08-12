@@ -91,14 +91,23 @@ const LoginPage = () => {
         padding: '50px 40px',
         textAlign: 'center'
       }}>
-        <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'center' }}>
-          <Logo />
-        </div>
-
         <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--secondary)' }}>반가워요! 팔도댕댕입니다.</h2>
-        <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '40px' }}>
+        <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginBottom: '30px' }}>
           가장 따뜻한 가족을 만나는 첫 걸음
         </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
+          <div style={socialBtnStyle('#FEE500')} title="카카오 로그인" onClick={handleKakaoLogin}>카카오</div>
+          <div style={socialBtnStyle('#03C75A', null, 'white')} title="네이버 로그인" onClick={handleNaverLogin}>네이버</div>
+          <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인" onClick={handleGoogleLogin}>구글</div>
+        </div>
+
+        <div style={{ position: 'relative', margin: '30px 0 40px', borderTop: '1px solid #eee' }}>
+          <span style={{ 
+            position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
+            backgroundColor: '#fff', padding: '0 15px', color: '#bbb', fontSize: '0.8rem'
+          }}>또는 이메일로 로그인</span>
+        </div>
 
         <form onSubmit={handleLogin} style={{ display: 'grid', gap: '15px', marginBottom: '20px' }}>
           <div style={{ textAlign: 'left' }}>
@@ -146,19 +155,6 @@ const LoginPage = () => {
             >
               비밀번호를 잊으셨나요?
             </span>
-        </div>
-
-        <div style={{ position: 'relative', margin: '40px 0', borderTop: '1px solid #eee' }}>
-          <span style={{ 
-            position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
-            backgroundColor: '#fff', padding: '0 15px', color: '#bbb', fontSize: '0.8rem'
-          }}>소셜 로그인</span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
-          <div style={socialBtnStyle('#FEE500')} title="카카오 로그인" onClick={handleKakaoLogin}>K</div>
-          <div style={socialBtnStyle('#03C75A')} title="네이버 로그인" onClick={handleNaverLogin}>N</div>
-          <div style={socialBtnStyle('#fff', '#eee')} title="구글 로그인" onClick={handleGoogleLogin}>G</div>
         </div>
 
         <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)' }}>
@@ -215,9 +211,9 @@ const LoginPage = () => {
 
 const labelStyle = { display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--muted-text)', marginBottom: '8px' };
 const inputStyle = { width: '100%', padding: '14px', borderRadius: '10px', border: '1px solid #eee', outline: 'none', fontSize: '1rem' };
-const socialBtnStyle = (bg, border) => ({
-  width: '50px', height: '50px', borderRadius: '50%', backgroundColor: bg, border: border ? `1px solid ${border}` : 'none',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: '800', fontSize: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+const socialBtnStyle = (bg, border, color = '#333') => ({
+  flex: 1, padding: '14px 0', borderRadius: '12px', backgroundColor: bg, border: border ? `1px solid ${border}` : 'none', color,
+  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: '800', fontSize: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
 });
 
 const modalOverlayStyle = {

@@ -71,7 +71,6 @@ const Card = ({ data, badgeText }) => {
     if (badgeText === '인기') return 'badge-popular';
     if (badgeText === '스페셜') return 'badge-special';
     if (badgeText === '추천') return 'badge-recommend';
-    if (badgeText === '히어로') return 'badge-hero';
     if (badgeText === '신규') return 'badge-new';
     return '';
   };

@@ -156,7 +156,7 @@ const HeroCarousel = ({ breedName }) => {
     const loadHeroAds = async () => {
       try {
         const currentAdType = breedName ? 'breed_main' : 'main';
-        const data = await fetchAdsAndFill(currentAdType, 10, '히어로', breedName);
+        const data = await fetchAdsAndFill(currentAdType, 10, '추천', breedName);
         if (data && data.length > 0) {
           setAds(data);
         } else {

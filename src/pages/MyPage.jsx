@@ -699,7 +699,7 @@ const MyPage = () => {
       { id: 'subscription', label: '💎 정기구매 스토어', action: () => navigate('/subscription') },
       { id: 'stats', label: '📊 통계' },
     ] : []),
-    { id: 'chats', label: '💬 다잇톡' },
+    { id: 'chats', label: '💬 댕댕톡' },
     { id: 'bookmarks', label: '💝 관심아이' },
     { id: 'notifications', label: '🔔 알림' },
   ];
@@ -950,7 +950,7 @@ const MyPage = () => {
                   <span style={{ fontSize: '0.65rem', padding: '2px 6px', backgroundColor: '#f59e0b', color: 'white', borderRadius: '6px', fontWeight: 'bold' }}>권장</span>
                 </div>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#b45309', lineHeight: '1.5', wordBreak: 'keep-all' }}>
-                  스토어 소개글, 실 주소, 문의 연락처를 모두 완성하면 구매자가 매장 위치를 지도로 확인하고 즉시 다잇톡으로 상담을 요청할 수 있습니다. 스토어 신뢰도를 높여보세요!
+                  스토어 소개글, 실 주소, 문의 연락처를 모두 완성하면 구매자가 매장 위치를 지도로 확인하고 즉시 댕댕톡으로 상담을 요청할 수 있습니다. 스토어 신뢰도를 높여보세요!
                 </p>
                 <button
                   onClick={() => setActiveTab('store')}
@@ -989,7 +989,7 @@ const MyPage = () => {
                   </div>
                   <div onClick={() => setActiveTab('chats')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer', gridColumn: 'span 2' }}>
                     <span style={{ fontSize: '1.2rem' }}>💬</span>
-                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 다잇톡 상담</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 댕댕톡 상담</span>
                     <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{chatRooms.length}건</span>
                   </div>
                 </>
@@ -1002,7 +1002,7 @@ const MyPage = () => {
                   </div>
                   <div onClick={() => setActiveTab('chats')} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '14px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
                     <span style={{ fontSize: '1.2rem' }}>💬</span>
-                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 다잇톡</span>
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>진행중인 댕댕톡</span>
                     <span style={{ fontSize: '1.1rem', fontWeight: '800' }}>{chatRooms.length}건</span>
                   </div>
                 </>
@@ -1010,7 +1010,7 @@ const MyPage = () => {
             </div>
 
             <div style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid #eee', marginTop: '5px' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', marginBottom: '12px', color: '#333' }}>최근 다잇톡 상담</h4>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', marginBottom: '12px', color: '#333' }}>최근 댕댕톡 상담</h4>
               {chatRooms.slice(0, 3).map(room => (
                 <div 
                   key={room.id} 
@@ -1304,7 +1304,7 @@ const MyPage = () => {
               // 톡방 목록
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: 'white', borderRadius: '14px', border: '1px solid #eee', overflow: 'hidden' }}>
                 <div style={{ padding: '15px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: 0 }}>💬 다잇톡 상담 목록</h3>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: 0 }}>💬 댕댕톡 상담 목록</h3>
                 </div>
                 <div style={{ flex: 1, overflowY: 'auto' }}>
                   {chatRooms.length === 0 ? (
@@ -1395,7 +1395,7 @@ const MyPage = () => {
               {myNotifications.map(n => (
                 <div key={n.id} onClick={() => handleMarkAsRead(n.id, n.is_read)} style={{ backgroundColor: 'white', padding: '12px', borderRadius: '10px', border: '1px solid #eee', borderLeft: n.is_read ? '1px solid #eee' : '4px solid var(--primary-dark)', opacity: n.is_read ? 0.7 : 1, cursor: 'pointer' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--primary-dark)', fontWeight: 'bold' }}>
-                    {n.type === 'chat' && '💬 다잇톡'}
+                    {n.type === 'chat' && '💬 댕댕톡'}
                     {n.type === 'bookmark' && '💝 관심등록'}
                     {n.type === 'coupon' && '🎁 쿠폰'}
                     {n.type === 'system' && '📢 공지'}
@@ -1527,14 +1527,14 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                   </>
                 )}
-                <button onClick={() => setActiveTab('chats')} style={navBtnStyle('chats')}>💬 다잇톡</button>
+                <button onClick={() => setActiveTab('chats')} style={navBtnStyle('chats')}>💬 댕댕톡</button>
                 <button onClick={() => setActiveTab('bookmarks')} style={navBtnStyle('bookmarks')}>💝 관심아이</button>
                 <button onClick={() => setActiveTab('notifications')} style={navBtnStyle('notifications')}>🔔 알림내역</button>
+                <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={isEditingProfile ? { ...navBtnStyle(''), backgroundColor: 'var(--primary)', color: 'white' } : navBtnStyle('')}>⚙️ 프로필 설정</button>
               </div>
 
               {/* 설정, 로그아웃 */}
               <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
-                <button onClick={() => setIsEditingProfile(!isEditingProfile)} style={{ ...actionBtnStyle, fontSize: '0.85rem', marginBottom: '10px' }}>⚙️ 프로필 설정</button>
                 <button onClick={async () => { await api.auth.logout(); navigate('/'); }} style={{ ...actionBtnStyle, color: '#ff4757', border: 'none' }}>로그아웃</button>
 
                 {!isSeller && (
@@ -1723,7 +1723,7 @@ const MyPage = () => {
                           <span style={{ fontSize: '0.7rem', padding: '3px 8px', backgroundColor: '#f59e0b', color: 'white', borderRadius: '8px', fontWeight: 'bold' }}>권장 사항</span>
                         </div>
                         <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#b45309', lineHeight: '1.5' }}>
-                          스토어 소개글, 실 주소, 문의 연락처를 채워 구매자들에게 신뢰감을 전하세요. 정보를 모두 채우면 매장 지도가 활성화되고 다잇톡 상담률이 평균 40% 이상 상승합니다!
+                          스토어 소개글, 실 주소, 문의 연락처를 채워 구매자들에게 신뢰감을 전하세요. 정보를 모두 채우면 매장 지도가 활성화되고 댕댕톡 상담률이 평균 40% 이상 상승합니다!
                         </p>
                       </div>
                       <button
@@ -1754,19 +1754,19 @@ const MyPage = () => {
                       <>
                         <StatBox title="총 방문자 분석" value={totalViews} suffix="명" color="#F5A623" icon="👀" onClick={() => setActiveTab('stats')} />
                         <StatBox title="전체 게시물" value={myDogs.length} suffix="건" color="var(--primary)" icon="🐶" onClick={() => setActiveTab('posts')} />
-                        <StatBox title="진행중인 다잇톡" value={chatRooms.length} suffix="건" color="#4A90E2" icon="💬" onClick={() => setActiveTab('chats')} />
+                        <StatBox title="진행중인 댕댕톡" value={chatRooms.length} suffix="건" color="#4A90E2" icon="💬" onClick={() => setActiveTab('chats')} />
                       </>
                     ) : (
                       <>
                         <StatBox title="관심아이" value={bookmarks.length} suffix="마리" color="var(--primary)" icon="💝" onClick={() => setActiveTab('bookmarks')} />
-                        <StatBox title="진행중인 다잇톡" value={chatRooms.length} suffix="건" color="#F5A623" icon="💬" onClick={() => setActiveTab('chats')} />
+                        <StatBox title="진행중인 댕댕톡" value={chatRooms.length} suffix="건" color="#F5A623" icon="💬" onClick={() => setActiveTab('chats')} />
                       </>
                     )}
                   </div>
                   
                   {/* 최신 알림 및 요약 */}
                   <div style={{ padding: '20px', backgroundColor: '#fcfcfc', borderRadius: '15px', border: '1px solid #eee' }}>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '15px' }}>최근 대화 (다잇톡)</h3>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '15px' }}>최근 대화 (댕댕톡)</h3>
                     {chatRooms.slice(0, 3).map(room => (
                       <div 
                         key={room.id} 
@@ -2216,7 +2216,7 @@ const MyPage = () => {
                   {/* 좌측: 대화 목록 */}
                   <div className="chat-room-panel">
                     <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>다잇톡 대화목록</h3>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>댕댕톡 대화목록</h3>
                     </div>
                     <div style={{ flex: 1, overflowY: 'auto' }}>
                       {chatRooms.length === 0 ? (

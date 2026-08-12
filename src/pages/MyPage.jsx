@@ -606,7 +606,12 @@ const MyPage = () => {
   };
 
   const handleUpdatePassword = async () => {
-    if (!passwordMatch || newPassword.length < 6) return alert('비밀번호를 확인해주세요.');
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return alert('비밀번호는 영문, 숫자, 특수문자를 모두 포함하여 8자 이상으로 설정해 주세요.');
+    }
+    if (!passwordMatch) return alert('비밀번호가 일치하지 않습니다.');
+    
     const { error } = await api.auth.updatePassword(newPassword);
     if (!error) {
       alert('비밀번호가 변경되었습니다.');
@@ -815,7 +820,10 @@ const MyPage = () => {
                  <button onClick={() => setIsChangingPassword(true)} style={{ ...actionBtnStyle, padding: '8px 12px', fontSize: '0.8rem' }}>비밀번호 변경하기</button>
               ) : (
                 <div style={{ display: 'grid', gap: '10px' }}>
-                  <input type="password" placeholder="새 비밀번호" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle} />
+                  <div>
+                    <input type="password" placeholder="새 비밀번호 (영문,숫자,특수문자 포함 8자 이상)" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle} />
+                    <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px', wordBreak: 'keep-all', lineHeight: '1.3' }}>* 영문, 숫자, 특수문자 포함 8자 이상</p>
+                  </div>
                   <input type="password" placeholder="비밀번호 확인" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ ...inputStyle, borderColor: passwordMatch === false ? '#FF5252' : (passwordMatch ? 'var(--primary)' : '#eee') }} />
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={handleUpdatePassword} style={{ ...miniBtnStyle, flex: 1 }}>변경 완료</button>
@@ -1606,7 +1614,10 @@ const MyPage = () => {
                        <button onClick={() => setIsChangingPassword(true)} style={{ ...actionBtnStyle, width: 'auto', padding: '8px 15px', fontSize: '0.85rem' }}>비밀번호 변경하기</button>
                     ) : (
                       <div style={{ display: 'grid', gap: '10px', maxWidth: '300px' }}>
-                        <input type="password" placeholder="새 비밀번호" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle} />
+                        <div>
+                          <input type="password" placeholder="새 비밀번호 (영문,숫자,특수문자 8자 이상)" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle} />
+                          <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px', wordBreak: 'keep-all', lineHeight: '1.3' }}>* 영문, 숫자, 특수문자 포함 8자 이상</p>
+                        </div>
                         <input type="password" placeholder="비밀번호 확인" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ ...inputStyle, borderColor: passwordMatch === false ? '#FF5252' : (passwordMatch ? 'var(--primary)' : '#eee') }} />
                         <div style={{ display: 'flex', gap: '5px' }}>
                           <button onClick={handleUpdatePassword} style={miniBtnStyle}>변경 완료</button>

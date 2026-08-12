@@ -26,8 +26,9 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    if (password.length < 6) {
-      alert('비밀번호는 최소 6자리 이상이어야 합니다.');
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      alert('비밀번호는 영문, 숫자, 특수문자를 모두 포함하여 8자 이상으로 설정해 주세요.');
       return;
     }
 
@@ -77,12 +78,13 @@ const ResetPasswordPage = () => {
             <label style={labelStyle}>새 비밀번호</label>
             <input 
               type="password" 
-              placeholder="6자리 이상 입력" 
+              placeholder="영문, 숫자, 특수문자 포함 8자 이상" 
               style={inputStyle} 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px', wordBreak: 'keep-all', lineHeight: '1.3' }}>* 영문, 숫자, 특수문자 포함 8자 이상</p>
           </div>
           <div>
             <label style={labelStyle}>비밀번호 확인</label>

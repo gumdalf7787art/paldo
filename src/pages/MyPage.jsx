@@ -920,43 +920,7 @@ const MyPage = () => {
               </div>
             )}
 
-            {/* 일반 구매자인데 신청도 안 한 경우 온보딩 유도 카드 */}
-            {!isSeller && !businessApp && (
-              <div className="fade-in" style={{
-                padding: '20px',
-                backgroundColor: '#f6f9fc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '14px',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span style={{ fontSize: '2rem' }}>🏪</span>
-                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#4a5568' }}>펫샵 사장님이신가요?</h4>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#718096', lineHeight: '1.4', wordBreak: 'keep-all' }}>
-                  팔도댕댕에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
-                </p>
-                <button
-                  onClick={() => setIsApplyModalOpen(true)}
-                  style={{
-                    marginTop: '10px',
-                    padding: '10px 20px',
-                    backgroundColor: 'var(--primary)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(38, 166, 154, 0.2)'
-                  }}
-                >
-                  인증 분양 사업자 신청하기
-                </button>
-              </div>
-            )}
+
 
             {/* 스토어 정보 미완성 CTA 배너 */}
             {isSeller && (!storeDescription || !storeAddress || !storeContact) && (
@@ -1057,17 +1021,7 @@ const MyPage = () => {
               {chatRooms.length === 0 && <div style={{ color: '#bbb', fontSize: '0.8rem', padding: '15px 0', textAlign: 'center' }}>진행 중인 대화가 없습니다.</div>}
             </div>
 
-            {!isSeller && (
-              <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                {(!businessApp || businessApp.status === 'rejected') ? (
-                  <button onClick={() => setIsApplyModalOpen(true)} style={{ background: 'none', border: 'none', color: '#777', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer' }}>
-                    인증 분양 사업자로 등록하여 혜택 받기
-                  </button>
-                ) : (
-                  businessApp.status === 'pending' ? <div style={{ fontSize:'0.8rem', color:'var(--primary)', fontWeight: 'bold' }}>⏳ 사업자 심사 진행 중입니다.</div> : null
-                )}
-              </div>
-            )}
+
           </div>
         )}
 
@@ -1734,47 +1688,7 @@ const MyPage = () => {
                     </div>
                   )}
 
-                  {/* 일반 구매자인데 신청도 안 한 경우 온보딩 유도 카드 */}
-                  {!isSeller && !businessApp && (
-                    <div style={{
-                      padding: '24px',
-                      backgroundColor: '#f6f9fc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '16px',
-                      marginBottom: '25px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '20px'
-                    }}>
-                      <span style={{ fontSize: '2.5rem' }}>🏪</span>
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#4a5568' }}>인증 분양 사업자(스토어)로 입점해보세요!</h4>
-                        <p style={{ margin: '6px 0 0', fontSize: '0.9rem', color: '#718096', lineHeight: '1.4' }}>
-                          팔도댕댕에 사업자 등록을 하시면 무제한 분양글 등록, 매장 전용 미니홈피 제공 및 다양한 비즈니스 서비스 혜택을 이용하실 수 있습니다.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setIsApplyModalOpen(true)}
-                        style={{
-                          padding: '12px 24px',
-                          backgroundColor: 'var(--primary)',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          fontWeight: 'bold',
-                          fontSize: '0.9rem',
-                          cursor: 'pointer',
-                          boxShadow: '0 4px 12px rgba(38, 166, 154, 0.2)',
-                          transition: 'all 0.2s',
-                          whiteSpace: 'nowrap'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--primary-dark)'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--primary)'}
-                      >
-                        사업자 신청하기
-                      </button>
-                    </div>
-                  )}
+
 
                   {/* 스토어 정보 미완성 CTA 배너 */}
                   {isSeller && (!storeDescription || !storeAddress || !storeContact) && (

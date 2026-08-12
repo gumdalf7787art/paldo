@@ -2463,6 +2463,7 @@ const resizeImageToBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 
 const BusinessApplyModal = ({ onClose, onSuccess }) => {
   const [form, setForm] = useState({ bizName: '', repName: '', phone: '', address: '', bizNo: '', animalNo: '' });
   const [file, setFile] = useState(null);
+  const [animalFile, setAnimalFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -2473,42 +2474,28 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
       return;
     }
 
-    if (!file) {
-      alert('사업자등록증 등의 증빙 서류 파일을 반드시 첨부해 주세요.');
+    if (!file || !animalFile) {
+      alert('사업자등록증 및 동물판매업 등록증 파일을 모두 첨부해 주세요.');
       return;
     }
 
     setUploading(true);
 
     try {
-      // 이미지 파일인 경우 리사이징 및 압축 최적화 적용
-      let fileBase64 = null;
-      let fileName = file.name;
-
-      if (file.type.startsWith('image/')) {
-        try {
-          fileBase64 = await resizeImageToBase64(file, 1200, 1200, 0.75);
-          if (!fileName.toLowerCase().endsWith('.jpg') && !fileName.toLowerCase().endsWith('.jpeg')) {
-            fileName = fileName.substring(0, fileName.lastIndexOf('.')) + '.jpg';
-          }
-        } catch (e) {
-          console.error('이미지 압축 실패, 원본 파일로 진행합니다:', e);
-          fileBase64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (err) => reject(err);
-            reader.readAsDataURL(file);
-          });
-        }
-      } else {
-        // 이미지가 아닌 경우(PDF 등) 원본 base64 변환
-        fileBase64 = await new Promise((resolve, reject) => {
+      const fileToBase64 = (f) => {
+        return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.onerror = (err) => reject(err);
-          reader.readAsDataURL(file);
+          reader.readAsDataURL(f);
         });
-      }
+      };
+
+      const fileBase64 = await fileToBase64(file);
+      const fileName = file.name;
+      
+      const animalFileBase64 = await fileToBase64(animalFile);
+      const animalFileName = animalFile.name;
 
       try {
         const result = await Tesseract.recognize(fileBase64, 'kor+eng');
@@ -2533,6 +2520,8 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
         animal_sale_no: form.animalNo,
         file_base64: fileBase64,
         file_name: fileName,
+        animal_sale_file_base64: animalFileBase64,
+        animal_sale_file_name: animalFileName,
       });
 
       if (error) throw new Error(error);
@@ -2562,6 +2551,7 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
           <div><label style={labelStyle}>사업자등록번호</label><input required style={inputStyle} value={form.bizNo} onChange={e => setForm({...form, bizNo: e.target.value})} /></div>
           <div><label style={labelStyle}>동물판매업번호</label><input required style={inputStyle} value={form.animalNo} onChange={e => setForm({...form, animalNo: e.target.value})} /></div>
           <div><label style={labelStyle}>사업자등록증 첨부 (필수)</label><input type="file" required onChange={e => setFile(e.target.files[0])} /></div>
+          <div><label style={labelStyle}>동물판매업 등록증 첨부 (필수)</label><input type="file" required onChange={e => setAnimalFile(e.target.files[0])} /></div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
             <button type="submit" disabled={uploading} style={{ ...miniBtnStyle, flex: 1, padding: '15px' }}>{uploading ? '신청 중...' : '확인'}</button>
             <button type="button" onClick={onClose} style={{ ...miniBtnStyle, backgroundColor: '#eee', color: '#666', flex: 1 }}>취소</button>

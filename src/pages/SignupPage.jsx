@@ -61,6 +61,10 @@ const SignupPage = () => {
   const [bizFile, setBizFile] = useState(null);
   const [bizFileBase64, setBizFileBase64] = useState('');
   const [bizFileName, setBizFileName] = useState('');
+  
+  const [animalFile, setAnimalFile] = useState(null);
+  const [animalFileBase64, setAnimalFileBase64] = useState('');
+  const [animalFileName, setAnimalFileName] = useState('');
 
   const [emailStatus, setEmailStatus] = useState(''); // '', 'invalid', 'valid', 'duplicate'
   const [passwordMatch, setPasswordMatch] = useState(null); // null, true, false
@@ -117,6 +121,27 @@ const SignupPage = () => {
     }
   };
 
+  const handleAnimalFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAnimalFile(file);
+    setAnimalFileName(file.name);
+    
+    if (file.type.startsWith('image/')) {
+      try {
+        const base64 = await resizeImageToBase64(file, 1200, 1200, 0.75);
+        setAnimalFileBase64(base64);
+      } catch (err) {
+        console.error('이미지 압축 실패:', err);
+        const base64 = await fileToBase64(file);
+        setAnimalFileBase64(base64);
+      }
+    } else {
+      const base64 = await fileToBase64(file);
+      setAnimalFileBase64(base64);
+    }
+  };
+
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -138,8 +163,8 @@ const SignupPage = () => {
         alert('파트너 사업자 정보를 모두 입력해 주세요.');
         return;
       }
-      if (!bizFile) {
-        alert('사업자등록증 파일을 반드시 첨부해 주세요.');
+      if (!bizFile || !animalFile) {
+        alert('사업자등록증 및 동물판매업 등록증 파일을 모두 첨부해 주세요.');
         return;
       }
     }
@@ -187,6 +212,8 @@ const SignupPage = () => {
             animal_sale_no: animalNo,
             file_base64: bizFileBase64,
             file_name: bizFileName,
+            animal_sale_file_base64: animalFileBase64,
+            animal_sale_file_name: animalFileName,
           });
 
           if (applyError) {
@@ -484,11 +511,22 @@ const SignupPage = () => {
               </div>
 
               <div>
-                <label style={labelStyle}>사업자등록증 또는 관련 증빙 서류 첨부</label>
+                <label style={labelStyle}>사업자등록증 첨부 (필수)</label>
                 <input
                   type="file"
                   accept="image/*,application/pdf"
                   onChange={handleFileChange}
+                  required={tab === 'seller'}
+                  style={{ display: 'block', marginTop: '5px' }}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>동물판매업 등록증 첨부 (필수)</label>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleAnimalFileChange}
                   required={tab === 'seller'}
                   style={{ display: 'block', marginTop: '5px' }}
                 />

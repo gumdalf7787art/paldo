@@ -98,12 +98,12 @@ export async function onRequestPost(context) {
 
   // 사업자 자격 신청 (apply)
   if (action === 'apply') {
-    const { business_name, representative_name, phone, address, biz_no, animal_sale_no, file_base64, file_name } = body;
+    const { business_name, representative_name, phone, address, biz_no, animal_sale_no, file_base64, file_name, animal_sale_file_base64, animal_sale_file_name } = body;
     if (!business_name || !address || !biz_no || !animal_sale_no) {
       return createResponse({ error: '모든 신청 항목(상호명, 주소, 등록번호 등)은 필수 입력 사항입니다.' }, 400);
     }
-    if (!file_base64) {
-      return createResponse({ error: '사업자등록증 등의 증빙 서류 파일은 필수 첨부 사항입니다.' }, 400);
+    if (!file_base64 || !animal_sale_file_base64) {
+      return createResponse({ error: '사업자등록증과 동물판매업 등록증 파일은 필수 첨부 사항입니다.' }, 400);
     }
 
     try {
@@ -135,26 +135,50 @@ export async function onRequestPost(context) {
 
       // R2 파일 업로드 처리
       let fileUrl = null;
-      if (file_base64 && env.R2) {
+      let animalSaleFileUrl = null;
+      if (env.R2) {
         try {
-          const parts = file_base64.split(',');
-          const mimeMatch = parts[0].match(/:(.*?);/);
-          const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-          const binary = atob(parts[1]);
-          const bytes = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) {
-            bytes[i] = binary.charCodeAt(i);
+          if (file_base64) {
+            const parts = file_base64.split(',');
+            const mimeMatch = parts[0].match(/:(.*?);/);
+            const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            const binary = atob(parts[1]);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+            const arrayBuffer = bytes.buffer;
+
+            const fileExt = (file_name || 'file.jpg').split('.').pop() || 'jpg';
+            const randomId = Math.random().toString(36).substring(2, 8);
+            const key = `business/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
+
+            await env.R2.put(key, arrayBuffer, {
+              httpMetadata: { contentType }
+            });
+            fileUrl = `/api/images?key=${encodeURIComponent(key)}`;
           }
-          const arrayBuffer = bytes.buffer;
 
-          const fileExt = (file_name || 'file.jpg').split('.').pop() || 'jpg';
-          const randomId = Math.random().toString(36).substring(2, 8);
-          const key = `business/${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
+          if (animal_sale_file_base64) {
+            const parts = animal_sale_file_base64.split(',');
+            const mimeMatch = parts[0].match(/:(.*?);/);
+            const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            const binary = atob(parts[1]);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+            const arrayBuffer = bytes.buffer;
 
-          await env.R2.put(key, arrayBuffer, {
-            httpMetadata: { contentType }
-          });
-          fileUrl = `/api/images?key=${encodeURIComponent(key)}`;
+            const fileExt = (animal_sale_file_name || 'file.jpg').split('.').pop() || 'jpg';
+            const randomId = Math.random().toString(36).substring(2, 8);
+            const key = `business/animal_${authUser.id}_${Date.now()}_${randomId}.${fileExt}`;
+
+            await env.R2.put(key, arrayBuffer, {
+              httpMetadata: { contentType }
+            });
+            animalSaleFileUrl = `/api/images?key=${encodeURIComponent(key)}`;
+          }
         } catch (uploadErr) {
           console.error('Business file upload to R2 failed:', uploadErr);
           return createResponse({ error: `증빙 서류 업로드 실패: ${uploadErr.message}` }, 500);
@@ -163,7 +187,7 @@ export async function onRequestPost(context) {
 
       // 신청서 등록
       await env.DB.prepare(
-        'INSERT INTO business_applications (user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, file_url) VALUES (?, ?, ?, ?, ?, ?, ?, "pending", ?)'
+        'INSERT INTO business_applications (user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, file_url, animal_sale_file_url) VALUES (?, ?, ?, ?, ?, ?, ?, "pending", ?, ?)'
       )
         .bind(
           authUser.id,
@@ -173,7 +197,8 @@ export async function onRequestPost(context) {
           address || '',
           biz_no,
           animal_sale_no,
-          fileUrl
+          fileUrl,
+          animalSaleFileUrl
         )
         .run();
 

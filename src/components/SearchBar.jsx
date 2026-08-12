@@ -101,7 +101,7 @@ const SearchBar = ({ hideBreed, defaultBreed }) => {
     return (
       <>
         {/* 📱 모바일 최소화된 버튼 검색 섹션 - 하나의 옅은 푸른색 컨테이너 안에 2개의 버튼 배치 */}
-        <section className="fade-in search-bar-section" style={{ padding: '0px', width: '100%' }}>
+        <section className="fade-in" style={{ padding: '0px', width: '100%', margin: '0px' }}>
           <div style={{ 
             display: 'flex', 
             gap: '8px', 

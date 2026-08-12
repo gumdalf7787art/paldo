@@ -174,12 +174,12 @@ const Home = () => {
         </div>
         
         {/* 2. 검색창 */}
-        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '5px' : '12px' }}>
+        <div style={{ position: 'relative', zIndex: 10, marginBottom: isMobile ? '10px' : '12px' }}>
           <SearchBar />
         </div>
         
         {/* 3. 추천 파트너 / 배너 / 우수 매장 소개 / 인기 파트너 / 배너 / 스페셜 파트너 */}
-        <div style={{ padding: '0', marginTop: isMobile ? '-10px' : '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
+        <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
           <AdSections 
             mobileMiddleContent={
               <div style={{ marginBottom: '10px' }}>

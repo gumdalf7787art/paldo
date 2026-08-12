@@ -2096,24 +2096,55 @@ const MyPage = () => {
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 멤버십 이용권 현황</h3>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 쿠폰 현황</h3>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
-                    {userCoupons.length > 0 ? userCoupons.map(coupon => (
-                      <div key={coupon.user_coupon_id} style={{ padding: '20px', border: '1px solid #eee', borderRadius: '15px', backgroundColor: '#fffbf0', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ position: 'absolute', right: '-10px', top: '-10px', width: '50px', height: '50px', backgroundColor: '#ffd700', borderRadius: '50%', opacity: 0.2 }}></div>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#e6a800' }}>🎁 {renderAdName(coupon.name)}</h4>
-                        <div style={{ fontSize: '0.8rem', color: '#e67e22', marginBottom: '8px', fontWeight: 'bold' }}>
-                          사용 가능 기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '제한 없음 (무제한)'}
-                        </div>
-                        <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>
-                          {coupon.ad_type !== 'all' && coupon.ad_type ? `프리미엄 서비스 적용 시 ${coupon.discount_rate}일간 진행됩니다.` : coupon.description}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: coupon.is_used ? '#aaa' : 'var(--primary)', fontWeight: 'bold' }}>{coupon.is_used ? '사용 완료' : '사용 가능'}</div>
-                      </div>
-                    )) : (
-                      <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center' }}>보유한 이용권이 없습니다.</div>
-                    )}
+                    {(() => {
+                      const activeCoupons = userCoupons.filter(c => !c.is_used);
+                      const groupedCoupons = Object.values(activeCoupons.reduce((acc, curr) => {
+                        const key = curr.name;
+                        if (!acc[key]) acc[key] = { ...curr, count: 0 };
+                        acc[key].count += 1;
+                        return acc;
+                      }, {}));
+
+                      const getCouponStyle = (name) => {
+                        const isBreed = name.includes('견종') || name.includes('품종');
+                        if (isBreed) {
+                          if (name.includes('히어로')) return { bg: '#f0fff4', border: '#c6f6d5', icon: '#9ae6b4', title: '#2f855a' };
+                          if (name.includes('추천')) return { bg: '#e6fffa', border: '#b2f5ea', icon: '#81e6d9', title: '#285e61' };
+                          if (name.includes('인기')) return { bg: '#ebf8ff', border: '#bee3f8', icon: '#90cdf4', title: '#2b6cb0' };
+                          if (name.includes('스페셜')) return { bg: '#f0f4ff', border: '#d6e4ff', icon: '#adc8ff', title: '#434190' };
+                          return { bg: '#f0fff4', border: '#c6f6d5', icon: '#9ae6b4', title: '#276749' };
+                        } else {
+                          if (name.includes('히어로')) return { bg: '#fff5f5', border: '#fed7d7', icon: '#feb2b2', title: '#c53030' };
+                          if (name.includes('추천')) return { bg: '#fffaf0', border: '#feebc8', icon: '#fbd38d', title: '#c05621' };
+                          if (name.includes('인기')) return { bg: '#fffff0', border: '#fefcbf', icon: '#faf089', title: '#b7791f' };
+                          if (name.includes('스페셜')) return { bg: '#fff5f7', border: '#fed7e2', icon: '#fbb6ce', title: '#b83280' };
+                          return { bg: '#fffbf0', border: '#ffeeba', icon: '#ffd700', title: '#e6a800' };
+                        }
+                      };
+
+                      return groupedCoupons.length > 0 ? groupedCoupons.map((coupon, idx) => {
+                        const style = getCouponStyle(coupon.name || '');
+                        return (
+                          <div key={idx} style={{ padding: '20px', border: `1px solid ${style.border}`, borderRadius: '15px', backgroundColor: style.bg, position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', right: '-10px', top: '-10px', width: '50px', height: '50px', backgroundColor: style.icon, borderRadius: '50%', opacity: 0.3 }}></div>
+                            <div style={{ position: 'absolute', right: '15px', bottom: '15px', fontSize: '2rem', fontWeight: '900', color: style.title, opacity: 0.8 }}>{coupon.count}장</div>
+                            <h4 style={{ margin: '0 0 10px 0', color: style.title }}>🎁 {renderAdName(coupon.name)}</h4>
+                            <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px', fontWeight: 'bold' }}>
+                              사용 기한: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() + ' 까지' : '무제한'}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px', width: '70%', lineHeight: '1.4' }}>
+                              {coupon.ad_type !== 'all' && coupon.ad_type ? `적용 시 ${coupon.discount_rate || 100}일간 진행` : (coupon.description || '광고 서비스 적용 쿠폰')}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: style.title, fontWeight: 'bold', marginTop: '10px' }}>사용 가능</div>
+                          </div>
+                        );
+                      }) : (
+                        <div style={{ color: '#aaa', fontSize: '0.9rem', padding: '20px', border: '1px dashed #ddd', borderRadius: '10px', textAlign: 'center', gridColumn: '1 / -1' }}>보유한 쿠폰이 없습니다.</div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}

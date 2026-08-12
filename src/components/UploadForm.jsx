@@ -554,8 +554,8 @@ const UploadForm = () => {
                   age: formData.age ? `${formData.age}개월` : 'N개월',
                   gender: formData.gender,
                   region: formData.region,
-                  price: getPreviewPrice(),
-                  original_price: formData.originalPrice,
+                  price: formData.isFree ? 0 : (parseInt(formData.price) || parseInt(formData.originalPrice) || 0),
+                  original_price: formData.isFree ? null : parseInt(formData.originalPrice) || null,
                   is_negotiable: formData.isNegotiable,
                   image: images[primaryImageIdx] || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop', // 임시 플레이스홀더 이미지
                   isNew: true,

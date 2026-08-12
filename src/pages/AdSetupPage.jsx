@@ -14,11 +14,30 @@ const AdSetupPage = () => {
   const maxMainAds = 10; // 최대 슬롯 수
 
   // 폼 상태
-  const [adType, setAdType] = useState('main'); // main, breed, safe, popular, special
-  const [selectedCoupon, setSelectedCoupon] = useState('');
+  const [adType, setAdType] = useState('main'); // 기본 선택
+  const [showCoupons, setShowCoupons] = useState(false);
   
   // 상태 제출
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const adTypes = {
+    main: [
+      { id: 'main', label: '히어로 섹션', img: '/images/ad_hero.jpg' },
+      { id: 'recommend', label: '추천 섹션', img: '/images/ad_recommend.jpg' },
+      { id: 'popular', label: '인기 섹션', img: '/images/ad_popular.jpg' },
+      { id: 'special', label: '스페셜 섹션', img: '/images/ad_special.jpg' }
+    ],
+    breed: [
+      { id: 'breed_main', label: '히어로 섹션', img: '/images/ad_hero.jpg' },
+      { id: 'breed_recommend', label: '추천 섹션', img: '/images/ad_recommend.jpg' },
+      { id: 'breed_popular', label: '인기 섹션', img: '/images/ad_popular.jpg' },
+      { id: 'breed_special', label: '스페셜 섹션', img: '/images/ad_special.jpg' }
+    ]
+  };
+
+  const getAdInfo = (type) => {
+    return [...adTypes.main, ...adTypes.breed].find(a => a.id === type);
+  };
 
   useEffect(() => {
     fetchData();
@@ -77,14 +96,19 @@ const AdSetupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedCoupon) {
-      alert('서비스를 진행하시려면 사용할 이용권을 먼저 선택해 주세요.');
+    
+    const targetCoupons = coupons.filter(c => c.ad_type === adType || c.ad_type === 'all');
+    if (targetCoupons.length === 0) {
+      alert('선택하신 영역에 사용할 수 있는 쿠폰이 없습니다.');
       return;
     }
+
     if (adType === 'main' && activeMainAds >= maxMainAds) {
       alert('프리미엄 노출 잔여 슬롯이 없습니다. 다른 서비스 구역을 선택해주세요.');
       return;
     }
+
+    const couponToUse = targetCoupons[0];
 
     setIsSubmitting(true);
     try {
@@ -92,8 +116,8 @@ const AdSetupPage = () => {
       const { data, error } = await api.ads.create({
         dog_id: parseInt(dogId),
         ad_type: adType,
-        title: `${dog.nickname} 프리미엄 서비스 (${adTypeDisplay[adType]})`,
-        used_coupon_id: parseInt(selectedCoupon)
+        title: `${dog.nickname} 프리미엄 서비스 (${getAdInfo(adType)?.label})`,
+        used_coupon_id: couponToUse.id
       });
 
       if (error) throw new Error(error);
@@ -120,13 +144,13 @@ const AdSetupPage = () => {
   }
 
   return (
-    <div className="container" style={{ padding: '60px 0', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="container" style={{ padding: '60px 0', maxWidth: '900px', margin: '0 auto' }}>
       <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', marginBottom: '20px', fontSize: '1rem' }}>
         ← 마이페이지로 돌아가기
       </button>
 
       <div className="glass-card" style={{ padding: '40px' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px', textAlign: 'center' }}>서비스 설정하기 📢</h1>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px', textAlign: 'center' }}>광고 설정하기 📢</h1>
         
         <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #eee', borderRadius: '15px', padding: '20px', display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '40px' }}>
           <img src={dog.image_url} alt={dog.nickname} style={{ width: '80px', height: '80px', borderRadius: '10px', objectFit: 'cover' }} />
@@ -136,87 +160,131 @@ const AdSetupPage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '25px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           
-          {/* 서비스 종류 */}
-          <div>
-            <label style={labelStyle}>서비스 노출 영역 선택</label>
-            <div style={{ display: 'grid', gap: '10px' }}>
-              {Object.entries(adTypeDisplay).map(([val, label]) => {
-                const isMainFull = val === 'main' && activeMainAds >= maxMainAds;
-                
-                return (
-                  <label key={val} style={{ 
-                    ...radioBoxStyle, 
-                    borderColor: adType === val ? 'var(--primary)' : '#eee', 
-                    backgroundColor: adType === val ? 'var(--primary-light)' : (isMainFull ? '#f5f5f5' : 'white'),
-                    opacity: isMainFull ? 0.6 : 1,
-                    cursor: isMainFull ? 'not-allowed' : 'pointer'
-                  }}>
-                    <input 
-                      type="radio" 
-                      value={val} 
-                      checked={adType === val} 
-                      onChange={() => !isMainFull && setAdType(val)} 
-                      disabled={isMainFull}
-                      style={{ display: 'none' }} 
-                    />
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid', borderColor: adType === val ? 'var(--primary)' : '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {adType === val && <div style={{ width: '10px', height: '10px', backgroundColor: 'var(--primary)', borderRadius: '50%' }}></div>}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px' }}>
+            
+            {/* 왼쪽: 이미지 미리보기 */}
+            <div style={{ flex: '1 1 300px', backgroundColor: '#f8fafc', borderRadius: '15px', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', minHeight: '300px' }}>
+              <div style={{ fontSize: '1rem', color: '#475569', fontWeight: 'bold', marginBottom: '15px' }}>선택된 영역 미리보기</div>
+              {adType ? (
+                <img src={getAdInfo(adType)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: 'var(--shadow)' }} />
+              ) : (
+                <div style={{ padding: '40px', color: '#94a3b8' }}>광고 영역을 선택해주세요.</div>
+              )}
+            </div>
+
+            {/* 오른쪽: 라디오 옵션 */}
+            <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              <label style={labelStyle}>서비스 노출 영역 선택</label>
+              
+              <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#E65100' }}>[메인페이지]</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {adTypes.main.map((opt) => {
+                  const availableCount = coupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
+                  const isMainFull = opt.id === 'main' && activeMainAds >= maxMainAds;
+                  const isDisabled = availableCount === 0 || isMainFull;
+
+                  return (
+                    <label key={opt.id} style={{ 
+                      ...radioBoxStyle, 
+                      padding: '12px 15px',
+                      borderColor: adType === opt.id ? 'var(--primary)' : '#eee', 
+                      backgroundColor: adType === opt.id ? 'var(--primary-light)' : (isDisabled ? '#f8fafc' : 'white'),
+                      opacity: isDisabled ? 0.5 : 1,
+                      cursor: isDisabled ? 'not-allowed' : 'pointer'
+                    }}>
+                      <input 
+                        type="radio" 
+                        value={opt.id} 
+                        checked={adType === opt.id} 
+                        onChange={() => !isDisabled && setAdType(opt.id)} 
+                        disabled={isDisabled}
+                        style={{ display: 'none' }} 
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        <div style={{ fontWeight: adType === opt.id ? '800' : '600', color: adType === opt.id ? 'var(--primary-dark)' : '#334155' }}>
+                          {opt.label}
                         </div>
-                        <span style={{ fontWeight: adType === val ? '800' : '500', color: adType === val ? 'var(--primary-dark)' : '#333' }}>
-                          {formatAdLabel(label)}
-                        </span>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: availableCount > 0 ? 'var(--primary)' : '#94a3b8' }}>
+                          보유 쿠폰: {availableCount}장
+                        </div>
                       </div>
-                      {val === 'main' && (
-                         <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: isMainFull ? '#ff4757' : 'var(--primary)' }}>
-                           {isMainFull ? '(마감)' : `(${activeMainAds}/${maxMainAds} 사용중)`}
-                         </span>
-                      )}
-                    </div>
-                  </label>
-                );
-              })}
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#00796B', marginTop: '10px' }}>[견종별 페이지]</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {adTypes.breed.map((opt) => {
+                  const availableCount = coupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
+                  const isDisabled = availableCount === 0;
+
+                  return (
+                    <label key={opt.id} style={{ 
+                      ...radioBoxStyle,
+                      padding: '12px 15px',
+                      borderColor: adType === opt.id ? '#00796B' : '#eee', 
+                      backgroundColor: adType === opt.id ? '#E0F2F1' : (isDisabled ? '#f8fafc' : 'white'),
+                      opacity: isDisabled ? 0.5 : 1,
+                      cursor: isDisabled ? 'not-allowed' : 'pointer'
+                    }}>
+                      <input 
+                        type="radio" 
+                        value={opt.id} 
+                        checked={adType === opt.id} 
+                        onChange={() => !isDisabled && setAdType(opt.id)} 
+                        disabled={isDisabled}
+                        style={{ display: 'none' }} 
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        <div style={{ fontWeight: adType === opt.id ? '800' : '600', color: adType === opt.id ? '#004D40' : '#334155' }}>
+                          {opt.label}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: availableCount > 0 ? '#00796B' : '#94a3b8' }}>
+                          보유 쿠폰: {availableCount}장
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* 결제 및 아이템 */}
           <div style={{ borderTop: '2px dashed #eee', paddingTop: '25px' }}>
-            <label style={labelStyle}>사용할 이용권 선택</label>
-            <div style={{ backgroundColor: '#fffbf0', padding: '20px', borderRadius: '15px', border: '1px solid #ffeeba' }}>
-              <select 
-                value={selectedCoupon} 
-                onChange={(e) => setSelectedCoupon(e.target.value)}
-                style={{ width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #ffd700', outline: 'none', backgroundColor: 'white', color: '#333', fontSize: '0.95rem', fontWeight: 'bold' }}
-              >
-                <option value="">🎁 사용할 이용권을 선택해 주세요</option>
-                {coupons
-                  .filter(c => c.ad_type === 'all' || c.ad_type === adType)
-                  .map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name || '이용권'} (기한: {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '무제한'})
-                    </option>
-                ))}
-              </select>
-              {coupons.filter(c => c.ad_type === 'all' || c.ad_type === adType).length === 0 && (
-                <div style={{ marginTop: '15px', backgroundColor: '#fff', padding: '15px', borderRadius: '10px', border: '1px dashed #ff4757', textAlign: 'center' }}>
-                  <p style={{ color: '#ff4757', fontSize: '0.9rem', marginBottom: '10px', fontWeight: 'bold' }}>
-                    현재 선택한 구역에 사용 가능한 이용권이 없습니다.
-                  </p>
-                  <button 
-                    type="button"
-                    onClick={() => navigate('/ad-store')}
-                    style={{ padding: '8px 20px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
-                    onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}
-                  >
-                    💳 멤버십 이용권 구매하러 가기
-                  </button>
-                </div>
-              )}
+            <div 
+              onClick={() => setShowCoupons(!showCoupons)}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '15px 20px', backgroundColor: '#fffbf0', borderRadius: '10px', border: '1px solid #ffeeba' }}
+            >
+              <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#b45309' }}>🎟️ 나의 보유 쿠폰 보기</span>
+              <span style={{ fontWeight: 'bold', color: '#b45309' }}>{showCoupons ? '▲ 접기' : '▼ 펼치기'}</span>
             </div>
+            
+            {showCoupons && (
+              <div style={{ marginTop: '10px', padding: '15px', backgroundColor: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', maxHeight: '280px', overflowY: 'auto' }}>
+                {coupons.length === 0 ? (
+                   <p style={{ color: '#64748b', textAlign: 'center', margin: '20px 0' }}>보유 중인 쿠폰이 없습니다.</p>
+                ) : (
+                   <div style={{ display: 'grid', gap: '8px' }}>
+                     {Object.values(coupons.reduce((acc, curr) => {
+                        const key = curr.name;
+                        if (!acc[key]) acc[key] = { ...curr, count: 0 };
+                        acc[key].count += 1;
+                        return acc;
+                      }, {})).map((c, idx) => (
+                       <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                         <span style={{ fontWeight: 'bold', color: '#334155' }}>{c.name}</span>
+                         <span style={{ color: 'var(--primary-dark)', fontWeight: '900', fontSize: '1.1rem' }}>{c.count}장</span>
+                       </div>
+                     ))}
+                   </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
@@ -228,11 +296,11 @@ const AdSetupPage = () => {
 
           <button 
             type="submit" 
-            disabled={isSubmitting || coupons.length === 0}
+            disabled={isSubmitting || coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0}
             style={{ 
               width: '100%', padding: '20px', borderRadius: '15px', border: 'none', 
-              backgroundColor: coupons.length === 0 ? '#ccc' : 'var(--primary)', 
-              color: 'white', fontWeight: '900', fontSize: '1.1rem', cursor: coupons.length === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', marginTop: '10px'
+              backgroundColor: coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0 ? '#ccc' : 'var(--primary)', 
+              color: 'white', fontWeight: '900', fontSize: '1.1rem', cursor: coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', marginTop: '10px'
             }}
           >
             {isSubmitting ? '처리 중...' : '확인 및 서비스 적용하기'}

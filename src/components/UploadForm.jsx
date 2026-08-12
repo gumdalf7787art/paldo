@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card'; // 미리보기용 컴포넌트 임포트
 import { api } from '../lib/api';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { calculateAge } from '../utils/age';
 

@@ -29,11 +29,15 @@ const Card = ({ data, badgeText }) => {
 
     // 낙관적 UI 업데이트
     setIsLiked(prev => !prev);
-    const { error } = await api.bookmarks.toggle(data.id);
+    const { data: toggleData, error } = await api.bookmarks.toggle(data.id);
     if (error) {
       // 실패 시 롤백
       setIsLiked(prev => !prev);
       alert('관심 등록에 실패했습니다.');
+    } else {
+      window.dispatchEvent(new CustomEvent('bookmark-toggled', { 
+        detail: { dogId: data.id, bookmarked: toggleData?.bookmarked } 
+      }));
     }
   };
   

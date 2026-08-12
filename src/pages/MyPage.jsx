@@ -106,8 +106,22 @@ const MyPage = () => {
     const handleNotificationsUpdate = () => {
       fetchMyNotifications();
     };
+    
+    const handleBookmarkToggled = (e) => {
+      const { dogId, bookmarked } = e.detail;
+      // 관심 해제된 경우 목록에서 즉시 제거
+      if (!bookmarked) {
+        setBookmarks(prev => prev.filter(b => b.id !== dogId));
+      }
+    };
+    
     window.addEventListener('notifications-updated', handleNotificationsUpdate);
-    return () => window.removeEventListener('notifications-updated', handleNotificationsUpdate);
+    window.addEventListener('bookmark-toggled', handleBookmarkToggled);
+    
+    return () => {
+      window.removeEventListener('notifications-updated', handleNotificationsUpdate);
+      window.removeEventListener('bookmark-toggled', handleBookmarkToggled);
+    };
   }, []);
   const [paymentResultMsg, setPaymentResultMsg] = useState(null);
 

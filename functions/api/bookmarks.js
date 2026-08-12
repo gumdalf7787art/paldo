@@ -86,7 +86,7 @@ export async function onRequestGet(context) {
       .bind(authUser.id)
       .all();
 
-    // 이미지 배열 변환
+    // 이미지 배열 변환 및 image_url, additional_images 합성 (dogs.js와 동일 규격)
     const cleanResults = results.map(dog => {
       let images = [];
       if (dog.images) {
@@ -96,7 +96,12 @@ export async function onRequestGet(context) {
           images = dog.images.split(',').filter(Boolean);
         }
       }
-      return { ...dog, images };
+      return { 
+        ...dog, 
+        images,
+        image_url: images[0] || '',
+        additional_images: images.slice(1)
+      };
     });
 
     return createResponse(cleanResults);

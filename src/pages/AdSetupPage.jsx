@@ -168,7 +168,12 @@ const AdSetupPage = () => {
             <div style={{ flex: '1 1 300px', backgroundColor: '#f8fafc', borderRadius: '15px', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', minHeight: '300px' }}>
               <div style={{ fontSize: '1rem', color: '#475569', fontWeight: 'bold', marginBottom: '15px' }}>선택된 영역 미리보기</div>
               {adType ? (
-                <img src={getAdInfo(adType)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: 'var(--shadow)' }} />
+                <>
+                  <img src={getAdInfo(adType)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: 'var(--shadow)', marginBottom: '15px' }} />
+                  <div style={{ padding: '10px 15px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', width: '100%', textAlign: 'center', fontWeight: 'bold', color: '#0f172a' }}>
+                    ⏳ 광고 노출 기간: <span style={{ color: '#E65100' }}>7일</span>
+                  </div>
+                </>
               ) : (
                 <div style={{ padding: '40px', color: '#94a3b8' }}>광고 영역을 선택해주세요.</div>
               )}

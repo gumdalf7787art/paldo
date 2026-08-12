@@ -94,23 +94,35 @@ const shuffleArray = (array) => {
   return newArray;
 };
 
-// 광고 데이터 및 부족한 슬롯 송기기 공통 로직 (api.js 기반)
-const fetchAdsAndFill = async (_adType, limit, defaultBadge, breedName) => {
+// 광고 데이터 및 부족한 슬롯 채우기 공통 로직 (api.js 기반)
+const fetchAdsAndFill = async (adType, limit, defaultBadge, breedName) => {
   try {
-    // API를 통해 사용가능한 매물 로드
-    const params = { status: 'available', limit: 100 };
+    // API를 통해 사용가능한 매물 로드 (충분히 많이 불러와서 광고 매물을 찾음)
+    const params = { status: 'available', limit: 500 };
     if (breedName) params.breed = breedName;
     const { data: allDogs } = await api.dogs.getList(params);
     const dogs = Array.isArray(allDogs) ? allDogs : [];
 
-    // 관련 유형에 맞는 멌 매물 선별 (현재는 유기견 리스트를 섞어서 사용)
-    const selected = shuffleArray(dogs).slice(0, limit);
+    // 광고가 설정된 매물 필터링
+    const adDogs = dogs.filter(d => d.ad_type === adType);
+    
+    // 광고가 아닌 일반 매물 필터링
+    const nonAdDogs = dogs.filter(d => d.ad_type !== adType);
+
+    // 광고 매물을 우선으로 하고, 부족하면 일반 매물을 랜덤으로 채움
+    // 광고 매물이 설정한 limit보다 많으면 10개 제한 없이 광고 매물 전체를 노출
+    let selected = [];
+    if (adDogs.length >= limit) {
+      selected = shuffleArray(adDogs);
+    } else {
+      selected = [...shuffleArray(adDogs), ...shuffleArray(nonAdDogs).slice(0, limit - adDogs.length)];
+    }
 
     return selected.map(dog => ({
       ...dog,
       id: dog.id,
       image: dog.image_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80',
-      badgeText: defaultBadge,
+      badgeText: dog.ad_type === adType ? defaultBadge : '추천',
       breed: dog.breed || '견종 미상',
       nickname: dog.nickname || '이름 없음',
       gender: dog.gender || '-',
@@ -143,7 +155,8 @@ const HeroCarousel = ({ breedName }) => {
   useEffect(() => {
     const loadHeroAds = async () => {
       try {
-        const data = await fetchAdsAndFill('main', 10, '추천', breedName);
+        const currentAdType = breedName ? 'breed_main' : 'main';
+        const data = await fetchAdsAndFill(currentAdType, 10, '히어로', breedName);
         if (data && data.length > 0) {
           setAds(data);
         } else {
@@ -820,28 +833,24 @@ const AdSections = ({ mobileMiddleContent, breedName }) => {
   useEffect(() => {
     const loadAllSections = async () => {
       try {
-        // 섹션 통합 광고(section) 데이터 풀을 한 번에 24개 가져옵니다.
-        const [allSectionAds, bannerDataResponse] = await Promise.all([
-          Promise.race([
-            fetchAdsAndFill('section', 24, '추천', breedName), 
-            timeoutPromise(2500)
-          ]),
+        const currentRecommend = breedName ? 'breed_recommend' : 'recommend';
+        const currentPopular = breedName ? 'breed_popular' : 'popular';
+        const currentSpecial = breedName ? 'breed_special' : 'special';
+
+        const [recommendAds, popularAds, specialAds, bannerDataResponse] = await Promise.all([
+          Promise.race([fetchAdsAndFill(currentRecommend, 8, '추천', breedName), timeoutPromise(2500)]),
+          Promise.race([fetchAdsAndFill(currentPopular, 8, '인기', breedName), timeoutPromise(2500)]),
+          Promise.race([fetchAdsAndFill(currentSpecial, 8, '스페셜', breedName), timeoutPromise(2500)]),
           api.banners.getList()
         ]);
 
-        const ads = allSectionAds || [];
         if (bannerDataResponse.data) {
           setSystemBanners(bannerDataResponse.data);
         }
         
-        // 가져온 전체 광고 풀에서 각각 무작위로 8개씩 추출하여 할당합니다 (매물 수가 적을 경우 중복 허용)
-        const safePool = shuffleArray(ads).slice(0, 8);
-        const popularPool = shuffleArray(ads).slice(0, 8);
-        const specialPool = shuffleArray(ads).slice(0, 8);
-        
-        setSafeDogs(safePool.map(d => ({...d, badgeText: '추천'})));
-        setPopularDogs(popularPool.map(d => ({...d, badgeText: '인기'})));
-        setSpecialDogs(specialPool.map(d => ({...d, badgeText: '스페셜'})));
+        setSafeDogs(recommendAds || []);
+        setPopularDogs(popularAds || []);
+        setSpecialDogs(specialAds || []);
       } catch (err) {
         console.error('Failed to load sections:', err);
         setSafeDogs([]);
@@ -852,7 +861,7 @@ const AdSections = ({ mobileMiddleContent, breedName }) => {
       }
     };
     loadAllSections();
-  }, []);
+  }, [breedName]);
 
   return (
     <>

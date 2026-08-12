@@ -66,10 +66,30 @@ const UploadForm = () => {
   const [userCoupons, setUserCoupons] = useState([]);
   const [selectedCouponId, setSelectedCouponId] = useState('');
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+  const [modalAdType, setModalAdType] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const editDog = location.state?.editDog;
+
+  const adTypes = {
+    main: [
+      { id: 'main', label: '히어로 섹션', img: '/images/ad_recommend.jpg' },
+      { id: 'recommend', label: '추천 섹션', img: '/images/ad_hero.jpg' },
+      { id: 'popular', label: '인기 섹션', img: '/images/ad_popular.jpg' },
+      { id: 'special', label: '스페셜 섹션', img: '/images/ad_special.jpg' }
+    ],
+    breed: [
+      { id: 'breed_main', label: '히어로 섹션', img: '/images/ad_breed_hero.jpg' },
+      { id: 'breed_recommend', label: '추천 섹션', img: '/images/ad_breed_recommend.jpg' },
+      { id: 'breed_popular', label: '인기 섹션', img: '/images/ad_breed_popular.jpg' },
+      { id: 'breed_special', label: '스페셜 섹션', img: '/images/ad_breed_special.jpg' }
+    ]
+  };
+
+  const getAdInfo = (type) => {
+    return [...adTypes.main, ...adTypes.breed].find(a => a.id === type);
+  };
 
   useEffect(() => {
     if (editDog) {
@@ -521,7 +541,12 @@ const UploadForm = () => {
               </div>
               
               <button 
-                onClick={(e) => { e.preventDefault(); setIsAdModalOpen(true); }}
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  const currentCoupon = userCoupons.find(c => c.user_coupon_id === selectedCouponId);
+                  setModalAdType(currentCoupon ? currentCoupon.ad_type : '');
+                  setIsAdModalOpen(true); 
+                }}
                 style={{
                   marginLeft: '15px',
                   padding: '10px 20px',
@@ -634,8 +659,8 @@ const UploadForm = () => {
           padding: '20px'
         }}>
           <div style={{
-            backgroundColor: '#fff', borderRadius: '15px', width: '100%', maxWidth: '500px',
-            maxHeight: '85vh', display: 'flex', flexDirection: 'column',
+            backgroundColor: '#fff', borderRadius: '15px', width: '100%', maxWidth: '900px',
+            maxHeight: '90vh', display: 'flex', flexDirection: 'column',
             boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
           }}>
             <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -643,47 +668,139 @@ const UploadForm = () => {
               <button onClick={(e) => { e.preventDefault(); setIsAdModalOpen(false); }} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#999' }}>&times;</button>
             </div>
             
-            <div style={{ padding: '20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <p style={{ color: '#666', marginBottom: '10px', fontSize: '0.95rem' }}>
-                적용할 광고 쿠폰을 선택해주세요. 등록 시 해당 쿠폰이 즉시 소모됩니다.
-              </p>
-              
-              <div 
-                onClick={() => { setSelectedCouponId(''); setIsAdModalOpen(false); }}
+            <div style={{ padding: '30px', overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px' }}>
+                {/* 왼쪽: 이미지 미리보기 */}
+                <div style={{ flex: '1 1 300px', backgroundColor: '#f8fafc', borderRadius: '15px', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', minHeight: '300px' }}>
+                  <div style={{ fontSize: '1rem', color: '#475569', fontWeight: 'bold', marginBottom: '15px' }}>선택된 영역 미리보기</div>
+                  {modalAdType ? (
+                    <>
+                      <img src={getAdInfo(modalAdType)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', marginBottom: '15px' }} />
+                      <div style={{ padding: '10px 15px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', width: '100%', textAlign: 'center', fontWeight: 'bold', color: '#0f172a' }}>
+                        ⏳ 광고 노출 기간: <span style={{ color: '#E65100' }}>7일</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ padding: '40px', color: '#94a3b8' }}>광고 영역을 선택해주세요.</div>
+                  )}
+                </div>
+
+                {/* 오른쪽: 라디오 옵션 */}
+                <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '1.1rem', fontWeight: '700', color: '#333' }}>서비스 노출 영역 선택</label>
+                  
+                  <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#E65100' }}>[메인페이지]</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {adTypes.main.map((opt) => {
+                      const availableCount = userCoupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
+                      const isDisabled = availableCount === 0;
+
+                      return (
+                        <label key={opt.id} style={{ 
+                          display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', border: '2px solid #eee', borderRadius: '12px',
+                          borderColor: modalAdType === opt.id ? 'var(--primary)' : '#eee', 
+                          backgroundColor: modalAdType === opt.id ? 'var(--primary-light)' : (isDisabled ? '#f8fafc' : 'white'),
+                          opacity: isDisabled ? 0.5 : 1,
+                          cursor: isDisabled ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                          <input 
+                            type="radio" 
+                            value={opt.id} 
+                            checked={modalAdType === opt.id} 
+                            onChange={() => !isDisabled && setModalAdType(opt.id)} 
+                            disabled={isDisabled}
+                            style={{ display: 'none' }} 
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <div style={{ fontWeight: modalAdType === opt.id ? '800' : '600', color: modalAdType === opt.id ? 'var(--primary-dark)' : '#334155' }}>
+                              {opt.label}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: availableCount > 0 ? 'var(--primary)' : '#94a3b8' }}>
+                              보유 쿠폰: {availableCount}장
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#00796B', marginTop: '10px' }}>[견종별 페이지]</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {adTypes.breed.map((opt) => {
+                      const availableCount = userCoupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
+                      const isDisabled = availableCount === 0;
+
+                      return (
+                        <label key={opt.id} style={{ 
+                          display: 'flex', alignItems: 'center', gap: '10px', padding: '15px', border: '2px solid #eee', borderRadius: '12px',
+                          borderColor: modalAdType === opt.id ? '#00796B' : '#eee', 
+                          backgroundColor: modalAdType === opt.id ? '#E0F2F1' : (isDisabled ? '#f8fafc' : 'white'),
+                          opacity: isDisabled ? 0.5 : 1,
+                          cursor: isDisabled ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                          <input 
+                            type="radio" 
+                            value={opt.id} 
+                            checked={modalAdType === opt.id} 
+                            onChange={() => !isDisabled && setModalAdType(opt.id)} 
+                            disabled={isDisabled}
+                            style={{ display: 'none' }} 
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <div style={{ fontWeight: modalAdType === opt.id ? '800' : '600', color: modalAdType === opt.id ? '#004D40' : '#334155' }}>
+                              {opt.label}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: availableCount > 0 ? '#00796B' : '#94a3b8' }}>
+                              보유 쿠폰: {availableCount}장
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* 하단 버튼 */}
+            <div style={{ padding: '20px', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'center', gap: '15px', backgroundColor: '#fafafa', borderBottomLeftRadius: '15px', borderBottomRightRadius: '15px' }}>
+              <button 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  setModalAdType(''); 
+                  setSelectedCouponId(''); 
+                  setIsAdModalOpen(false); 
+                }}
                 style={{
-                  padding: '15px', borderRadius: '10px', border: selectedCouponId === '' ? '2px solid #f59e0b' : '1px solid #e2e8f0',
-                  backgroundColor: selectedCouponId === '' ? '#fffbeb' : '#fff', cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  padding: '12px 24px', backgroundColor: '#f1f5f9', color: '#475569',
+                  border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer',
+                  fontSize: '1rem', flex: 1, maxWidth: '200px'
                 }}
               >
-                <div style={{ fontWeight: 'bold', color: selectedCouponId === '' ? '#b45309' : '#475569' }}>적용 안 함</div>
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '5px' }}>일반 분양글로 등록됩니다.</div>
-              </div>
-
-              {userCoupons.map(coupon => (
-                <div 
-                  key={coupon.user_coupon_id}
-                  onClick={() => { setSelectedCouponId(coupon.user_coupon_id); setIsAdModalOpen(false); }}
-                  style={{
-                    padding: '15px', borderRadius: '10px', border: selectedCouponId === coupon.user_coupon_id ? '2px solid #f59e0b' : '1px solid #e2e8f0',
-                    backgroundColor: selectedCouponId === coupon.user_coupon_id ? '#fffbeb' : '#fff', cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <div style={{ fontWeight: 'bold', color: selectedCouponId === coupon.user_coupon_id ? '#b45309' : '#0f172a' }}>
-                    {coupon.name}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '5px' }}>
-                    {coupon.description}
-                  </div>
-                </div>
-              ))}
-              
-              {userCoupons.length === 0 && (
-                <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '10px' }}>
-                  보유 중인 광고 쿠폰이 없습니다.
-                </div>
-              )}
+                적용 안함
+              </button>
+              <button 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  if (modalAdType) {
+                    const c = userCoupons.find(coupon => coupon.ad_type === modalAdType || coupon.ad_type === 'all');
+                    if (c) {
+                      setSelectedCouponId(c.user_coupon_id);
+                    }
+                  }
+                  setIsAdModalOpen(false); 
+                }}
+                disabled={!modalAdType}
+                style={{
+                  padding: '12px 24px', backgroundColor: modalAdType ? 'var(--primary)' : '#ccc', color: '#fff',
+                  border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: modalAdType ? 'pointer' : 'not-allowed',
+                  fontSize: '1rem', flex: 1, maxWidth: '200px'
+                }}
+              >
+                설정 완료
+              </button>
             </div>
           </div>
         </div>

@@ -225,6 +225,7 @@ ul {
 .badge-special { background: #F3E5F5; color: #7B1FA2; }
 .badge-recommend { background: #E0F2FE; color: #0369A1; }
 .badge-new { background: #FFE4E6; color: #E11D48; }
+.badge-hero { background: #1E293B; color: #FBBF24; box-shadow: 0 0 5px rgba(251,191,36,0.3); }
 
 /* Modern Card Layout */
 .modern-card:hover .card-image-container {

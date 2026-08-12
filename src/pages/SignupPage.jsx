@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import Tesseract from 'tesseract.js';
 
 // --- 이미지 리사이징 & 압축 헬퍼 함수 ---
 const resizeImageToBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.75) => {
@@ -142,6 +143,23 @@ const SignupPage = () => {
     }
     
     setLoading(true);
+
+    if (tab === 'seller' && bizFileBase64) {
+      try {
+        const result = await Tesseract.recognize(bizFileBase64, 'kor+eng');
+        const ocrText = result.data.text.replace(/[^0-9]/g, '');
+        const inputBizNo = bizNo.replace(/[^0-9]/g, '');
+        
+        if (!ocrText.includes(inputBizNo)) {
+          alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error('OCR Error:', err);
+      }
+    }
+
     try {
       const { data: userData, error: signupError } = await api.auth.signup(email, password, {
         nickname: nickname,

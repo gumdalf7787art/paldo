@@ -7,6 +7,7 @@ import { useMobile } from '../context/MobileContext';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer 
 } from 'recharts';
+import Tesseract from 'tesseract.js';
 
 const regions = [
   '서울시', '인천시', '경기도', '부산시', '대구시', '대전시', '광주시', '울산시', 
@@ -2507,6 +2508,20 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
           reader.onerror = (err) => reject(err);
           reader.readAsDataURL(file);
         });
+      }
+
+      try {
+        const result = await Tesseract.recognize(fileBase64, 'kor+eng');
+        const ocrText = result.data.text.replace(/[^0-9]/g, '');
+        const inputBizNo = form.bizNo.replace(/[^0-9]/g, '');
+        
+        if (!ocrText.includes(inputBizNo)) {
+          alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
+          setUploading(false);
+          return;
+        }
+      } catch (err) {
+        console.error('OCR Error:', err);
       }
 
       const { error } = await api.business.apply({

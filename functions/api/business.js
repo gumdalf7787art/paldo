@@ -107,7 +107,18 @@ export async function onRequestPost(context) {
     }
 
     try {
-      // 이미 승인되었거나 심사 중인 신청서가 있는지 체크
+      // 중복 사업자등록번호 체크
+      const duplicateBizNo = await env.DB.prepare(
+        'SELECT id FROM business_applications WHERE biz_no = ? AND status IN ("pending", "approved")'
+      )
+        .bind(biz_no)
+        .first();
+
+      if (duplicateBizNo) {
+        return createResponse({ error: '중복된 사업자등록번호입니다. 관리자에게 이메일로 문의하세요.' }, 400);
+      }
+
+      // 이미 승인되었거나 심사 중인 신청서가 있는지 체크 (기존 유저 체크)
       const existing = await env.DB.prepare(
         'SELECT status FROM business_applications WHERE user_id = ? AND status IN ("pending", "approved")'
       )

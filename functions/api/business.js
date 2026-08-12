@@ -202,6 +202,32 @@ export async function onRequestPost(context) {
         )
         .run();
 
+      // 관리자 알림 문자 발송 (Aligo SMS)
+      if (env.ALIGO_API_KEY && env.ALIGO_USER_ID && env.ALIGO_SENDER && env.ADMIN_PHONE) {
+        try {
+          const smsMsg = `[팔도댕댕 입점신청]\n상호명: ${business_name}\n대표자: ${representative_name || ''}\n연락처: ${phone || ''}\n빠른 시일 내에 관리자 페이지에서 승인 처리를 진행해주세요.`;
+          
+          const params = new URLSearchParams();
+          params.append('key', env.ALIGO_API_KEY);
+          params.append('userid', env.ALIGO_USER_ID);
+          params.append('sender', env.ALIGO_SENDER);
+          params.append('receiver', env.ADMIN_PHONE);
+          params.append('msg', smsMsg);
+          // params.append('testmode_yn', 'Y'); // 알리고 테스트 모드 적용 시 주석 해제
+
+          await fetch('https://apis.aligo.in/send/', {
+            method: 'POST',
+            body: params,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            }
+          });
+        } catch (smsErr) {
+          console.error('Aligo SMS 발송 실패:', smsErr);
+          // 문자 발송 실패가 전체 신청 실패로 이어지지 않도록 예외 처리
+        }
+      }
+
       return createResponse({ success: true, message: '판매자 자격 신청서가 성공적으로 접수되었습니다.' });
     } catch (err) {
       return createResponse({ error: `신청서 제출 실패: ${err.message}` }, 500);

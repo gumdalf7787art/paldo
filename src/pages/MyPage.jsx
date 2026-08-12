@@ -2048,14 +2048,6 @@ const MyPage = () => {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>보유 멤버십 이용권 현황</h3>
-                    <button 
-                      onClick={() => navigate('/ad-store')}
-                      style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: '#fff', color: 'var(--primary-dark)', border: '2px solid var(--primary)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
-                      onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--primary)'; e.target.style.color = '#fff'; }}
-                      onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff'; e.target.style.color = 'var(--primary-dark)'; }}
-                    >
-                      💳 멤버십 이용권 구매
-                    </button>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
                     {userCoupons.length > 0 ? userCoupons.map(coupon => (

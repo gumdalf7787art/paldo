@@ -234,7 +234,7 @@ const HeroCarousel = ({ breedName }) => {
     });
   };
 
-  if (ads.length === 0) return null;
+
 
   // 모바일 부드러운 자동 스크롤 로직
   useEffect(() => {
@@ -270,6 +270,8 @@ const HeroCarousel = ({ breedName }) => {
       setIsInteracting(false);
     }, 2000); // 2초 후 자동 스크롤 재개
   };
+
+  if (ads.length === 0) return null;
 
   if (isMobile) {
     // 2줄로 만들기 위해 2개씩 묶음

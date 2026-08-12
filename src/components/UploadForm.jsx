@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card'; // 미리보기용 컴포넌트 임포트
 import { api } from '../lib/api';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { calculateAge } from '../utils/age';
 
@@ -350,22 +352,6 @@ const UploadForm = () => {
     }
   };
 
-  const getPreviewPrice = () => {
-    if (formData.isFree) return '무료분양';
-    const mainPrice = formData.price;
-    const origPrice = formData.originalPrice;
-    
-    if (!mainPrice && !origPrice) return '0원';
-    
-    // 만약 할인가격만 있으면 할인가격 리턴
-    if (!origPrice) return parseInt(mainPrice).toLocaleString() + '만원';
-    // 만약 최초가격만 있으면 최초가격 리턴
-    if (!mainPrice) return parseInt(origPrice).toLocaleString() + '만원';
-    
-    // 둘 다 있을 때: 할인가격 리턴
-    return parseInt(mainPrice).toLocaleString() + '만원';
-  };
-
   return (
     <div className="container" style={{ padding: '60px 0' }}>
       <div className="glass-card" style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
@@ -516,8 +502,27 @@ const UploadForm = () => {
           </div>
 
           <div>
-            <label style={labelStyle}>분양 설명글</label>
-            <textarea placeholder="아이의 성격, 접종 상태, 특징 등을 자유롭게 적어주세요!" style={{...inputStyle, height: '150px', resize: 'vertical'}} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <label style={labelStyle}>분양 설명글 (상세)</label>
+            <div style={{ backgroundColor: 'white' }}>
+              <ReactQuill 
+                theme="snow"
+                value={formData.description} 
+                onChange={(val) => setFormData({...formData, description: val})}
+                modules={{
+                  toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                  ]
+                }}
+                style={{ height: '250px', marginBottom: '50px' }}
+                placeholder="아이의 성격, 접종 상태, 특징 등을 자유롭게 적어주세요!"
+              />
+            </div>
             <p style={helperTextStyle}>📝 사료 먹는 법, 성격 및 특징, 배변 훈련 유무, 부견/모견 정보 등을 자세히 작성할수록 예비 견주의 결정을 돕는 데 효과적입니다.</p>
           </div>
 

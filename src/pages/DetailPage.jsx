@@ -663,9 +663,13 @@ const DetailPage = () => {
             {/* 상세 설명 */}
             <div style={{ backgroundColor: 'white', padding: '20px 15px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '12px', color: '#1e293b' }}>📄 상세 설명</h3>
-              <p style={{ whiteSpace: 'pre-wrap', color: '#475569', fontSize: '0.98rem', lineHeight: '1.6', margin: 0 }}>
-                {dog.desc || `안녕하세요! 팔도댕댕 인증 매장입니다.\n사랑스런 ${dog.breed} 아이 정보를 소개합니다.\n성격이 매우 온순하고 사회성이 좋습니다.\n궁금하신 점은 언제든 상담 신청해주세요.`}
-              </p>
+              <div 
+                className="quill-content"
+                style={{ color: '#475569', fontSize: '0.98rem', lineHeight: '1.6' }}
+                dangerouslySetInnerHTML={{ 
+                  __html: dog.desc || `<p>안녕하세요! 팔도댕댕 인증 매장입니다.<br/>사랑스런 ${dog.breed} 아이 정보를 소개합니다.<br/>성격이 매우 온순하고 사회성이 좋습니다.<br/>궁금하신 점은 언제든 상담 신청해주세요.</p>` 
+                }} 
+              />
 
               {dog.video_url && (
                 <div style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>

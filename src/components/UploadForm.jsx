@@ -395,15 +395,23 @@ const UploadForm = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <label style={labelStyle}>나이 (개월 - 생일 선택 시 자동 계산)</label>
+              <label style={labelStyle}>생일 (필수)</label>
               <input 
-                type="text" 
-                placeholder="생일을 선택하면 자동 계산됩니다" 
-                style={{ ...inputStyle, backgroundColor: '#f5f5f5' }} 
-                value={formData.age ? `${formData.age}개월령` : ''} 
-                readOnly 
+                type="date" 
+                style={inputStyle} 
+                value={formData.birthday} 
+                onChange={e => {
+                  const bday = e.target.value;
+                  const calculated = calculateAge(bday, '');
+                  const monthNum = calculated.includes('개월') ? calculated.replace('개월', '') : (calculated.includes('일') ? '0' : calculated);
+                  setFormData({
+                    ...formData,
+                    birthday: bday,
+                    age: monthNum
+                  });
+                }} 
               />
-              <p style={helperTextStyle}>⏳ 생년월일에 따라 자동으로 개월령이 계산됩니다.</p>
+              <p style={helperTextStyle}>📅 동물보호법상 2개월령(60일령) 이상의 아이만 등록 및 분양이 가능합니다.</p>
             </div>
             <div>
               <label style={labelStyle}>성별</label>
@@ -424,46 +432,25 @@ const UploadForm = () => {
               <p style={helperTextStyle}>📍 매장 주소지를 파악해 해당 지역이 자동으로 바인딩되었습니다. 필요한 경우 목록에서 변경하실 수 있습니다.</p>
             </div>
             <div>
-              <label style={labelStyle}>생일 (필수)</label>
-              <input 
-                type="date" 
-                style={inputStyle} 
-                value={formData.birthday} 
-                onChange={e => {
-                  const bday = e.target.value;
-                  const calculated = calculateAge(bday, '');
-                  const monthNum = calculated.includes('개월') ? calculated.replace('개월', '') : (calculated.includes('일') ? '0' : calculated);
-                  setFormData({
-                    ...formData,
-                    birthday: bday,
-                    age: monthNum
-                  });
-                }} 
-              />
-              <p style={helperTextStyle}>📅 동물보호법상 2개월령(60일령) 이상의 아이만 등록 및 분양이 가능합니다.</p>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
               <label style={labelStyle}>접종 내역</label>
               <input type="text" placeholder="예: 2차 접종 완료" style={inputStyle} value={formData.vaccination} onChange={e => setFormData({...formData, vaccination: e.target.value})} />
               <p style={helperTextStyle}>💉 종합 백신, 코로나, 켄넬코프 등 현재까지 완료된 예방접종 차수를 자세히 적어주세요.</p>
             </div>
-            <div>
-               <label style={labelStyle}>분양 설정</label>
-               <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={labelStyle}>분양 설정</label>
+            <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem' }}>
+                <input type="checkbox" checked={formData.isFree} onChange={e => setFormData({...formData, isFree: e.target.checked, price: e.target.checked ? '0' : '', originalPrice: e.target.checked ? '0' : ''})} /> 무료분양
+              </label>
+              {!formData.isFree && (
                 <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem' }}>
-                  <input type="checkbox" checked={formData.isFree} onChange={e => setFormData({...formData, isFree: e.target.checked, price: e.target.checked ? '0' : '', originalPrice: e.target.checked ? '0' : ''})} /> 무료분양
+                  <input type="checkbox" checked={formData.isNegotiable} onChange={e => setFormData({...formData, isNegotiable: e.target.checked})} /> 협의가능
                 </label>
-                {!formData.isFree && (
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem' }}>
-                    <input type="checkbox" checked={formData.isNegotiable} onChange={e => setFormData({...formData, isNegotiable: e.target.checked})} /> 협의가능
-                  </label>
-                )}
-              </div>
-              <p style={helperTextStyle}>💰 '무료분양' 체크 시 책임비는 0원으로 등록되며, '협의가능' 체크 시 가격 절충이 가능함을 표시합니다.</p>
+              )}
             </div>
+            <p style={helperTextStyle}>💰 '무료분양' 체크 시 책임비는 0원으로 등록되며, '협의가능' 체크 시 가격 절충이 가능함을 표시합니다.</p>
           </div>
 
           {!formData.isFree && (

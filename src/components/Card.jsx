@@ -79,7 +79,7 @@ const Card = ({ data, badgeText }) => {
 
   return (
     <div 
-      onClick={() => navigate('/detail', { state: { dog: data } })}
+      onClick={() => navigate(`/detail?id=${data.id}`, { state: { dog: data } })}
       style={{
         width: '100%',
         height: '100%',

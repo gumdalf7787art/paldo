@@ -570,6 +570,9 @@ const MyPage = () => {
         setStoreHeaderPreview(null);
         setStoreImages(updatedProfile.store_additional_images || []);
         setStoreImagePreviews(updatedProfile.store_additional_images || []);
+        
+        // 스토어 정보 저장 후 스토어 페이지로 이동
+        navigate(`/store/${updatedProfile.id}`);
       }
     } catch (err) {
       alert('저장 실패: ' + err.message);

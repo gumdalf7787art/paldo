@@ -496,9 +496,15 @@ export const SectionTitle = ({ title, sub, isAd }) => {
       alignItems: 'flex-end', 
       marginBottom: isMobile ? '0px' : '15px' 
     }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row', 
+        alignItems: isMobile ? 'flex-start' : 'baseline', 
+        gap: isMobile ? '4px' : '8px', 
+        flexWrap: 'nowrap' 
+      }}>
         <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.4rem', margin: 0 }}>{title}</h2>
-        <span style={{ fontSize: '0.85rem' }}>{sub}</span>
+        <span style={{ fontSize: isMobile ? '0.75rem' : '0.85rem', color: '#64748b' }}>{sub}</span>
       </div>
       {!isMobile && isAd && (
         <span style={{ 

@@ -300,7 +300,7 @@ const SignupPage = () => {
 
           {tab === 'seller' && (
             <div style={{ textAlign: 'center', color: '#ff6b6b', fontSize: '0.8rem', marginTop: '5px', marginBottom: '10px', fontWeight: 'bold', wordBreak: 'keep-all', lineHeight: '1.4' }}>
-              💡 파트너 사업자 가입 시, 소셜 로그인 후 [마이페이지]에서 사업자 정보를 별도로 추가하셔야 정상 승인 처리됩니다.
+              💡 사업자 가입시 소셜 계정으로 회원가입할 경우<br/>[마이페이지]에서 사업자 정보를 별도로 추가하셔야 정상 승인 처리됩니다.
             </div>
           )}
 

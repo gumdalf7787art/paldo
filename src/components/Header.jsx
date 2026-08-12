@@ -6,6 +6,7 @@ import { useMobile } from '../context/MobileContext';
 
 const Header = () => {
   const [session, setSession] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [role, setRole] = useState('user');
   const [nickname, setNickname] = useState('');
   const [notifications, setNotifications] = useState([]);
@@ -35,11 +36,13 @@ const Header = () => {
       if (session?.user) {
         const { data: profileData } = await api.auth.getUser();
         if (profileData) {
+          setUserProfile(profileData);
           setRole(profileData.role || 'user');
           setNickname(profileData.nickname || profileData.email?.split('@')[0] || '사용자');
         }
         fetchNotifications();
       } else {
+        setUserProfile(null);
         setRole('user');
         setNickname('');
         setNotifications([]);
@@ -325,6 +328,16 @@ const Header = () => {
                       >
                         💬 댕댕톡 메시지
                       </Link>
+                      
+                      {userProfile?.role === 'seller' && userProfile?.email !== 'blueprime1@daum.net' && (
+                        <Link 
+                          to={`/store/${userProfile.id}`}
+                          onClick={() => setShowUserDropdown(false)}
+                          className="header-dropdown-item"
+                        >
+                          🏪 나의 스토어 바로가기
+                        </Link>
+                      )}
 
 
 

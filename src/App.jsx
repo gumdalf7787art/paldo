@@ -178,9 +178,15 @@ const Home = () => {
           <SearchBar />
         </div>
         
-        {/* 6. 우수 매장 소개 */}
-        <div style={{ marginBottom: '10px' }}>
-          <PersonalRecommendWidget />
+        {/* 3. 추천 파트너 / 배너 / 우수 매장 소개 / 인기 파트너 / 배너 / 스페셜 파트너 */}
+        <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
+          <AdSections 
+            mobileMiddleContent={
+              <div style={{ marginBottom: '10px' }}>
+                <PersonalRecommendWidget />
+              </div>
+            }
+          />
         </div>
 
         {/* 4. 커뮤니티 최근 이야기 */}
@@ -188,13 +194,7 @@ const Home = () => {
           <LatestCommunityWidget />
         </div>
 
-
-        {/* 3. 최신 입양 리스트 (안심/인기/스페셜 분양 광고 섹션) */}
-        <div style={{ padding: '0', marginTop: '0px', marginBottom: '5px', position: 'relative', zIndex: 5 }}>
-          <AdSections />
-        </div>
-
-        {/* 5. 일반 분양 리스트 (전체 분양 리스트) */}
+        {/* 5. 전체 등록 댕댕이 정보 */}
         <div style={{ padding: '0', marginBottom: '15px' }}>
           <AdoptionList />
         </div>

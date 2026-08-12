@@ -607,8 +607,48 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
   // extendedPairs 구성 (뒤에 처음 4개 pair 복제)
   const extendedPairs = showSlider ? [...pairs, ...pairs.slice(0, 4)] : pairs;
 
+  // 모바일 부드러운 자동 스크롤 로직
+  const mobileScrollRef = useRef(null);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (!isMobile || isInteracting || !mobileScrollRef.current || dogs.length === 0) return;
+
+    let animationFrameId;
+    const smoothScroll = () => {
+      if (mobileScrollRef.current) {
+        mobileScrollRef.current.scrollLeft += 0.5; // 천천히 이동
+        
+        if (mobileScrollRef.current.scrollLeft >= (mobileScrollRef.current.scrollWidth - mobileScrollRef.current.clientWidth) / 2) {
+           mobileScrollRef.current.scrollLeft = 0;
+        }
+      }
+      animationFrameId = requestAnimationFrame(smoothScroll);
+    };
+
+    animationFrameId = requestAnimationFrame(smoothScroll);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isMobile, isInteracting, dogs]);
+
+  const handleTouchStart = () => {
+    setIsInteracting(true);
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    interactionTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, 2000); 
+  };
+
   if (isMobile) {
     const isSafeAd = title.includes("안심");
+    const displayDogs = dogs.length > 0 ? [...dogs, ...dogs, ...dogs] : [];
+
     return (
       <section style={{ 
         padding: isSafeAd ? '0px 10px 10px 10px' : '10px 10px 10px 10px', 
@@ -631,24 +671,25 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
           </p>
         ) : (
           <div 
+            ref={mobileScrollRef}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             style={{ 
               overflowX: 'auto', 
               display: 'flex',
               gap: '10px',
               padding: '4px 10px',
-              scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none', 
               msOverflowStyle: 'none'
             }}
             className="mobile-scroll-container"
           >
-            {dogs.map((dog, i) => (
+            {displayDogs.map((dog, i) => (
               <div 
                 key={`mobile-ad-${badge}-${dog.id}-${i}`} 
                 style={{ 
-                  flex: '0 0 calc(45% - 8px)',
-                  scrollSnapAlign: 'start'
+                  flex: '0 0 calc(45% - 8px)'
                 }}
               >
                 <Card 
@@ -763,7 +804,7 @@ const AdSectionItem = ({ title, sub, dogs, badge, loading }) => {
 };
 
 
-const AdSections = () => {
+const AdSections = ({ mobileMiddleContent }) => {
   const [safeDogs, setSafeDogs] = useState([]);
   const [popularDogs, setPopularDogs] = useState([]);
   const [specialDogs, setSpecialDogs] = useState([]);
@@ -815,6 +856,8 @@ const AdSections = () => {
         banners={systemBanners.main_bottom_a} 
         slotName="main_bottom_a" 
       />
+
+      {mobileMiddleContent}
 
       <AdSectionItem title="🔥 인기 파트너 아이들" sub="지금 많은 반려인들이 주목하고 있는 우수 케어 아이들" dogs={popularDogs} badge="인기" loading={loading} />
       

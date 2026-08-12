@@ -21,7 +21,8 @@ const Card = ({ data, badgeText }) => {
 
   const toggleLike = async (e) => {
     e.stopPropagation();
-    if (!userId) {
+    const token = localStorage.getItem('paldo_session_token');
+    if (!token && !userId) {
       alert('관심아이 등록을 위해 먼저 로그인해 주세요!');
       navigate('/login');
       return;
@@ -33,7 +34,13 @@ const Card = ({ data, badgeText }) => {
     if (error) {
       // 실패 시 롤백
       setIsLiked(prev => !prev);
-      alert('관심 등록에 실패했습니다.');
+      if (error.includes('로그인') || error.includes('401')) {
+        alert('세션이 만료되었습니다. 다시 로그인해 주세요.');
+        localStorage.removeItem('paldo_session_token');
+        navigate('/login');
+      } else {
+        alert('관심 등록에 실패했습니다.');
+      }
     } else {
       window.dispatchEvent(new CustomEvent('bookmark-toggled', { 
         detail: { dogId: data.id, bookmarked: toggleData?.bookmarked } 

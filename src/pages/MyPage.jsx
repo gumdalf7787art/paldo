@@ -1821,22 +1821,22 @@ const MyPage = () => {
 
                   {/* 데스크탑 테이블 */}
                   <div className="post-table-wrap" style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #eee' }}>
-                          <th style={thStyle}>사진</th>
-                          <th style={thStyle}>견종/이름</th>
-                          <th style={thStyle}>지역/가격</th>
-                          <th style={thStyle}>성과 (조회/찜)</th>
-                          <th style={thStyle}>상태</th>
-                          <th style={thStyle}>광고 현황</th>
-                          <th style={{ ...thStyle, textAlign: 'center' }}>관리</th>
+                          <th style={{ ...thStyle, width: '75px', paddingRight: '5px' }}>사진</th>
+                          <th style={{ ...thStyle, width: '16%' }}>견종/이름</th>
+                          <th style={{ ...thStyle, width: '12%' }}>지역/가격</th>
+                          <th style={{ ...thStyle, width: '12%' }}>성과(조회/찜)</th>
+                          <th style={{ ...thStyle, width: '10%' }}>상태</th>
+                          <th style={{ ...thStyle }}>광고 현황</th>
+                          <th style={{ ...thStyle, width: '110px', textAlign: 'center', paddingLeft: '5px', paddingRight: '5px' }}>관리</th>
                         </tr>
                       </thead>
                       <tbody>
                         {myDogs.map(dog => (
                           <tr key={dog.id} style={{ borderBottom: '1px solid #eee' }}>
-                            <td style={tdStyle}><img src={dog.image_url} alt="dog" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }}/></td>
+                            <td style={{ ...tdStyle, paddingRight: '5px' }}><img src={dog.image_url} alt="dog" style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover' }}/></td>
                             <td style={tdStyle}>
                               <strong>{dog.breed}</strong><br/>
                               <span style={{ fontSize: '0.85rem', color: '#666' }}>{dog.nickname} ({dog.gender})</span>
@@ -1879,10 +1879,10 @@ const MyPage = () => {
                                 )}
                               </div>
                             </td>
-                            <td style={{ ...tdStyle, textAlign: 'center' }}>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <td style={{ ...tdStyle, textAlign: 'center', paddingLeft: '5px', paddingRight: '5px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 <button onClick={() => handleCompleteAdoption(dog.id)} style={{ ...tableBtnStyle, backgroundColor: '#7ed321', color: 'white', fontWeight: 'bold' }}>💖 분양완료</button>
-                                <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
                                   <button onClick={() => handleEditPost(dog)} style={{ ...tableBtnStyle, flex: 1 }}>수정</button>
                                   <button onClick={() => handleDeletePost(dog.id)} style={{ ...tableBtnStyle, backgroundColor: '#ff6b6b', color: 'white', flex: 1 }}>삭제</button>
                                 </div>

@@ -1777,7 +1777,7 @@ const MyPage = () => {
                   <div className={`dashboard-stats-grid ${isSeller ? '' : 'buyer'}`}>
                     {isSeller ? (
                       <>
-                        <StatBox title="총 방문자 분석" value={totalViews} suffix="명" color="#F5A623" icon="👀" onClick={() => setActiveTab('stats')} />
+                        {/* <StatBox title="총 방문자 분석" value={totalViews} suffix="명" color="#F5A623" icon="👀" onClick={() => setActiveTab('stats')} /> */}
                         <StatBox title="전체 게시물" value={myDogs.length} suffix="건" color="var(--primary)" icon="🐶" onClick={() => setActiveTab('posts')} />
                         <StatBox title="진행중인 댕댕톡" value={chatRooms.length} suffix="건" color="#4A90E2" icon="💬" onClick={() => setActiveTab('chats')} />
                       </>

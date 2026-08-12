@@ -65,6 +65,7 @@ const UploadForm = () => {
   const [postingStats, setPostingStats] = useState({ used: 0, limit: 20, loading: true });
   const [userCoupons, setUserCoupons] = useState([]);
   const [selectedCouponId, setSelectedCouponId] = useState('');
+  const [isAdModalOpen, setIsAdModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -500,25 +501,46 @@ const UploadForm = () => {
             <p style={helperTextStyle}>📝 사료 먹는 법, 성격 및 특징, 배변 훈련 유무, 부견/모견 정보 등을 자세히 작성할수록 예비 견주의 결정을 돕는 데 효과적입니다.</p>
           </div>
 
-          {/* 프리미엄 혜택 쿠폰 적용 */}
-          <div style={{ padding: '15px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba' }}>
-            <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '800', color: '#e6a800', marginBottom: '10px' }}>
-              📢 프리미엄 서비스 설정 (선택)
+          {/* 광고 설정 (선택) */}
+          <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: '#fffbf0', border: '1px solid #ffeeba', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <label style={{ display: 'block', fontSize: '1.1rem', fontWeight: '800', color: '#d97706', marginBottom: '5px' }}>
+              📢 광고 설정 (선택)
             </label>
-            <select 
-              style={inputStyle} 
-              value={selectedCouponId} 
-              onChange={e => setSelectedCouponId(e.target.value)}
-            >
-              <option value="">적용 안 함</option>
-              {userCoupons.map(coupon => (
-                <option key={coupon.user_coupon_id} value={coupon.user_coupon_id}>
-                  {coupon.name} ({coupon.description}) (쿠폰)
-                </option>
-              ))}
-            </select>
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '5px', marginBottom: 0 }}>
-              * 이용 쿠폰을 사용하면 게시물 등록과 동시에 7일간 해당 구역에 프리미엄 노출 서비스가 제공됩니다.
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ flex: 1 }}>
+                {selectedCouponId ? (
+                  <div style={{ padding: '12px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #fcd34d', fontWeight: '600', color: '#b45309' }}>
+                    ✅ 적용 예정: {userCoupons.find(c => c.user_coupon_id === selectedCouponId)?.name || '광고 적용됨'}
+                  </div>
+                ) : (
+                  <div style={{ color: '#92400e', fontSize: '0.95rem' }}>
+                    분양글을 더 눈에 띄게 홍보하고 싶으신가요?
+                  </div>
+                )}
+              </div>
+              
+              <button 
+                onClick={(e) => { e.preventDefault(); setIsAdModalOpen(true); }}
+                style={{
+                  marginLeft: '15px',
+                  padding: '10px 20px',
+                  backgroundColor: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 5px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                {selectedCouponId ? '변경하기' : '광고 설정하기'}
+              </button>
+            </div>
+            
+            <p style={{ fontSize: '0.8rem', color: '#b45309', margin: 0 }}>
+              * 광고를 설정하면 게시물 등록과 동시에 해당 구역에 최우선 노출됩니다.
             </p>
           </div>
 
@@ -603,6 +625,69 @@ const UploadForm = () => {
           </button>
         </div>
       </div>
+      {/* 광고 설정 모달 */}
+      {isAdModalOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#fff', borderRadius: '15px', width: '100%', maxWidth: '500px',
+            maxHeight: '85vh', display: 'flex', flexDirection: 'column',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#333' }}>📢 광고 설정하기</h3>
+              <button onClick={(e) => { e.preventDefault(); setIsAdModalOpen(false); }} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#999' }}>&times;</button>
+            </div>
+            
+            <div style={{ padding: '20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ color: '#666', marginBottom: '10px', fontSize: '0.95rem' }}>
+                적용할 광고 쿠폰을 선택해주세요. 등록 시 해당 쿠폰이 즉시 소모됩니다.
+              </p>
+              
+              <div 
+                onClick={() => { setSelectedCouponId(''); setIsAdModalOpen(false); }}
+                style={{
+                  padding: '15px', borderRadius: '10px', border: selectedCouponId === '' ? '2px solid #f59e0b' : '1px solid #e2e8f0',
+                  backgroundColor: selectedCouponId === '' ? '#fffbeb' : '#fff', cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ fontWeight: 'bold', color: selectedCouponId === '' ? '#b45309' : '#475569' }}>적용 안 함</div>
+                <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '5px' }}>일반 분양글로 등록됩니다.</div>
+              </div>
+
+              {userCoupons.map(coupon => (
+                <div 
+                  key={coupon.user_coupon_id}
+                  onClick={() => { setSelectedCouponId(coupon.user_coupon_id); setIsAdModalOpen(false); }}
+                  style={{
+                    padding: '15px', borderRadius: '10px', border: selectedCouponId === coupon.user_coupon_id ? '2px solid #f59e0b' : '1px solid #e2e8f0',
+                    backgroundColor: selectedCouponId === coupon.user_coupon_id ? '#fffbeb' : '#fff', cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <div style={{ fontWeight: 'bold', color: selectedCouponId === coupon.user_coupon_id ? '#b45309' : '#0f172a' }}>
+                    {coupon.name}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '5px' }}>
+                    {coupon.description}
+                  </div>
+                </div>
+              ))}
+              
+              {userCoupons.length === 0 && (
+                <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '10px' }}>
+                  보유 중인 광고 쿠폰이 없습니다.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

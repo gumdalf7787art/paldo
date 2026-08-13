@@ -14,7 +14,7 @@ const AdSetupPage = () => {
   const maxMainAds = 10; // 최대 슬롯 수
 
   // 폼 상태
-  const [adType, setAdType] = useState('main'); // 기본 선택
+  const [selectedAds, setSelectedAds] = useState([]); // 중복 선택 지원 배열
   const [showCoupons, setShowCoupons] = useState(false);
   
   // 상태 제출
@@ -97,34 +97,45 @@ const AdSetupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const targetCoupons = coupons.filter(c => c.ad_type === adType || c.ad_type === 'all');
-    if (targetCoupons.length === 0) {
-      alert('선택하신 영역에 사용할 수 있는 쿠폰이 없습니다.');
+    if (selectedAds.length === 0) {
+      alert('광고 영역을 하나 이상 선택해주세요.');
       return;
     }
 
-    if (adType === 'main' && activeMainAds >= maxMainAds) {
-      alert('프리미엄 노출 잔여 슬롯이 없습니다. 다른 서비스 구역을 선택해주세요.');
+    if (selectedAds.includes('main') && activeMainAds >= maxMainAds) {
+      alert('메인페이지 히어로 영역은 현재 꽉 차 있어서 선택할 수 없습니다.');
       return;
     }
 
-    const couponToUse = targetCoupons[0];
+
+    const couponsToUse = [];
+    let availablePool = [...coupons];
+
+    // 선택된 광고 수만큼 쿠폰이 넉넉한지 확인하고 차감할 쿠폰 리스트업
+    for (const adId of selectedAds) {
+      const matchIndex = availablePool.findIndex(c => c.ad_type === adId || c.ad_type === 'all');
+      if (matchIndex === -1) {
+        alert('선택하신 모든 영역을 적용하기에 쿠폰이 부족합니다. 선택을 줄여주세요.');
+        return;
+      }
+      couponsToUse.push({ adId, couponId: availablePool[matchIndex].id });
+      availablePool.splice(matchIndex, 1); // 풀에서 제외하여 중복 사용 방지
+    }
 
     setIsSubmitting(true);
     try {
-      // REST API: 서비스 생성 및 쿠폰 소모 동시 처리
-      const { data, error } = await api.ads.create({
-        dog_id: parseInt(dogId),
-        ad_type: adType,
-        title: `${dog.nickname} 프리미엄 서비스 (${getAdInfo(adType)?.label})`,
-        used_coupon_id: couponToUse.id
-      });
+      // 여러 개의 광고 동시 생성
+      for (const item of couponsToUse) {
+        const { error } = await api.ads.create({
+          dog_id: parseInt(dogId),
+          ad_type: item.adId,
+          title: `${dog.nickname} 프리미엄 서비스 (${getAdInfo(item.adId)?.label})`,
+          used_coupon_id: item.couponId
+        });
+        if (error) throw new Error(error);
+      }
 
-      if (error) throw new Error(error);
-
-      const endDate = data?.endDate ? new Date(data.endDate) : new Date();
-
-      alert(`서비스 설정이 완료되었습니다!\n(${endDate.toLocaleDateString()} 까지)\n내 게시물에 프리미엄 혜택이 적용됩니다.`);
+      alert(`총 ${selectedAds.length}개 구역에 서비스 설정이 완료되었습니다!\n내 게시물에 프리미엄 혜택이 즉시 적용됩니다.`);
       navigate('/mypage');
       
     } catch (error) {
@@ -166,14 +177,21 @@ const AdSetupPage = () => {
             
             {/* 왼쪽: 이미지 미리보기 */}
             <div style={{ flex: '1 1 300px', backgroundColor: '#f8fafc', borderRadius: '15px', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', minHeight: '300px' }}>
-              <div style={{ fontSize: '1rem', color: '#475569', fontWeight: 'bold', marginBottom: '15px' }}>선택된 영역 미리보기</div>
-              {adType ? (
-                <>
-                  <img src={getAdInfo(adType)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: 'var(--shadow)', marginBottom: '15px' }} />
-                  <div style={{ padding: '10px 15px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', width: '100%', textAlign: 'center', fontWeight: 'bold', color: '#0f172a' }}>
-                    ⏳ 광고 노출 기간: <span style={{ color: '#E65100' }}>7일</span>
+              <div style={{ fontSize: '1rem', color: '#475569', fontWeight: 'bold', marginBottom: '15px' }}>선택된 영역 ({selectedAds.length}개)</div>
+              {selectedAds.length > 0 ? (
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {selectedAds.map(adId => (
+                    <div key={adId} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <img src={getAdInfo(adId)?.img} alt="미리보기" style={{ width: '100%', borderRadius: '10px', boxShadow: 'var(--shadow)', marginBottom: '5px' }} />
+                      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#334155' }}>
+                        {getAdInfo(adId)?.label}
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ padding: '10px 15px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', width: '100%', textAlign: 'center', fontWeight: 'bold', color: '#0f172a', marginTop: '10px' }}>
+                    ⏳ 광고 노출 기간: <span style={{ color: '#E65100' }}>14일</span>
                   </div>
-                </>
+                </div>
               ) : (
                 <div style={{ padding: '40px', color: '#94a3b8' }}>광고 영역을 선택해주세요.</div>
               )}
@@ -182,7 +200,7 @@ const AdSetupPage = () => {
             {/* 오른쪽: 라디오 옵션 */}
             <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
-              <label style={labelStyle}>서비스 노출 영역 선택</label>
+              <label style={labelStyle}>서비스 노출 영역 선택 (중복 가능)</label>
               
               <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#E65100' }}>[메인페이지]</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -190,27 +208,34 @@ const AdSetupPage = () => {
                   const availableCount = coupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
                   const isMainFull = opt.id === 'main' && activeMainAds >= maxMainAds;
                   const isDisabled = availableCount === 0 || isMainFull;
+                  const isSelected = selectedAds.includes(opt.id);
 
                   return (
                     <label key={opt.id} style={{ 
                       ...radioBoxStyle, 
                       padding: '12px 15px',
-                      borderColor: adType === opt.id ? 'var(--primary)' : '#eee', 
-                      backgroundColor: adType === opt.id ? 'var(--primary-light)' : (isDisabled ? '#f8fafc' : 'white'),
-                      opacity: isDisabled ? 0.5 : 1,
-                      cursor: isDisabled ? 'not-allowed' : 'pointer'
+                      borderColor: isSelected ? 'var(--primary)' : '#eee', 
+                      backgroundColor: isSelected ? 'var(--primary-light)' : (isDisabled ? '#f8fafc' : 'white'),
+                      opacity: isDisabled && !isSelected ? 0.5 : 1,
+                      cursor: isDisabled && !isSelected ? 'not-allowed' : 'pointer'
                     }}>
                       <input 
-                        type="radio" 
+                        type="checkbox" 
                         value={opt.id} 
-                        checked={adType === opt.id} 
-                        onChange={() => !isDisabled && setAdType(opt.id)} 
-                        disabled={isDisabled}
+                        checked={isSelected} 
+                        onChange={() => {
+                          if (isDisabled && !isSelected) return;
+                          if (isSelected) {
+                            setSelectedAds(selectedAds.filter(id => id !== opt.id));
+                          } else {
+                            setSelectedAds([...selectedAds, opt.id]);
+                          }
+                        }} 
                         style={{ display: 'none' }} 
                       />
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <div style={{ fontWeight: adType === opt.id ? '800' : '600', color: adType === opt.id ? 'var(--primary-dark)' : '#334155' }}>
-                          {opt.label}
+                        <div style={{ fontWeight: isSelected ? '800' : '600', color: isSelected ? 'var(--primary-dark)' : '#334155' }}>
+                          {isSelected ? '✅ ' : ''}{opt.label}
                         </div>
                         <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: availableCount > 0 ? 'var(--primary)' : '#94a3b8' }}>
                           보유 쿠폰: {availableCount}장
@@ -226,27 +251,34 @@ const AdSetupPage = () => {
                 {adTypes.breed.map((opt) => {
                   const availableCount = coupons.filter(c => c.ad_type === opt.id || c.ad_type === 'all').length;
                   const isDisabled = availableCount === 0;
+                  const isSelected = selectedAds.includes(opt.id);
 
                   return (
                     <label key={opt.id} style={{ 
                       ...radioBoxStyle,
                       padding: '12px 15px',
-                      borderColor: adType === opt.id ? '#00796B' : '#eee', 
-                      backgroundColor: adType === opt.id ? '#E0F2F1' : (isDisabled ? '#f8fafc' : 'white'),
-                      opacity: isDisabled ? 0.5 : 1,
-                      cursor: isDisabled ? 'not-allowed' : 'pointer'
+                      borderColor: isSelected ? '#00796B' : '#eee', 
+                      backgroundColor: isSelected ? '#E0F2F1' : (isDisabled ? '#f8fafc' : 'white'),
+                      opacity: isDisabled && !isSelected ? 0.5 : 1,
+                      cursor: isDisabled && !isSelected ? 'not-allowed' : 'pointer'
                     }}>
                       <input 
-                        type="radio" 
+                        type="checkbox" 
                         value={opt.id} 
-                        checked={adType === opt.id} 
-                        onChange={() => !isDisabled && setAdType(opt.id)} 
-                        disabled={isDisabled}
+                        checked={isSelected} 
+                        onChange={() => {
+                          if (isDisabled && !isSelected) return;
+                          if (isSelected) {
+                            setSelectedAds(selectedAds.filter(id => id !== opt.id));
+                          } else {
+                            setSelectedAds([...selectedAds, opt.id]);
+                          }
+                        }} 
                         style={{ display: 'none' }} 
                       />
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <div style={{ fontWeight: adType === opt.id ? '800' : '600', color: adType === opt.id ? '#004D40' : '#334155' }}>
-                          {opt.label}
+                        <div style={{ fontWeight: isSelected ? '800' : '600', color: isSelected ? '#004D40' : '#334155' }}>
+                          {isSelected ? '✅ ' : ''}{opt.label}
                         </div>
                         <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: availableCount > 0 ? '#00796B' : '#94a3b8' }}>
                           보유 쿠폰: {availableCount}장
@@ -301,14 +333,14 @@ const AdSetupPage = () => {
 
           <button 
             type="submit" 
-            disabled={isSubmitting || coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0}
+            disabled={isSubmitting || selectedAds.length === 0}
             style={{ 
               width: '100%', padding: '20px', borderRadius: '15px', border: 'none', 
-              backgroundColor: coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0 ? '#ccc' : 'var(--primary)', 
-              color: 'white', fontWeight: '900', fontSize: '1.1rem', cursor: coupons.filter(c => c.ad_type === adType || c.ad_type === 'all').length === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', marginTop: '10px'
+              backgroundColor: selectedAds.length === 0 ? '#ccc' : 'var(--primary)', 
+              color: 'white', fontWeight: '900', fontSize: '1.1rem', cursor: selectedAds.length === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', marginTop: '10px'
             }}
           >
-            {isSubmitting ? '처리 중...' : '확인 및 서비스 적용하기'}
+            {isSubmitting ? '처리 중...' : `확인 및 서비스 적용하기 (${selectedAds.length}개 구역)`}
           </button>
         </form>
       </div>

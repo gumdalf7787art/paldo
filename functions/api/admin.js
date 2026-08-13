@@ -212,13 +212,37 @@ export async function onRequestPost(context) {
         await env.DB.prepare('UPDATE profiles SET role = "seller" WHERE id = ?').bind(user_id).run();
       }
       
-      // 자동 발급 쿠폰(welcome 타입) 지급
-      const { results: welcomeCoupons } = await env.DB.prepare('SELECT id, valid_until FROM coupons WHERE auto_issue_type = "welcome"').all();
-      if (welcomeCoupons && welcomeCoupons.length > 0) {
-        for (const coupon of welcomeCoupons) {
-          await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) VALUES (?, ?, ?, 0)')
-            .bind(user_id, coupon.id, coupon.valid_until || null)
+      // 파트너 창립 멤버 특별 쿠폰 구성 (총 25장)
+      const couponSpecs = [
+        { name: '메인 히어로 광고 쿠폰', code: 'WELCOME_MAIN', ad_type: 'main', count: 4 },
+        { name: '메인 추천 광고 쿠폰', code: 'WELCOME_REC', ad_type: 'recommend', count: 3 },
+        { name: '메인 인기 광고 쿠폰', code: 'WELCOME_POP', ad_type: 'popular', count: 3 },
+        { name: '메인 스페셜 광고 쿠폰', code: 'WELCOME_SPC', ad_type: 'special', count: 3 },
+        { name: '견종별 히어로 광고 쿠폰', code: 'WELCOME_B_MAIN', ad_type: 'breed_main', count: 3 },
+        { name: '견종별 추천 광고 쿠폰', code: 'WELCOME_B_REC', ad_type: 'breed_recommend', count: 3 },
+        { name: '견종별 인기 광고 쿠폰', code: 'WELCOME_B_POP', ad_type: 'breed_popular', count: 3 },
+        { name: '견종별 스페셜 광고 쿠폰', code: 'WELCOME_B_SPC', ad_type: 'breed_special', count: 3 }
+      ];
+
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 6);
+      const expiresAtStr = expiresAt.toISOString();
+
+      for (const spec of couponSpecs) {
+        let coupon = await env.DB.prepare('SELECT id FROM coupons WHERE code = ?').bind(spec.code).first();
+        if (!coupon) {
+          await env.DB.prepare('INSERT INTO coupons (name, discount_rate, code, auto_issue_type, ad_type) VALUES (?, 100, ?, "welcome", ?)')
+            .bind(spec.name, spec.code, spec.ad_type)
             .run();
+          coupon = await env.DB.prepare('SELECT id FROM coupons WHERE code = ?').bind(spec.code).first();
+        }
+
+        if (coupon && coupon.id) {
+          for (let i = 0; i < spec.count; i++) {
+            await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) VALUES (?, ?, ?, 0)')
+              .bind(user_id, coupon.id, expiresAtStr)
+              .run();
+          }
         }
       }
 
@@ -309,10 +333,14 @@ export async function onRequestPost(context) {
       if (!coupon) return createResponse({ error: '해당 쿠폰을 찾을 수 없습니다.' }, 404);
 
       // profiles 테이블의 모든 사용자에게 쿠폰 매핑 일괄 인서트
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 6);
+      const expiresAtStr = expiresAt.toISOString();
+
       await env.DB.prepare(
         'INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) SELECT id, ?, ?, 0 FROM profiles'
       )
-        .bind(coupon_id, coupon.valid_until || null)
+        .bind(coupon_id, expiresAtStr)
         .run();
 
       // 알림 생성
@@ -340,8 +368,12 @@ export async function onRequestPost(context) {
       const coupon = await env.DB.prepare('SELECT valid_until, name FROM coupons WHERE id = ?').bind(coupon_id).first();
       if (!coupon) return createResponse({ error: '해당 쿠폰을 찾을 수 없습니다.' }, 404);
 
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 6);
+      const expiresAtStr = expiresAt.toISOString();
+
       await env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at, is_used) VALUES (?, ?, ?, 0)')
-        .bind(user_id, coupon_id, coupon.valid_until || null)
+        .bind(user_id, coupon_id, expiresAtStr)
         .run();
 
       await env.DB.prepare(

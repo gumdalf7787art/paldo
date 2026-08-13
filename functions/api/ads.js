@@ -186,8 +186,8 @@ export async function onRequestPost(context) {
         return createResponse({ error: '해당 아이템은 이 광고 구역에서 사용할 수 없습니다.' }, 400);
       }
 
-      // 쿠폰 혜택인 광고 노출 기간은 기본 7일로 고정 (추후 DB 컬럼 추가 시 연동)
-      couponDuration = 7; 
+      // 쿠폰 혜택인 광고 노출 기간은 14일로 설정 (추후 DB 컬럼 추가 시 연동)
+      couponDuration = 14; 
     }
 
     // 2. 광고 날짜 계산

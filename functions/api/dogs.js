@@ -522,7 +522,7 @@ export async function onRequestPost(context) {
         stmts.push(
           env.DB.prepare(`
             INSERT INTO advertisements (user_id, dog_id, ad_type, title, status, duration, start_date, end_date, used_coupon_id)
-            VALUES (?, ?, ?, ?, 'active', 7, ?, ?, ?)
+            VALUES (?, ?, ?, ?, 'active', 14, ?, ?, ?)
           `).bind(authUser.id, newId, adType, `${coupon.name} 자동 적용`, now, endDate, used_coupon_id)
         );
       }

@@ -6,12 +6,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 2000,
-    minify: false,
-    cssMinify: false,
     sourcemap: true,
-    rollupOptions: {
-      // onwarn 생략하여 경고가 콘솔에 출력되게 함
-    }
   },
   server: {
     watch: {

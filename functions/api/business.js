@@ -24,6 +24,38 @@ function getAuthenticatedUser(request) {
   return verifyToken(token);
 }
 
+// NTS 국세청 사업자등록 상태조회 API 호출
+async function checkBusinessStatus(bizNo) {
+  const apiKey = "2b12557f058a486cf715373f86fb47e4bea6970b9e512e9d47678f2a951da15d";
+  const url = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${apiKey}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "b_no": [bizNo.replace(/-/g, '')]
+      })
+    });
+    
+    if (!response.ok) {
+       return { apiError: true };
+    }
+    
+    const result = await response.json();
+    if (result && result.data && result.data.length > 0) {
+      return result.data[0];
+    }
+    return { apiError: true };
+  } catch (e) {
+    console.error("NTS API Error:", e);
+    return { apiError: true };
+  }
+}
+
 // CORS 응답 생성
 function createResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -54,6 +86,22 @@ export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
+
+  // 사업자등록번호 중복 체크 (action = check_biz_no)
+  if (action === 'check_biz_no') {
+    const biz_no = url.searchParams.get('biz_no');
+    if (!biz_no) return createResponse({ error: '사업자등록번호가 필요합니다.' }, 400);
+    try {
+      const duplicateBizNo = await env.DB.prepare(
+        'SELECT id FROM business_applications WHERE biz_no = ? AND status IN ("pending", "approved")'
+      )
+        .bind(biz_no)
+        .first();
+      return createResponse({ is_duplicate: !!duplicateBizNo });
+    } catch (err) {
+      return createResponse({ error: `조회 실패: ${err.message}` }, 500);
+    }
+  }
 
   const authUser = getAuthenticatedUser(request);
   if (!authUser) {
@@ -133,6 +181,19 @@ export async function onRequestPost(context) {
         }
       }
 
+      // --- 국세청 사업자 진위 확인 ---
+      let newStatus = "pending";
+      const ntsResult = await checkBusinessStatus(biz_no);
+      if (!ntsResult.apiError) {
+        if (ntsResult.b_stt_cd === "01") {
+          newStatus = "approved"; // 정상 영업중 -> 자동 승인
+        } else if (ntsResult.b_stt_cd === "02" || ntsResult.b_stt_cd === "03") {
+          return createResponse({ error: `해당 사업자는 [${ntsResult.b_stt}] 상태입니다. 가입이 불가합니다.` }, 400);
+        } else if (ntsResult.tax_type && ntsResult.tax_type.includes("등록되지 않은")) {
+          return createResponse({ error: '국세청에 등록되지 않은 사업자등록번호입니다. 번호를 확인해 주세요.' }, 400);
+        }
+      }
+
       // R2 파일 업로드 처리
       let fileUrl = null;
       let animalSaleFileUrl = null;
@@ -187,7 +248,7 @@ export async function onRequestPost(context) {
 
       // 신청서 등록
       await env.DB.prepare(
-        'INSERT INTO business_applications (user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, file_url, animal_sale_file_url) VALUES (?, ?, ?, ?, ?, ?, ?, "pending", ?, ?)'
+        'INSERT INTO business_applications (user_id, business_name, representative_name, phone, address, biz_no, animal_sale_no, status, file_url, animal_sale_file_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
       )
         .bind(
           authUser.id,
@@ -197,15 +258,47 @@ export async function onRequestPost(context) {
           address || '',
           biz_no,
           animal_sale_no,
+          newStatus,
           fileUrl,
           animalSaleFileUrl
         )
         .run();
 
-      // 관리자 알림 문자 발송 (Aligo SMS)
+      if (newStatus === "approved") {
+        await env.DB.prepare('UPDATE profiles SET role = "seller" WHERE id = ?').bind(authUser.id).run();
+      }
+
+      // 1. 파트너(사업자)에게 가입 완료 알림톡 발송 (카카오 알림톡)
+      if (newStatus === "approved" && env.ALIGO_API_KEY && env.ALIGO_USER_ID && env.ALIGO_SENDER && phone) {
+        try {
+          const alimtalkMsg = `안녕하세요.\n팔도댕댕이 파트너스 회원가입이 완료되었습니다.\n\n국세청 정상 사업자로 확인되어 즉시 입점 승인 처리되었으니, 지금 바로 PC에서 팔도댕댕이에 접속하여 아이들의 분양 정보를 등록해 보세요!\n\n* 추후 관리자의 서류 확인 과정에서 보완이 필요할 경우 별도로 안내될 수 있습니다.`;
+          
+          const params = new URLSearchParams();
+          params.append('apikey', env.ALIGO_API_KEY);
+          params.append('userid', env.ALIGO_USER_ID);
+          params.append('senderkey', env.ALIGO_SENDER_KEY || '82c0b59e854a5348f4cee724681b4c3a28b35845');
+          params.append('tpl_code', 'UK_3258');
+          params.append('sender', env.ALIGO_SENDER);
+          params.append('receiver_1', phone.replace(/-/g, ''));
+          params.append('subject_1', '팔도댕댕 파트너스 입점 안내');
+          params.append('message_1', alimtalkMsg);
+
+          await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', {
+            method: 'POST',
+            body: params,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          });
+        } catch (e) {
+          console.error("Alimtalk send error:", e);
+        }
+      }
+
+      // 2. 관리자 알림 문자 발송 (Aligo SMS)
       if (env.ALIGO_API_KEY && env.ALIGO_USER_ID && env.ALIGO_SENDER && env.ADMIN_PHONE) {
         try {
-          const smsMsg = `[팔도댕댕 입점신청]\n상호명: ${business_name}\n대표자: ${representative_name || ''}\n연락처: ${phone || ''}\n빠른 시일 내에 관리자 페이지에서 승인 처리를 진행해주세요.`;
+          const smsMsg = newStatus === "approved"
+            ? `[자동승인 완료]\n상호명: ${business_name}\n대표자: ${representative_name || ''}\n서류 사후검토 요망.`
+            : `[팔도댕댕 입점신청]\n상호명: ${business_name}\n대표자: ${representative_name || ''}\n승인 처리 요망.`;
           
           const params = new URLSearchParams();
           params.append('key', env.ALIGO_API_KEY);
@@ -228,7 +321,7 @@ export async function onRequestPost(context) {
         }
       }
 
-      return createResponse({ success: true, message: '판매자 자격 신청서가 성공적으로 접수되었습니다.' });
+      return createResponse({ success: true, status: newStatus, message: '판매자 자격 신청서가 접수되었습니다.' });
     } catch (err) {
       return createResponse({ error: `신청서 제출 실패: ${err.message}` }, 500);
     }

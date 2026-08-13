@@ -184,12 +184,25 @@ const SignupPage = () => {
         const ocrText = result.data.text.replace(/[^0-9]/g, '');
         const inputBizNo = bizNo.replace(/[^0-9]/g, '');
         
-        // [임시 비활성화] 테스트를 위해 OCR 사업자번호 일치 검증 생략
-        // if (!ocrText.includes(inputBizNo)) {
-        //   alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
-        //   setLoading(false);
-        //   return;
-        // }
+        // OCR 사업자번호 일치 검증 활성화
+        if (!ocrText.includes(inputBizNo)) {
+          alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
+          setLoading(false);
+          return;
+        }
+
+        // 사업자 번호 중복 체크
+        try {
+          const checkRes = await fetch(`/api/business?action=check_biz_no&biz_no=${inputBizNo}`);
+          const checkData = await checkRes.json();
+          if (checkData.is_duplicate) {
+             alert('이미 가입된 혹은 심사 중인 사업자등록번호입니다.');
+             setLoading(false);
+             return;
+          }
+        } catch (e) {
+          console.error('Duplicate biz_no check error:', e);
+        }
       } catch (err) {
         console.error('OCR Error:', err);
       }
@@ -211,7 +224,7 @@ const SignupPage = () => {
       if (userData) {
         if (tab === 'seller') {
           // 세션 토큰이 확보된 상태에서 즉시 사업자 인증 신청을 동시에 완료
-          const { error: applyError } = await api.business.apply({
+          const { data: applyData, error: applyError } = await api.business.apply({
             business_name: bizName,
             representative_name: bizRepName,
             phone: bizPhone,
@@ -231,7 +244,11 @@ const SignupPage = () => {
             return;
           }
 
-          alert('🎉 회원가입 및 사업자 등록 신청이 함께 접수되었습니다! 최대 24시간 내 심사가 완료됩니다.');
+          if (applyData && applyData.status === 'approved') {
+            alert('🎉 회원가입이 완료되었습니다!\n이제 바로 분양 강아지를 등록하세요.');
+          } else {
+            alert('🎉 회원가입 및 사업자 등록 신청이 함께 접수되었습니다! 최대 24시간 내 심사가 완료됩니다.');
+          }
           window.dispatchEvent(new Event('auth-change'));
           navigate('/mypage');
         } else {

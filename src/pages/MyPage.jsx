@@ -711,9 +711,9 @@ const MyPage = () => {
       { id: 'store', label: '🏪 스토어' },
       { id: 'ads', label: '📢 광고 쿠폰 관리' },
       ...(!isSellerGroup2 ? [
-        { id: 'payments', label: '💳 결제 관리' },
+        /* { id: 'payments', label: '💳 결제 관리' },
         { id: 'adStore', label: '🛒 단건구매 스토어', action: () => navigate('/ad-store') },
-        { id: 'subscription', label: '💎 정기구매 스토어', action: () => navigate('/subscription') },
+        { id: 'subscription', label: '💎 정기구매 스토어', action: () => navigate('/subscription') }, */
         { id: 'stats', label: '📊 통계' },
       ] : [])
     ] : []),
@@ -1188,7 +1188,7 @@ const MyPage = () => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>📢 광고 쿠폰</h3>
-              <button onClick={() => navigate('/ad-store')} style={{ ...miniBtnStyle, fontSize: '0.75rem', padding: '6px 12px' }}>🛒 스토어 가기</button>
+              {/* <button onClick={() => navigate('/ad-store')} style={{ ...miniBtnStyle, fontSize: '0.75rem', padding: '6px 12px' }}>🛒 스토어 가기</button> */}
             </div>
 
             <div style={{ display: 'grid', gap: '12px', marginBottom: '25px' }}>
@@ -1544,9 +1544,9 @@ const MyPage = () => {
                     <button onClick={() => setActiveTab('ads')} style={navBtnStyle('ads')}>📢 광고 쿠폰 관리</button>
                     {!isSellerGroup2 && (
                       <>
-                        <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
+                        {/* <button onClick={() => setActiveTab('payments')} style={navBtnStyle('payments')}>💳 결제 내역 관리</button>
                         <button onClick={() => navigate('/ad-store')} style={navBtnStyle('adStore')}>🛒 단건구매 스토어</button>
-                        <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 정기구매 스토어</button>
+                        <button onClick={() => navigate('/subscription')} style={{...navBtnStyle('subscription'), color: '#9b59b6', fontWeight: '900'}}>💎 정기구매 스토어</button> */}
                         <button onClick={() => setActiveTab('stats')} style={navBtnStyle('stats')}>📊 통계확인</button>
                       </>
                     )}
@@ -2612,12 +2612,12 @@ const BusinessApplyModal = ({ onClose, onSuccess }) => {
         const ocrText = result.data.text.replace(/[^0-9]/g, '');
         const inputBizNo = form.bizNo.replace(/[^0-9]/g, '');
         
-        // [임시 비활성화] 테스트를 위해 OCR 사업자번호 일치 검증 생략
-        // if (!ocrText.includes(inputBizNo)) {
-        //   alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
-        //   setUploading(false);
-        //   return;
-        // }
+        // OCR 사업자번호 일치 검증 활성화
+        if (!ocrText.includes(inputBizNo)) {
+          alert('사업자등록번호가 사업자등록증과 같지 않습니다. 확인 바랍니다.');
+          setUploading(false);
+          return;
+        }
       } catch (err) {
         console.error('OCR Error:', err);
       }

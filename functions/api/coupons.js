@@ -109,8 +109,12 @@ export async function onRequestPost(context) {
         else if (coupon.coupon_type === 'ad_breed_premium') amount = 10;
         else if (coupon.coupon_type === 'post_ticket') amount = 10;
         
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + 6);
+        const expiresAtStr = expiresAt.toISOString();
+
         for (let i = 0; i < amount; i++) {
-          stmts.push(env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id) VALUES (?, ?)').bind(target_user_id, coupon.id));
+          stmts.push(env.DB.prepare('INSERT INTO user_coupons (user_id, coupon_id, expires_at) VALUES (?, ?, ?)').bind(target_user_id, coupon.id, expiresAtStr));
         }
       }
       

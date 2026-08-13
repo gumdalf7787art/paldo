@@ -545,6 +545,11 @@ const SignupPage = () => {
                   required={tab === 'seller'}
                   style={{ display: 'block', marginTop: '5px' }}
                 />
+                {bizFileName && (
+                  <p style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '5px', fontWeight: 'bold' }}>
+                    📎 첨부파일: {bizFileName}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -556,9 +561,9 @@ const SignupPage = () => {
                   required={tab === 'seller'}
                   style={{ display: 'block', marginTop: '5px' }}
                 />
-                {bizFileName && (
+                {animalFileName && (
                   <p style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '5px', fontWeight: 'bold' }}>
-                    📎 첨부파일: {bizFileName}
+                    📎 첨부파일: {animalFileName}
                   </p>
                 )}
               </div>

@@ -30,6 +30,35 @@ const AnalyticsTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // 사이트 전체 방문자 트래킹 (일별 세션 단위)
+    const trackSiteVisit = async () => {
+      try {
+        let sessionId = sessionStorage.getItem('paldo_session_id');
+        if (!sessionId) {
+          sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem('paldo_session_id', sessionId);
+        }
+        
+        // KST 기준 오늘 날짜 문자열
+        const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const loggedToday = sessionStorage.getItem(`visited_${today}`);
+        
+        if (!loggedToday) {
+          await fetch('/api/visits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+          });
+          sessionStorage.setItem(`visited_${today}`, 'true');
+        }
+      } catch (err) {
+        console.error('Site visit tracking failed:', err);
+      }
+    };
+    trackSiteVisit();
+  }, []);
+
+  useEffect(() => {
     const trackView = async () => {
       try {
         await api.auth.getUser();

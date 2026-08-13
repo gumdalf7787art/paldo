@@ -604,6 +604,15 @@ export const api = {
       }
     },
 
+    async getVisits(period = 'daily') {
+      try {
+        const { data } = await request(`${BASE_URL}/api/admin/visits?period=${period}`);
+        return { data, error: null };
+      } catch (err) {
+        return { data: null, error: err.message };
+      }
+    },
+
     async approveApplication(id, userId) {
       try {
         const { data } = await request(`${BASE_URL}/api/admin?action=approve_app`, {

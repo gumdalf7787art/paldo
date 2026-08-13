@@ -13,6 +13,8 @@ const AdminPage = () => {
   const [stats, setStats] = useState({ users: 0, applications: 0, dogs: 0, clicks: 0 });
   const [chartData, setChartData] = useState([]);
   const [eventData, setEventData] = useState([]);
+  const [visitStats, setVisitStats] = useState({ todayCount: 0, data: [] });
+  const [visitPeriod, setVisitPeriod] = useState('daily');
   const [applications, setApplications] = useState([]);
   const [users, setUsers] = useState([]);
   const [dogs, setDogs] = useState([]);
@@ -59,10 +61,19 @@ const AdminPage = () => {
     fetchAdminData();
   }
 
+  async function fetchVisitData(period) {
+    const { data } = await api.admin.getVisits(period);
+    if (data && data.success) {
+      setVisitStats({ todayCount: data.todayCount, data: data.data });
+      setVisitPeriod(period);
+    }
+  }
+
   async function fetchAdminData() {
     setLoading(true);
 
     try {
+      fetchVisitData('daily');
       // 1. 요약 통계 및 차트
       const { data: statsData } = await api.admin.getStats();
       if (statsData) {
@@ -418,45 +429,95 @@ const AdminPage = () => {
 
         {activeTab === 'summary' && (
           <div className="fade-in">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '30px' }}>
               <StatCard label="총 회원" value={stats.users} color="#4A90E2" />
               <StatCard label="승인 대기" value={stats.applications} color="#F5A623" />
               <StatCard label="활성 분양글" value={stats.dogs} color="#7ED321" />
               <StatCard label="누적 활동수" value={stats.clicks} color="#9013FE" />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
-              <div className="glass-card" style={{ padding: '30px' }}>
-                <h3 style={{ marginBottom: '20px' }}>최근 7일 페이지 뷰 트렌드</h3>
-                <div style={{ height: '300px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                      <XAxis dataKey="date" fontSize={12} stroke="#999" />
-                      <YAxis fontSize={12} stroke="#999" />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="views" stroke="#4A90E2" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
+            <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #eee', paddingBottom: '30px', marginBottom: '30px' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 20px 0' }}>
+                    조회수 <span style={{ fontSize: '1rem', color: '#999', fontWeight: 'normal', cursor: 'pointer' }}>❔</span>
+                  </h2>
+                  <div>
+                    <div style={{ color: '#888', fontSize: '0.95rem', marginBottom: '5px' }}>{new Date().toLocaleDateString('ko-KR')} 기준</div>
+                    <div style={{ fontSize: '3rem', fontWeight: '800', letterSpacing: '-1px', color: '#111' }}>
+                      {visitStats.todayCount}<span style={{ fontSize: '1.2rem', fontWeight: 'normal', color: '#666', marginLeft: '4px' }}>건</span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden' }}>
+                  {['daily', 'weekly', 'monthly'].map(p => (
+                    <button 
+                      key={p} 
+                      onClick={() => fetchVisitData(p)}
+                      style={{ 
+                        padding: '10px 24px', 
+                        border: 'none', 
+                        backgroundColor: visitPeriod === p ? '#00c73c' : 'white', 
+                        color: visitPeriod === p ? 'white' : '#666',
+                        fontWeight: visitPeriod === p ? '700' : '500',
+                        fontSize: '0.95rem',
+                        cursor: 'pointer',
+                        borderRight: p !== 'monthly' ? '1px solid #ddd' : 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {p === 'daily' ? '일간' : p === 'weekly' ? '주간' : '월간'}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="glass-card" style={{ padding: '30px' }}>
-                <h3 style={{ marginBottom: '20px' }}>활동 분포</h3>
-                <div style={{ height: '300px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={eventData}>
-                      <XAxis dataKey="name" fontSize={12} stroke="#999" />
-                      <YAxis hide />
-                      <Tooltip />
-                      <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-                        {eventData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === 0 ? '#4A90E2' : '#7ED321'} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+
+              {/* 차트 영역 */}
+              <div style={{ height: '350px', width: '100%', marginBottom: '50px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={visitStats.data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis dataKey="label" fontSize={12} stroke="#999" tickMargin={12} axisLine={false} tickLine={false} />
+                    <YAxis fontSize={12} stroke="#999" axisLine={false} tickLine={false} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+                      labelStyle={{ color: '#666', marginBottom: '5px' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="count" 
+                      name="접속자수" 
+                      stroke="#00c73c" 
+                      strokeWidth={3} 
+                      dot={{ r: 4, fill: 'white', stroke: '#00c73c', strokeWidth: 2 }} 
+                      activeDot={{ r: 6, fill: '#00c73c', stroke: 'white', strokeWidth: 2 }} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
+
+              {/* 데이터 테이블 */}
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '1rem' }}>
+                <thead>
+                  <tr style={{ borderTop: '2px solid #333', borderBottom: '1px solid #333', backgroundColor: '#fafafa' }}>
+                    <th style={{ padding: '16px 10px', color: '#555', fontWeight: '600', width: '50%' }}>날짜</th>
+                    <th style={{ padding: '16px 10px', color: '#555', fontWeight: '600', width: '50%' }}>전체 접속자수</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...visitStats.data].reverse().map((item, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                      <td style={{ padding: '16px 10px', color: '#444' }}>{item.label}</td>
+                      <td style={{ padding: '16px 10px', color: '#222', fontWeight: '700' }}>{item.count}</td>
+                    </tr>
+                  ))}
+                  {visitStats.data.length === 0 && (
+                    <tr>
+                      <td colSpan="2" style={{ padding: '50px', color: '#999', fontSize: '0.95rem' }}>데이터가 없습니다.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

@@ -108,6 +108,7 @@ const MyPage = () => {
   const isBuyer = profile?.role === 'buyer';
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchInitialData();
     
     const handleNotificationsUpdate = () => {

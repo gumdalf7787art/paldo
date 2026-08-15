@@ -604,9 +604,11 @@ export const api = {
       }
     },
 
-    async getVisits(period = 'daily') {
+    async getVisits(period = 'daily', exactLabel = null) {
       try {
-        const { data } = await request(`${BASE_URL}/api/admin/visits?period=${period}`);
+        let url = `${BASE_URL}/api/admin/visits?period=${period}`;
+        if (exactLabel) url += `&exact_label=${encodeURIComponent(exactLabel)}`;
+        const { data } = await request(url);
         return { data, error: null };
       } catch (err) {
         return { data: null, error: err.message };

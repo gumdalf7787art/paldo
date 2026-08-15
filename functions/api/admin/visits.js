@@ -89,10 +89,20 @@ export async function onRequestGet(context) {
     let referrers = [];
     let keywords = [];
     try {
+      const exactLabel = url.searchParams.get('exact_label');
       let condition = '';
-      if (period === 'daily') condition = "created_at >= date('now', '-14 days')";
-      else if (period === 'weekly') condition = "created_at >= date('now', '-90 days')";
-      else if (period === 'monthly') condition = "created_at >= date('now', '-365 days')";
+      let bindings = [];
+      
+      if (exactLabel) {
+        if (period === 'daily') condition = "date(created_at, '+9 hours') = ?";
+        else if (period === 'weekly') condition = "strftime('%Y-%W', created_at, '+9 hours') = ?";
+        else if (period === 'monthly') condition = "strftime('%Y-%m', created_at, '+9 hours') = ?";
+        bindings.push(exactLabel);
+      } else {
+        if (period === 'daily') condition = "created_at >= date('now', '-14 days')";
+        else if (period === 'weekly') condition = "created_at >= date('now', '-90 days')";
+        else if (period === 'monthly') condition = "created_at >= date('now', '-365 days')";
+      }
 
       const refQuery = `
         SELECT referrer, COUNT(DISTINCT session_id) as count
@@ -102,7 +112,8 @@ export async function onRequestGet(context) {
         ORDER BY count DESC
         LIMIT 20
       `;
-      const { results: refResults } = await env.DB.prepare(refQuery).all();
+      const stmtRef = env.DB.prepare(refQuery);
+      const { results: refResults } = await (bindings.length > 0 ? stmtRef.bind(...bindings).all() : stmtRef.all());
       referrers = refResults;
 
       const kwQuery = `
@@ -113,7 +124,8 @@ export async function onRequestGet(context) {
         ORDER BY count DESC
         LIMIT 20
       `;
-      const { results: kwResults } = await env.DB.prepare(kwQuery).all();
+      const stmtKw = env.DB.prepare(kwQuery);
+      const { results: kwResults } = await (bindings.length > 0 ? stmtKw.bind(...bindings).all() : stmtKw.all());
       keywords = kwResults;
     } catch (e) {
       // Columns might not exist yet

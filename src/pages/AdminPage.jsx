@@ -14,6 +14,7 @@ const AdminPage = () => {
   const [chartData, setChartData] = useState([]);
   const [eventData, setEventData] = useState([]);
   const [visitStats, setVisitStats] = useState({ todayCount: 0, data: [], referrers: [], keywords: [] });
+  const [selectedDate, setSelectedDate] = useState(null);
   const [visitPeriod, setVisitPeriod] = useState('daily');
   const [applications, setApplications] = useState([]);
   const [users, setUsers] = useState([]);
@@ -61,16 +62,17 @@ const AdminPage = () => {
     fetchAdminData();
   }
 
-  async function fetchVisitData(period) {
-    const { data } = await api.admin.getVisits(period);
+  async function fetchVisitData(period, exactLabel = null) {
+    const { data } = await api.admin.getVisits(period, exactLabel);
     if (data && data.success) {
-      setVisitStats({ 
-        todayCount: data.todayCount, 
-        data: data.data,
+      setVisitStats(prev => ({ 
+        todayCount: exactLabel ? prev.todayCount : data.todayCount, 
+        data: exactLabel ? prev.data : data.data,
         referrers: data.referrers || [],
         keywords: data.keywords || []
-      });
-      setVisitPeriod(period);
+      }));
+      if (!exactLabel) setVisitPeriod(period);
+      setSelectedDate(exactLabel);
     }
   }
 
@@ -480,7 +482,7 @@ const AdminPage = () => {
               {/* 차트 영역 */}
               <div style={{ height: '350px', width: '100%', marginBottom: '50px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={visitStats.data}>
+                  <LineChart data={visitStats.data} onClick={(e) => { if(e && e.activeLabel) fetchVisitData(visitPeriod, e.activeLabel === selectedDate ? null : e.activeLabel); }} style={{ cursor: 'pointer' }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                     <XAxis dataKey="label" fontSize={12} stroke="#999" tickMargin={12} axisLine={false} tickLine={false} />
                     <YAxis fontSize={12} stroke="#999" axisLine={false} tickLine={false} />
@@ -511,8 +513,21 @@ const AdminPage = () => {
                 </thead>
                 <tbody>
                   {[...visitStats.data].reverse().map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                      <td style={{ padding: '16px 10px', color: '#444' }}>{item.label}</td>
+                    <tr 
+                      key={idx} 
+                      onClick={() => fetchVisitData(visitPeriod, item.label === selectedDate ? null : item.label)}
+                      style={{ 
+                        borderBottom: '1px solid #f0f0f0', 
+                        cursor: 'pointer',
+                        backgroundColor: selectedDate === item.label ? '#e8f5e9' : 'transparent',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => { if (selectedDate !== item.label) e.currentTarget.style.backgroundColor = '#fafafa'; }}
+                      onMouseLeave={(e) => { if (selectedDate !== item.label) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                    >
+                      <td style={{ padding: '16px 10px', color: '#444' }}>
+                        {item.label} {selectedDate === item.label && <span style={{ color: '#00c73c', fontWeight: 'bold', marginLeft: '5px' }}>✓</span>}
+                      </td>
                       <td style={{ padding: '16px 10px', color: '#222', fontWeight: '700' }}>{item.count}</td>
                     </tr>
                   ))}
@@ -527,7 +542,12 @@ const AdminPage = () => {
               {/* Referrer & Keyword 테이블 */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '40px' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>🔗 유입 경로 (Referrer)</h3>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>
+                    🔗 유입 경로 (Referrer)
+                    <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: '#666', marginLeft: '10px' }}>
+                      {selectedDate ? `(${selectedDate} 기준)` : '(전체 기간)'}
+                    </span>
+                  </h3>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #ddd', backgroundColor: '#fafafa' }}>
@@ -549,7 +569,12 @@ const AdminPage = () => {
                   </table>
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>🔍 검색 키워드 (Keyword)</h3>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>
+                    🔍 검색 키워드 (Keyword)
+                    <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: '#666', marginLeft: '10px' }}>
+                      {selectedDate ? `(${selectedDate} 기준)` : '(전체 기간)'}
+                    </span>
+                  </h3>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #ddd', backgroundColor: '#fafafa' }}>

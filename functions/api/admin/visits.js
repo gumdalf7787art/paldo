@@ -78,7 +78,6 @@ export async function onRequestGet(context) {
 
     const { results } = await env.DB.prepare(query).all();
 
-    // 오늘 방문자 수 (KST 기준)
     const todayQuery = `
       SELECT COUNT(DISTINCT session_id) as count
       FROM site_visits
@@ -87,7 +86,40 @@ export async function onRequestGet(context) {
     const todayResult = await env.DB.prepare(todayQuery).first();
     const todayCount = todayResult ? todayResult.count : 0;
 
-    return new Response(JSON.stringify({ success: true, data: results, todayCount }), { 
+    let referrers = [];
+    let keywords = [];
+    try {
+      let condition = '';
+      if (period === 'daily') condition = "created_at >= date('now', '-14 days')";
+      else if (period === 'weekly') condition = "created_at >= date('now', '-90 days')";
+      else if (period === 'monthly') condition = "created_at >= date('now', '-365 days')";
+
+      const refQuery = `
+        SELECT referrer, COUNT(DISTINCT session_id) as count
+        FROM site_visits
+        WHERE ${condition} AND referrer IS NOT NULL AND referrer != ''
+        GROUP BY referrer
+        ORDER BY count DESC
+        LIMIT 20
+      `;
+      const { results: refResults } = await env.DB.prepare(refQuery).all();
+      referrers = refResults;
+
+      const kwQuery = `
+        SELECT keyword, COUNT(DISTINCT session_id) as count
+        FROM site_visits
+        WHERE ${condition} AND keyword IS NOT NULL AND keyword != ''
+        GROUP BY keyword
+        ORDER BY count DESC
+        LIMIT 20
+      `;
+      const { results: kwResults } = await env.DB.prepare(kwQuery).all();
+      keywords = kwResults;
+    } catch (e) {
+      // Columns might not exist yet
+    }
+
+    return new Response(JSON.stringify({ success: true, data: results, todayCount, referrers, keywords }), { 
       status: 200, 
       headers: { 
         'Content-Type': 'application/json',

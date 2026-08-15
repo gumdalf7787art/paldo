@@ -24,10 +24,18 @@ export async function onRequestPost(context) {
       )
     `).run();
 
-    const { session_id } = await request.json();
+    try {
+      await env.DB.prepare('ALTER TABLE site_visits ADD COLUMN referrer TEXT').run();
+    } catch(e) {}
+    try {
+      await env.DB.prepare('ALTER TABLE site_visits ADD COLUMN keyword TEXT').run();
+    } catch(e) {}
+
+    const { session_id, referrer, keyword } = await request.json();
     
     if (session_id) {
-      await env.DB.prepare('INSERT INTO site_visits (session_id) VALUES (?)').bind(session_id).run();
+      await env.DB.prepare('INSERT INTO site_visits (session_id, referrer, keyword) VALUES (?, ?, ?)')
+        .bind(session_id, referrer || '', keyword || '').run();
     }
     
     return new Response(JSON.stringify({ success: true }), { 

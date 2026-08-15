@@ -44,10 +44,14 @@ const AnalyticsTracker = () => {
         const loggedToday = sessionStorage.getItem(`visited_${today}`);
         
         if (!loggedToday) {
+          const referrer = document.referrer || '';
+          const urlParams = new URLSearchParams(window.location.search);
+          const keyword = urlParams.get('q') || urlParams.get('keyword') || urlParams.get('utm_term') || '';
+
           await fetch('/api/visits', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
+            body: JSON.stringify({ session_id: sessionId, referrer, keyword })
           });
           sessionStorage.setItem(`visited_${today}`, 'true');
         }

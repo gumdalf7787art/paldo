@@ -13,7 +13,7 @@ const AdminPage = () => {
   const [stats, setStats] = useState({ users: 0, applications: 0, dogs: 0, clicks: 0 });
   const [chartData, setChartData] = useState([]);
   const [eventData, setEventData] = useState([]);
-  const [visitStats, setVisitStats] = useState({ todayCount: 0, data: [] });
+  const [visitStats, setVisitStats] = useState({ todayCount: 0, data: [], referrers: [], keywords: [] });
   const [visitPeriod, setVisitPeriod] = useState('daily');
   const [applications, setApplications] = useState([]);
   const [users, setUsers] = useState([]);
@@ -64,7 +64,12 @@ const AdminPage = () => {
   async function fetchVisitData(period) {
     const { data } = await api.admin.getVisits(period);
     if (data && data.success) {
-      setVisitStats({ todayCount: data.todayCount, data: data.data });
+      setVisitStats({ 
+        todayCount: data.todayCount, 
+        data: data.data,
+        referrers: data.referrers || [],
+        keywords: data.keywords || []
+      });
       setVisitPeriod(period);
     }
   }
@@ -518,6 +523,54 @@ const AdminPage = () => {
                   )}
                 </tbody>
               </table>
+
+              {/* Referrer & Keyword 테이블 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '40px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>🔗 유입 경로 (Referrer)</h3>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #ddd', backgroundColor: '#fafafa' }}>
+                        <th style={{ padding: '12px', color: '#555' }}>도메인 / URL</th>
+                        <th style={{ padding: '12px', width: '80px', textAlign: 'center', color: '#555' }}>방문수</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(visitStats.referrers || []).map((ref, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                          <td style={{ padding: '12px', wordBreak: 'break-all', color: '#444' }}>{ref.referrer}</td>
+                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#222' }}>{ref.count}</td>
+                        </tr>
+                      ))}
+                      {(!visitStats.referrers || visitStats.referrers.length === 0) && (
+                        <tr><td colSpan="2" style={{ padding: '30px', textAlign: 'center', color: '#999' }}>데이터가 없습니다.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#333' }}>🔍 검색 키워드 (Keyword)</h3>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #ddd', backgroundColor: '#fafafa' }}>
+                        <th style={{ padding: '12px', color: '#555' }}>키워드 / 검색어</th>
+                        <th style={{ padding: '12px', width: '80px', textAlign: 'center', color: '#555' }}>방문수</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(visitStats.keywords || []).map((kw, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                          <td style={{ padding: '12px', wordBreak: 'break-all', color: '#444' }}>{kw.keyword}</td>
+                          <td style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#222' }}>{kw.count}</td>
+                        </tr>
+                      ))}
+                      {(!visitStats.keywords || visitStats.keywords.length === 0) && (
+                        <tr><td colSpan="2" style={{ padding: '30px', textAlign: 'center', color: '#999' }}>데이터가 없습니다.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         )}
